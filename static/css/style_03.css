@@ -1,0 +1,573 @@
+/* ====================================================
+   🌟 MODULE: SIDEBAR HISTORY BOX (NORMAL CSS)
+==================================================== */
+
+.sidebar-history-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 🚀 FIX: Theme Variables for Light/Dark Mode */
+    background-color: var(--os-dropdown-bg, #111827); 
+    padding: 16px;
+    color: var(--os-text-primary, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--os-border, rgba(255, 255, 255, 0.05));
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+/* 🚀 FIX: Double dot typo (..) fixed to single dot (.) */
+.history-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--os-text-secondary, #9ca3af);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.history-trash-btn {
+    background: transparent;
+    border: none;
+    color: var(--os-text-secondary, #6b7280);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.history-trash-btn:hover { 
+   color: #f87171; 
+}
+
+.history-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
+}
+
+/* 🌌 AMBIENT SYNC: Interactive History Wrapper */
+.history-item-wrapper {
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    background: transparent; 
+    border-radius: 12px; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding-right: 8px;
+    border: 1px solid transparent;
+}
+
+/* 🚀 FIX: Hover and Active states linked to Theme Variables */
+.history-item-wrapper:hover { 
+    background: var(--os-btn-hover, rgba(128, 128, 128, 0.1)); 
+    backdrop-filter: blur(5px); 
+    border: 1px solid var(--os-border, rgba(128, 128, 128, 0.2));
+}
+
+.history-item-wrapper.active { 
+    background: var(--os-btn-bg, rgba(128, 128, 128, 0.05)); 
+    border: 1px solid var(--os-border, rgba(128, 128, 128, 0.3)); 
+    box-shadow: 0 0 15px var(--os-glow, rgba(0, 0, 0, 0.1));
+}
+
+.history-btn {
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left; 
+    padding: 12px; 
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--os-text-primary, #e2e8f0); 
+    background: transparent; 
+    border: none; 
+    cursor: pointer;
+    transition: color 0.3s ease;
+    width: calc(100% - 80px);
+}
+
+.history-text {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+
+/* 🚀 FIX: Text color adapts to light/dark mode */
+.history-item-wrapper:hover .history-btn { color: var(--os-text-primary); }
+
+/* Icons Colors */
+.icon-text-chat { color: #60a5fa; font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.icon-voice-chat { color: #c084fc; font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.icon-normal { color: var(--os-text-secondary, #9ca3af); font-size: 18px; }
+
+/* ⚙️ Hover Reveal Actions */
+.history-actions { 
+    display: flex; 
+    gap: 12px; 
+    opacity: 0; 
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+    align-items: center; 
+    pointer-events: none; 
+}
+
+.history-item-wrapper:hover .history-actions,
+.history-item-wrapper.active .history-actions { 
+    opacity: 1; 
+    pointer-events: auto;
+}
+
+.history-action-btn { 
+    background: transparent; 
+    color: var(--os-text-secondary, #94a3b8);
+    border: none; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    font-size: 13px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.history-action-btn:hover { transform: scale(1.25); color: var(--os-text-primary); }
+.btn-pin:hover { color: #facc15; }
+.btn-rename:hover { color: #93c5fd; }
+.btn-delete:hover { color: #f87171; }
+
+.pin-active { 
+    color: #facc15; 
+    transform: rotate(45deg); 
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8)); 
+}
+
+/* ====================================================
+   🗑️ MODULE: TRASH MODAL (NORMAL CSS)
+==================================================== */
+
+.trash-modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(16px);
+    z-index: 100005; /* 🚀 UPGRADED: Chat Room (100000) se bada hona chahiye */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    transition: all 0.5s ease;
+}
+
+
+.trash-modal-overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.trash-modal-content {
+    /* 🚀 FIX: Connected to Theme Engine */
+    background-color: var(--os-dropdown-bg, #111827);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--os-border, rgba(239, 68, 68, 0.2));
+    border-radius: 40px;
+    width: 100%;
+    max-width: 450px;
+    padding: 32px;
+    box-shadow: var(--os-shadow, 0 30px 60px rgba(0, 0, 0, 0.9));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    box-sizing: border-box;
+}
+
+.trash-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--os-text-secondary, #9ca3af);
+    background: var(--os-btn-bg, rgba(128, 128, 128, 0.1));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--os-border, rgba(128, 128, 128, 0.2));
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.trash-close-btn:hover {
+    color: var(--os-text-primary, #ffffff);
+    background: var(--os-btn-hover, rgba(239, 68, 68, 0.2));
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.trash-close-btn i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.trash-close-btn:hover i { transform: rotate(90deg); }
+
+.trash-title {
+    font-size: 24px;
+    font-weight: 300;
+    color: #f87171;
+    margin: 0 0 12px 0;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+@keyframes trashPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+.trash-icon-pulse { animation: trashPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+.trash-desc {
+    font-size: 14px;
+    color: var(--os-text-secondary, #9ca3af);
+    text-align: center;
+    margin: 0 0 24px 0;
+    line-height: 1.6;
+}
+
+.trash-list-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 8px;
+}
+
+/* Trash Items inside Modal */
+.trash-item {
+    /* 🚀 FIX: Linked to Theme */
+    background: var(--os-btn-bg, rgba(128, 128, 128, 0.05)); 
+    border: 1px solid var(--os-border, rgba(128, 128, 128, 0.1));
+    padding: 14px; 
+    border-radius: 16px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.trash-item:hover {
+    transform: translateY(-2px);
+    background: var(--os-btn-hover, rgba(128, 128, 128, 0.1));
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.trash-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--os-text-primary, #d1d5db);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.trash-icon-voice { color: rgba(192, 132, 252, 0.6); font-size: 18px; }
+.trash-icon-text { color: rgba(96, 165, 250, 0.6); font-size: 18px; }
+.trash-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.trash-actions { display: flex; gap: 10px; }
+
+.trash-action-btn { 
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; 
+    transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer;
+}
+
+.btn-recover { 
+    background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); 
+}
+.btn-recover:hover { 
+    background: rgba(16, 185, 129, 0.9); color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-perm-delete { 
+    background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); 
+}
+.btn-perm-delete:hover { 
+    background: rgba(239, 68, 68, 0.9); color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* ====================================================
+   🚀 HISTORY LONG-PRESS CONTEXT MENU 
+==================================================== */
+.history-context-menu {
+    display: flex;
+    flex-direction: column;
+    background: var(--os-dropdown-bg, rgba(0, 0, 0, 0.8));
+    border-radius: 8px;
+    margin: 0px 10px 10px 10px;
+    padding: 6px;
+    gap: 4px;
+    border: 1px solid var(--os-border, rgba(128, 128, 128, 0.2));
+    /* 🚀 FIX: Z-Index ensures clicks are registered on mobile */
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.history-context-menu.hidden {
+    display: none ;
+}
+
+.ctx-btn {
+    background: transparent;
+    border: none;
+    padding: 12px 14px; /* 🚀 Click area thoda bada kiya gaya hai */
+    text-align: left;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    color: var(--os-text-primary);
+    position: relative;
+    z-index: 110;
+}
+
+.ctx-btn:hover, .ctx-btn:active {
+    background: var(--os-btn-hover, rgba(128, 128, 128, 0.15));
+}
+
+
+
+
+
+
+
+/* 🚀 FIX: Voice Chat और Text Chat दोनों की डिज़ाइन और कलर को एक समान करने के लिए */
+
+/* दोनों आइकन्स का साइज़ और अलाइनमेंट बिल्कुल बराबर कर दिया है */
+.icon-text-chat,
+.icon-voice-chat {
+    font-size: 18px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    width: 24px; /* दोनों आइकन्स बराबर जगह लेंगे */
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* आइकन्स के कलर्स (आप चाहें तो दोनों को एक ही कलर दे सकते हैं) */
+.icon-text-chat { 
+    color: #60a5fa; /* Text Chat के लिए Blue */
+}
+
+.icon-voice-chat { 
+    color: #c084fc; /* Voice Chat के लिए Purple */
+}
+
+/* टेक्स्ट और आइकॉन के बीच का गैप और कलर फिक्स */
+.history-btn {
+    color: var(--os-text-primary, #ffffff);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+/* ====================================================
+   🌟 HISTORY MENU CLEAN STYLES (No JS Inline Styles)
+==================================================== */
+
+.clean-wrapper {
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.history-btn-clean {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 14px 12px;
+    color: inherit;
+    position: relative;
+    z-index: 10;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.history-text-clean {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.pinned-text-active {
+    color: #facc15 !important;
+}
+
+/* Context Menu Base */
+.clean-menu {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--os-dropdown-bg, #111827);
+    padding: 8px;
+    border-radius: 8px;
+    position: relative;
+    z-index: 9999;
+    margin-top: 5px;
+    border: 1px solid var(--os-border, rgba(255,255,255,0.1));
+    pointer-events: auto;
+}
+
+.clean-ctx-btn {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.clean-ctx-btn i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Context Menu Colors */
+.pin-btn { color: var(--os-text-secondary, #d1d5db); }
+.rename-btn { color: #c084fc; }
+.copy-btn { color: #60a5fa; }
+.delete-btn { color: #f87171; }
+.help-btn { color: #4ade80; }
+
+/* ====================================================
+   🗑️ TRASH MODAL CLEAN STYLES
+==================================================== */
+
+.empty-trash-msg {
+    text-align: center;
+    color: gray;
+    margin-top: 20px;
+}
+
+.clean-trash-item {
+    background: var(--os-btn-bg, rgba(128,128,128,0.1));
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--os-border);
+}
+
+.clean-trash-header {
+    display: flex;
+    gap: 10px;
+    color: var(--os-text-primary);
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.clean-trash-text {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.clean-trash-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.clean-action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    border: 1px solid transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.recover-btn {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.perm-delete-btn {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+
+
+
+
+
+/* 🚀 NEW: Trash Box Scroll Fix */
+#trash-list-container {
+    max-height: 55vh; /* बॉक्स की ऊंचाई फिक्स कर दी है */
+    overflow-y: auto; /* ज्यादा आइटम होने पर अपने आप स्क्रॉल आ जाएगा */
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+
+/* स्क्रॉलबार की डिज़ाइन ताकि वह सुंदर दिखे */
+#trash-list-container::-webkit-scrollbar {
+    width: 5px;
+}
+#trash-list-container::-webkit-scrollbar-thumb {
+    background: var(--os-border, rgba(255, 255, 255, 0.2));
+    border-radius: 10px;
+}
+
+
+

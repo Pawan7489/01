@@ -1,0 +1,247 @@
+/* =========================================================
+   💬 FULLSCREEN TEXT CHAT ROOM - PART 1 (LAYOUT & BUBBLES)
+   (Gemini AI Style, Light/Dark Auto-Switch, Hidden Actions)
+========================================================= */
+
+/* 1. MASTER VISIBILITY & BACKGROUND */
+html body #fullscreen-chat-room {
+    position: fixed; inset: 0; width: 100vw; height: 100dvh;
+    background-color: var(--os-bg-main); color: var(--os-text-primary);
+    z-index: 100000; display: flex; flex-direction: column; overflow: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+html body #fullscreen-chat-room.glassmorphism-ultra {
+    background: linear-gradient(135deg, var(--os-header-bg), var(--os-bg-main));
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+}
+
+
+/* 2. HEADER (Line Removed) */
+html body #fullscreen-chat-room .text-chat-header {
+    flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; background: transparent;
+    border-bottom: none; /* 🚀 FIX: Header ki bekar line hata di gayi */
+}
+
+html body #fullscreen-chat-room .voice-action-btn {
+    width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: var(--os-btn-bg); color: var(--os-text-primary);
+    border: 1.5px solid var(--os-border-solid); cursor: pointer; transition: all 0.3s ease;
+}
+
+html body #fullscreen-chat-room .voice-action-btn:hover { background: var(--os-btn-hover); transform: scale(1.05); }
+
+/* 3. CHAT LOG AREA */
+html body #fullscreen-chat-room #chat-box {
+    flex: 1 1 auto; overflow-y: auto; padding: 20px 15px;
+    display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth;
+}
+
+#fullscreen-chat-room #chat-box::-webkit-scrollbar { width: 4px; }
+#fullscreen-chat-room #chat-box::-webkit-scrollbar-thumb { background: var(--os-border-solid); border-radius: 10px; opacity: 0.5; }
+
+/* 4. PREMIUM CHAT BUBBLES (Live Voice Chat Sync) */
+html body #fullscreen-chat-room .chat-message-row { display: flex; width: 100%; animation: popupFadeInUp 0.4s ease forwards; }
+html body #fullscreen-chat-room .chat-message-row.user { justify-content: flex-end; }
+html body #fullscreen-chat-room .chat-message-row.ai { justify-content: flex-start; flex-direction: column; }
+
+html body #fullscreen-chat-room .bubble-container { max-width: 88%; position: relative; display: flex; flex-direction: column; }
+html body #fullscreen-chat-room .chat-message-row.user .bubble-container { align-items: flex-end; }
+html body #fullscreen-chat-room .chat-message-row.ai .bubble-container { align-items: flex-start; }
+
+html body #fullscreen-chat-room .chat-bubble {
+    padding: 12px 18px; border-radius: 20px; font-size: 15px; line-height: 1.6; font-weight: 500;
+    word-wrap: break-word;
+}
+
+/* User Bubble (Transparent/Light with Border) */
+html body #fullscreen-chat-room .chat-bubble.user-bubble {
+    background-color: var(--os-btn-bg); /* 🚀 FIX: Bhari color hata kar light background kiya */
+    color: var(--os-text-primary);
+    border: 1.5px solid var(--os-border-solid); 
+    border-bottom-right-radius: 4px;
+}
+
+/* AI Bubble (Transparent with Border) */
+html body #fullscreen-chat-room .chat-bubble.ai-bubble {
+    background-color: transparent; /* 🚀 FIX: Pure Gemini transparent look */
+    color: var(--os-text-primary);
+    border: 1.5px solid var(--os-border-solid);
+    border-bottom-left-radius: 4px; 
+}
+
+/* 5. USER ACTION BUTTONS (Hidden by Default) */
+html body #fullscreen-chat-room .user-action-bar,
+html body #fullscreen-chat-room .chat-action-bar {
+    display: flex; gap: 8px; margin-top: 8px; padding-left: 5px; padding-right: 5px;
+}
+
+/* 🚀 FIX: User buttons gayab rahenge. PC par hover, mobile par JS se dikhenge */
+html body #fullscreen-chat-room .user-action-bar {
+    opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;
+}
+html body #fullscreen-chat-room .chat-message-row.user:hover .user-action-bar,
+html body #fullscreen-chat-room .chat-message-row.user:active .user-action-bar {
+    opacity: 1; visibility: visible; pointer-events: auto;
+}
+
+html body #fullscreen-chat-room .action-icon-btn {
+    background: var(--os-btn-bg); border: 1.5px solid var(--os-border-solid); color: var(--os-text-primary);
+    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+}
+html body #fullscreen-chat-room .action-icon-btn:hover { background: var(--os-btn-hover); transform: scale(1.1); }
+
+/* 6. AI HOLOGRAM STATUS (Color Fix - No Blue!) */
+html body #fullscreen-chat-room .hologram-status-bar { margin-bottom: 8px; }
+html body #fullscreen-chat-room .inline-mini-hologram { position: relative; display: flex; align-items: center; justify-content: center; }
+
+/* 🚀 FIX: JS ke blue color ko override karke solid Theme color lagaya */
+html body #fullscreen-chat-room .inline-mini-hologram .mini-ring { 
+    position: absolute; border-radius: 50%; border-style: dashed; border-width: 1.5px; 
+    border-color: var(--os-border-solid) !important; 
+    animation: spinHologramRing 4s linear infinite; 
+}
+html body #fullscreen-chat-room .inline-mini-hologram .mini-core { 
+    border-radius: 50%; background: var(--os-text-primary) !important; 
+    animation: pulseVoiceOrb 1.5s infinite alternate; 
+}
+/* Rukne ke baad solid dikhega, invisible nahi hoga */
+html body #fullscreen-chat-room .inline-mini-hologram.stopped .mini-core,
+html body #fullscreen-chat-room .inline-mini-hologram.stopped .mini-ring { 
+    animation: none; opacity: 0.8 !important; 
+}
+
+@keyframes popupFadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+
+
+/* =========================================================
+   💬 FULLSCREEN TEXT CHAT ROOM - PART 2 (GEMINI INPUT BOX)
+   (Small Box, Auto-Expand, Attachments Inside, Right Resize)
+========================================================= */
+/* =========================================================
+   💬 FULLSCREEN TEXT CHAT ROOM - PART 2 (GEMINI INPUT BOX)
+   (Top-Typing, Expanding, Scrollable, Auto-Theme Popups)
+========================================================= */
+
+/* 1. BOTTOM AREA WRAPPER */
+html body #fullscreen-chat-room .text-chat-bottom-area {
+    flex-shrink: 0; padding: 10px 15px 20px 15px; background: transparent; position: relative; z-index: 20;
+}
+
+/* 2. OUTER WRAPPER (Border, Glassmorphism, Rounded Box) */
+html body #fullscreen-chat-room .text-chat-input-wrapper {
+    display: flex; flex-direction: column; gap: 5px;
+    background: var(--os-dropdown-bg);
+    border: 1.5px solid var(--os-border-solid);
+    border-radius: 26px; padding: 15px;
+    box-shadow: var(--os-shadow); transition: all 0.3s ease;
+    backdrop-filter: blur(20px);
+}
+html body #fullscreen-chat-room .text-chat-input-wrapper:focus-within {
+    border-color: var(--os-text-primary);
+}
+
+/* 3. ATTACHMENT PREVIEW AREA */
+html body #fullscreen-chat-room .attachment-preview-area {
+    width: 100%; display: flex; gap: 10px; padding: 5px; overflow-x: auto;
+}
+
+/* 🚀 4. GEMINI GRID LAYOUT (The magic that keeps buttons at bottom) */
+html body #fullscreen-chat-room .input-controls-row {
+    display: grid;
+    /* 4 Columns: Plus, Link, Khali Jagah, Mic/Send */
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-rows: auto auto; /* 2 Rows: Text area upar, Buttons niche */
+    align-items: center;
+    width: 100%;
+}
+
+/* 🚀 5. THE MAGIC TEXTAREA (Top-Typing & Expanding) */
+html body #fullscreen-chat-room #chat-user-input {
+    grid-column: 1 / -1; /* Pure box ki chaurai lega */
+    grid-row: 1;         /* Sabse upar rahega */
+    width: 100%; 
+    min-height: 50px;    /* Bada Box */
+    background: transparent; border: none; outline: none;
+    color: var(--os-text-primary); font-size: 16px;
+    padding: 0 0 15px 0; /* Niche ke buttons se gap */
+    resize: none; line-height: 1.5;
+    
+    /* 10,000 Words Scroll Logic */
+    max-height: 250px; overflow-y: auto; word-wrap: break-word;
+}
+html body #fullscreen-chat-room #chat-user-input::placeholder { color: var(--os-text-secondary); font-size: 16px; }
+
+/* Textarea Custom Scrollbar */
+html body #fullscreen-chat-room #chat-user-input::-webkit-scrollbar { width: 4px; }
+html body #fullscreen-chat-room #chat-user-input::-webkit-scrollbar-thumb { background: var(--os-border-solid); border-radius: 4px; }
+
+/* 6. BUTTON ALIGNMENTS (Grid ki Niche Wali Row) */
+html body #fullscreen-chat-room .input-action-group:nth-child(1) { grid-column: 1; grid-row: 2; }
+html body #fullscreen-chat-room .input-action-group:nth-child(2) { grid-column: 2; grid-row: 2; margin-left: 8px; }
+html body #fullscreen-chat-room .input-submit-group {
+    grid-column: 4; grid-row: 2; display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* Circular Buttons Style (+, Link, Mic) */
+html body #fullscreen-chat-room .input-icon-btn, 
+html body #fullscreen-chat-room .input-send-btn, 
+html body #fullscreen-chat-room .input-stop-btn {
+    width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; 
+    background: var(--os-btn-bg); color: var(--os-text-primary);
+    border: 1.5px solid var(--os-border-solid); transition: all 0.3s ease;
+}
+html body #fullscreen-chat-room .input-icon-btn:hover { background: var(--os-btn-hover); transform: scale(1.08); }
+
+/* Send Button Special Style */
+html body #fullscreen-chat-room .input-send-btn { 
+    background: var(--os-active-btn-bg); color: var(--os-active-btn-text); border-color: var(--os-active-btn-text); 
+}
+html body #fullscreen-chat-room .hidden { display: none !important; }
+
+/* 🚀 7. POPUP MENUS FIX (Killing the Ugly Grey Color!) */
+html body #fullscreen-chat-room .text-chat-popup-menu {
+    position: absolute; bottom: calc(100% + 20px); left: 0; width: 240px;
+    background: var(--os-dropdown-bg) !important;
+    border: 1.5px solid var(--os-border-solid) !important;
+    border-radius: 16px; padding: 10px; box-shadow: var(--os-shadow); z-index: 100;
+    display: flex; flex-direction: column; gap: 4px; backdrop-filter: blur(25px);
+}
+
+html body #fullscreen-chat-room .popup-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; 
+    color: var(--os-text-secondary); margin-bottom: 5px; padding-left: 10px;
+}
+
+/* Popup Items (Transparent + Auto Theme) */
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn {
+    width: 100%; text-align: left; 
+    background: transparent !important; /* Grey color hatane ke liye */
+    color: var(--os-text-primary) !important;
+    border: 1.5px solid transparent !important; 
+    padding: 12px 15px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 12px;
+    transition: all 0.2s ease;
+}
+
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn i {
+    width: 20px; text-align: center; color: var(--os-text-secondary); transition: all 0.2s ease;
+}
+
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn:hover {
+    background: var(--os-btn-hover) !important;
+    border: 1.5px solid var(--os-border-solid) !important;
+    transform: translateX(4px);
+}
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn:hover i {
+    color: var(--os-text-primary);
+}
+
+html body #fullscreen-chat-room .menu-divider {
+    height: 1.5px; background: var(--os-border-solid); opacity: 0.2; margin: 4px 0;
+}
+
+

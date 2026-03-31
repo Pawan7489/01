@@ -1,0 +1,389 @@
+/* =========================================================
+   🔐 AUTHENTICATION SCREENS (LOGIN / SIGNUP / 2FA)
+   100% Light, Dark & System Mode Compatible
+========================================================= */
+
+/* Main Container (Auto-adapts to White/Black) */
+.auth-container-glass {
+    width: 100%;
+    max-width: 420px;
+    margin: 40px auto;
+    background: var(--os-bg-main, #ffffff); /* Theme Background */
+    border: 1px solid var(--os-border, rgba(0, 0, 0, 0.1));
+    border-radius: 32px; 
+    padding: 40px 30px;
+    box-shadow: var(--os-shadow, 0 15px 35px rgba(0,0,0,0.1));
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+    transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Titles & Subtitles */
+.auth-title {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--os-text-primary, #000000); /* Auto Black/White */
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    text-align: center;
+    color: var(--os-text-secondary, #666666);
+    margin: 0 0 30px 0;
+}
+
+/* Tab/Radio Selection */
+.auth-tab-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.auth-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--os-text-secondary);
+    transition: 0.3s;
+}
+
+.auth-radio-custom {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--os-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.auth-radio-custom::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #3b82f6; /* Safe Blue for both modes */
+    transform: scale(0);
+    transition: 0.3s;
+}
+
+/* Radio Checked State Logic */
+input[type="radio"]:checked + .auth-radio-custom {
+    border-color: #3b82f6;
+}
+input[type="radio"]:checked + .auth-radio-custom::after {
+    transform: scale(1);
+}
+input[type="radio"]:checked ~ .auth-radio-text {
+    color: var(--os-text-primary);
+}
+
+/* Inputs (Pill Shaped from Image) */
+.auth-input-group {
+    position: relative;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.auth-input {
+    width: 100%;
+    background: var(--os-btn-bg, #f3f4f6); /* Auto Light/Dark background */
+    border: 1px solid var(--os-border, rgba(0,0,0,0.1));
+    color: var(--os-text-primary, #000000);
+    padding: 15px 20px;
+    border-radius: 16px; 
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.auth-input:focus {
+    background: var(--os-bg-main);
+    border-color: #3b82f6; 
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+.auth-input::placeholder {
+    color: var(--os-text-secondary);
+}
+
+.auth-eye-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--os-text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+.auth-eye-btn:hover { color: #3b82f6; }
+
+/* Options Row (Remember Me & Forgot Pass) */
+.auth-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 13px;
+    padding: 0 5px;
+}
+
+.auth-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--os-text-secondary);
+    cursor: pointer;
+}
+
+.auth-checkbox-label input {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.auth-link {
+    color: #3b82f6; /* Text link compatible with both modes */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0;
+    transition: 0.3s;
+}
+.auth-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* Primary Button (Gradient Pill - Matching your Image exactly) */
+.auth-btn-primary {
+    width: 100%;
+    background: linear-gradient(to right, #34d399, #3b82f6); /* Green to Blue Gradient */
+    color: #ffffff !important; 
+    border: none;
+    padding: 15px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); /* Soft Glow */
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+}
+.auth-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+}
+.auth-btn-primary:active { transform: translateY(0); }
+
+/* Divider */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--os-text-secondary);
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+.auth-divider::before, .auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--os-border);
+}
+.auth-divider span { padding: 0 10px; }
+
+/* Social Button (Google) */
+.auth-btn-social {
+    width: 100%;
+    background: transparent; /* No fill, works best everywhere */
+    color: var(--os-text-primary);
+    border: 1px solid var(--os-border);
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+    margin-bottom: 25px;
+}
+.auth-btn-social:hover { 
+    background: var(--os-btn-bg); 
+    border-color: var(--os-text-secondary);
+}
+.auth-btn-social i { color: #ea4335; font-size: 18px; }
+
+/* Footer Text */
+.auth-footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--os-text-secondary);
+}
+
+/* OTP Boxes Custom Fix */
+.auth-otp-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+.auth-otp-input {
+    width: 45px;
+    height: 50px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    background: var(--os-btn-bg);
+    border: 1px solid var(--os-border);
+    border-radius: 12px;
+    color: var(--os-text-primary);
+    outline: none;
+    transition: 0.3s;
+}
+.auth-otp-input:focus { 
+    border-color: #3b82f6; 
+    background: var(--os-bg-main); 
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+/* Utility (Back Button) */
+.auth-back-btn {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    background: transparent;
+    border: none;
+    color: var(--os-text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.auth-back-btn:hover { 
+    color: var(--os-text-primary); 
+    transform: translateX(-3px); 
+   }
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 FIX: HIDDEN ELEMENTS SPACING BUG (OVERLAP & GAP FIX)
+========================================================= */
+
+
+
+/* Divider ('or continue with') के ऊपर और नीचे परफेक्ट स्पेसिंग के लिए */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--os-text-secondary);
+    font-size: 13px;
+    margin-top: 25px; /* ऊपर से गैप */
+    margin-bottom: 20px; /* नीचे से गैप */
+}
+
+.auth-divider::before, .auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--os-border, rgba(255,255,255,0.1));
+}
+
+.auth-divider span { 
+    padding: 0 12px; 
+}
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 CUSTOM DATE OF BIRTH SELECTORS (Theme Compatible)
+========================================================= */
+.custom-dob-wrapper {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.custom-dob-select {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    background: var(--os-btn-bg, rgba(255,255,255,0.05));
+    border: 1px solid var(--os-border, rgba(255,255,255,0.1));
+    color: var(--os-text-primary);
+    border-radius: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    /* ब्राउज़र का डिफ़ॉल्ट तीर (Arrow) हटाकर अपना तीर लगाना */
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%2360a5fa' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 90%;
+    background-position-y: center;
+    transition: all 0.3s ease;
+}
+
+.custom-dob-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+/* ड्रॉपडाउन खुलने पर डार्क/लाइट मोड के अनुसार कलर */
+.custom-dob-select option {
+    background: var(--os-bg-main, #111827);
+    color: var(--os-text-primary, #ffffff);
+}
+
+
+
+
+
+
+
+
+
+/* 🚀 FIX 2: Strict Hide for Form Switching */
+.auth-input-group.hidden, 
+.auth-otp-row.hidden, 
+.auth-options-row.hidden,
+#login-password-input.hidden,
+#signup-otp-section.hidden {
+    display: none !important;
+}
+
+
+
+
