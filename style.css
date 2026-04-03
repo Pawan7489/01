@@ -1,0 +1,3955 @@
+/*  === 1. FUTURISTIC MONOCHROME VARIABLES === */
+:root {
+    /* DARK MODE DEFAULT */
+    --bg-main: #010101;
+    --header-bg: rgb(0, 0, 0); 
+    --dropdown-bg: rgb(0, 0, 0);
+    
+    --btn-bg: rgba(255, 255, 255, 0.08); 
+    --btn-hover: rgba(255, 255, 255, 0.15);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa; 
+    
+    --border: rgba(255, 255, 255, 0.15); 
+    --border-glow: rgba(255, 255, 255, 0.4); 
+    --shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
+    --glow: 0 0 25px rgba(255, 255, 255, 0.2);
+    
+    --active-btn-bg: #ffffff;
+    --active-btn-text: #000000;
+    
+    --theme-grid-bg: rgba(0, 0, 0, 0.5);
+
+    --hologram-core-1: #ffffff;
+    --hologram-core-2: #9ea09e;
+
+    /* 🚀 FIXED: PURE WHITE BORDER FOR DARK MODE */
+    --border-solid: #ffffff; 
+}
+
+body.light-mode {
+    /* LIGHT MODE OVERRIDE */
+    --bg-main: #fcfcfc;
+    --header-bg: rgba(252, 252, 252, 0.85); 
+    --dropdown-bg: rgba(255, 255, 255, 0.95);
+    
+    --btn-bg: rgba(0, 0, 0, 0.05);
+    --btn-hover: rgba(0, 0, 0, 0.1);
+    
+    --text-primary: #000000;
+    --text-secondary: #555555; 
+    
+    --border: rgba(0, 0, 0, 0.15);
+    --border-glow: rgba(0, 0, 0, 0.4);
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --glow: 0 0 25px rgba(0, 0, 0, 0.15);
+    
+    --active-btn-bg: #000000;
+    --active-btn-text: #ffffff;
+
+    --theme-grid-bg: rgba(240, 240, 240, 0.8);
+    
+    --hologram-core-1: #000000;
+    --hologram-core-2: #817e7e;
+
+    /* 🚀 FIXED: PURE BLACK BORDER FOR LIGHT MODE */
+    --border-solid: #000000; 
+}
+
+/* === 2. GLOBAL SETUP (🚀 NO SCROLL, LOCKED SCREEN) === */
+/* 🚀 FIX 4: Viewport Shift Fix */
+html, body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.4s ease, color 0.4s ease; 
+    margin: 0;
+    padding: 0;
+    width: 100%; /* 🚀 100vw ki jagah 100% karein */
+    height: 100vh;
+    height: 100dvh; 
+    overflow: hidden; 
+    overscroll-behavior: none; 
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* 🚀 FIX 1: Invisible Wall Fix (Space Collapser) */
+.hidden {
+    opacity: 0 ;
+    visibility: hidden ;
+    transform: scale(0.95) translateY(-10px) ;
+    pointer-events: none ;
+    position: absolute ; /* 🚀 Yeh code element ko layout se bahar nikal dega */
+    z-index: -9999 ;
+}
+
+
+/* ==========================================
+   3. HEADER MODULE (Ultra Glassmorphism)
+   ========================================== */
+.header-main {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 30px;
+    background: linear-gradient(to bottom, var(--header-bg) 60%, transparent 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transition: background 0.4s ease;
+}
+
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* 3D Glass Buttons */
+.menu-btn {
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    
+    /* 🚀 FIXED: Message Bubbles की तरह वाइट/ब्लैक बॉर्डर */
+    border: 1.5px solid var(--border-solid); 
+    
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    background: var(--btn-hover);
+    box-shadow: var(--glow);
+}
+
+.menu-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Profile Avatar */
+.profile-container { position: relative; }
+
+.avatar-3d-wrapper {
+    width: 48px; 
+    height: 48px; 
+    border-radius: 50%;
+    background: var(--btn-bg);
+    
+    /* 🚀 FIXED: Message Bubbles की तरह वाइट/ब्लैक बॉर्डर */
+    border: 1.5px solid var(--border-solid); 
+    
+    cursor: pointer; 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-3d-wrapper:hover {
+    box-shadow: 0 0 0 4px var(--btn-hover), var(--glow);
+    transform: scale(1.08);
+}
+
+.avatar-img { 
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    z-index: 2; position: absolute; 
+}
+
+.profile-icon-placeholder { font-size: 20px; color: var(--text-primary); z-index: 1; }
+
+/* Dropdown Menu */
+#profile-dropdown {
+    position: absolute; 
+    top: 70px; 
+    right: 0;
+    width: 280px; 
+    z-index: 10000;
+    background-color: var(--dropdown-bg);
+    
+    /* 🚀 FIXED: Message Bubbles की तरह वाइट/ब्लैक बॉर्डर */
+    border: 1.5px solid var(--border-solid); 
+    
+    border-radius: 20px; 
+    padding: 16px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    transform-origin: top right;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Dropdown Links */
+.dropdown-link {
+    width: 100%; padding: 12px 16px; border: none; background: transparent;
+    color: var(--text-primary); text-align: left; font-size: 14px; font-weight: 600;
+    cursor: pointer; border-radius: 12px; display: flex; align-items: center; gap: 14px;
+    transition: all 0.2s ease; margin-bottom: 4px;
+}
+
+.dropdown-link i { color: var(--text-secondary); font-size: 16px; width: 20px; text-align: center; transition: color 0.2s ease; }
+.dropdown-link:hover { background-color: var(--btn-hover); transform: translateX(5px); }
+.dropdown-link:hover i { color: var(--text-primary); transform: scale(1.1); }
+
+/* Theme Control Panel */
+.theme-panel { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 16px 0; margin: 12px 0; }
+.panel-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; display: block; padding: 0 4px; }
+.theme-switch-grid { display: flex; gap: 6px; background-color: var(--theme-grid-bg); padding: 6px; border-radius: 14px; border: 1px solid var(--border); }
+.mode-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-radius: 10px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mode-btn i { font-size: 16px; color: var(--text-secondary); transition: all 0.3s ease; }
+.mode-btn:hover { background-color: var(--btn-hover); color: var(--text-primary); }
+.mode-btn:hover i { color: var(--text-primary); }
+
+.theme-active-btn { 
+    background-color: var(--active-btn-bg); 
+    color: var(--active-btn-text); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
+.theme-active-btn i { color: var(--active-btn-text); }
+             
+
+
+
+
+
+/* =========================================================
+   🚀 PREMIUM FIX: PROFILE DROPDOWN MENU & THEME BUTTONS
+   (Light/Dark Mode Solid Border Sync & Icon Visibility Fix)
+========================================================= */
+
+/* 1. Theme Switcher Grid (थीम वाले बड़े डब्बे पर 1.5px बॉर्डर) */
+#profile-dropdown .theme-switch-grid {
+    border: 1.5px solid var(--border-solid) ;
+    background-color: var(--bg-main) ;
+    padding: 6px;
+    border-radius: 16px;
+}
+
+/* 2. Active Theme Button (जो सेलेक्टेड है उस पर सॉलिड बॉर्डर) */
+#profile-dropdown .theme-switch-grid .theme-active-btn {
+    border: 1.5px solid var(--border-solid) ;
+    /* 🚀 FIX: बैकग्राउंड को हल्का (Hover) किया ताकि बॉर्डर और आइकॉन साफ़ दिखें */
+    background-color: var(--btn-hover) ; 
+    color: var(--text-primary) ; /* डार्क में वाइट, लाइट में ब्लैक */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) ;
+}
+
+/* 🚀 FIX: आइकॉन गायब होने की प्रॉब्लम का पक्का इलाज */
+#profile-dropdown .theme-switch-grid .theme-active-btn i {
+    color: var(--text-primary) ;
+}
+
+/* 3. Panel Dividers (ऊपर-नीचे की लाइनें) */
+#profile-dropdown .theme-panel {
+    border-top: 1.5px solid var(--border-solid) ;
+    border-bottom: 1.5px solid var(--border-solid) ;
+}
+
+/* 4. Dropdown Links (Account Details, Settings - Premium Text & Hover Border) */
+#profile-dropdown .dropdown-link {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1.5px solid transparent; /* डिफ़ॉल्ट रूप से छुपी रहेगी */
+    transition: all 0.3s ease;
+}
+
+#profile-dropdown .dropdown-link:hover {
+    border: 1.5px solid var(--border-solid); /* माउस ले जाने पर वाइट/ब्लैक लाइन दिखेगी */
+    background-color: var(--btn-hover);
+    transform: translateX(5px);
+}
+
+/* 5. Logout Button (प्रीमियम रेड बॉर्डर के साथ) */
+#profile-dropdown .custom-logout-btn {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1.5px solid transparent;
+    transition: all 0.3s ease;
+}
+
+#profile-dropdown .custom-logout-btn:hover {
+    border: 1.5px solid #ef4444; /* लॉगआउट पर लाल बॉर्डर */
+    background: rgba(239, 68, 68, 0.1);
+    transform: translateX(5px);
+}
+
+
+
+
+
+
+/* ==========================================
+   4. SIDEBAR MODULE (🚀 Hatayi gayi suvidhayein wapas)
+   ========================================== */
+
+
+/* ==========================================
+   4. SIDEBAR MODULE (🚀 FIXED: Mobile/Tablet Cut-off & High Specificity Borders)
+   ========================================== */
+.sidebar-main-menu,
+#sidebar-menu { 
+    position: fixed;
+    top: 0;
+    left: -320px; /* JS isse 0px karega */
+    z-index: 100000;
+    width: 300px;
+    max-width: 80vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh; 
+    background-color: var(--dropdown-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    
+    /* 🚀 1.5px Solid Border (Light/Dark Sync) */
+    border-right: 1.5px solid var(--border-solid);
+    
+    transition: left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden; 
+}
+
+#sidebar-menu.open,
+#sidebar-menu.active {
+    left: 0;
+}
+
+/* 1. Header Area (दोनों क्लास नाम जोड़ दिए हैं ताकि मिसमैच न हो) */
+#sidebar-menu .sidebar-header-section,
+#sidebar-menu .sidebar-header {
+    flex-shrink: 0; 
+    padding: 24px 20px;
+    /* 🚀 1.5px Solid Border */
+    border-bottom: 1.5px solid var(--border-solid);
+}
+
+#sidebar-menu .search-box {
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    background: var(--btn-bg); 
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    
+    padding: 0 18px; 
+    height: 48px;
+    border-radius: 24px; 
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu .search-box:focus-within { 
+    border-color: var(--text-primary); 
+    box-shadow: var(--glow); 
+}
+
+#sidebar-menu .search-box i { color: var(--text-secondary); font-size: 14px; }
+
+#sidebar-menu .search-box input {
+    background: transparent; 
+    border: none; 
+    outline: none;
+    color: var(--text-primary); 
+    width: 100%; 
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* 2. New Chat Area */
+#sidebar-menu .sidebar-action-area,
+#sidebar-menu .sidebar-new-chat {
+    flex-shrink: 0; 
+    padding: 20px 20px 10px 20px;
+}
+
+#sidebar-menu .primary-btn.full-width { 
+    width: 100%;
+    height: 52px;
+    background-color: var(--text-primary); 
+    color: var(--bg-main); 
+    border-radius: 26px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu .primary-btn.full-width:hover { 
+    transform: translateY(-3px) scale(1.02); 
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 3. History Section */
+#sidebar-menu .sidebar-history-box,
+#sidebar-menu .sidebar-history {
+    flex: 1 1 auto; 
+    min-height: 0; 
+    padding: 10px 15px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px;
+}
+
+#sidebar-menu .sidebar-history h5,
+#sidebar-menu .sidebar-history-box h5 {
+    color: var(--text-secondary); 
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    margin: 15px 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+#sidebar-menu .history-item {
+    background: transparent; 
+    
+    /* 🚀 पारदर्शी बॉर्डर ताकि हिले नहीं */
+    border: 1.5px solid transparent; 
+    
+    text-align: left;
+    color: var(--text-primary); 
+    padding: 14px 16px;
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    flex-shrink: 0; 
+}
+
+#sidebar-menu .history-item:hover { 
+    background: var(--btn-bg); 
+    
+    /* 🚀 1.5px Solid Border on Hover */
+    border: 1.5px solid var(--border-solid); 
+    
+    transform: translateX(4px); 
+}
+
+/* 4. Sidebar Footer */
+#sidebar-menu .sidebar-footer-group,
+#sidebar-menu .sidebar-footer { 
+    flex-shrink: 0; 
+    padding: 20px; 
+    padding-bottom: 25px; 
+    
+    /* 🚀 1.5px Solid Border */
+    border-top: 1.5px solid var(--border-solid); 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#sidebar-menu .menu-list-btn {
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    color: var(--text-primary);
+    
+    /* 🚀 पारदर्शी बॉर्डर ताकि हिले नहीं */
+    border: 1.5px solid transparent; 
+    
+    border-radius: 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+#sidebar-menu .menu-list-btn:last-child {
+    margin-bottom: 0;
+}
+
+#sidebar-menu .menu-list-btn i {
+    color: var(--text-secondary);
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+#sidebar-menu .menu-list-btn:hover {
+    background-color: var(--btn-bg);
+    
+    /* 🚀 1.5px Solid Border on Hover */
+    border: 1.5px solid var(--border-solid); 
+    
+    transform: translateX(4px);
+}
+
+#sidebar-menu .menu-list-btn:hover i {
+    color: var(--text-primary);
+}
+
+    
+
+
+
+
+
+/* ==========================================
+   7. PERFECTLY CONNECTED SIDEBAR MENU (SEAMLESS DESIGN - FIXED)
+   ========================================== */
+
+/* 1. Main Sidebar Container (होम स्क्रीन से जुड़ा हुआ) */
+#sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -320px; /* JS इसे 0px करेगा */
+    width: 300px; /* चौड़ाई एकदम स्लीक */
+    max-width: 80vw; /* मोबाइल पर पूरी स्क्रीन नहीं घेरेगा */
+    height: 100vh;
+    height: 100dvh; /* मोबाइल के एड्रेस बार फिक्स के लिए */
+    
+    background-color: var(--dropdown-bg);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    z-index: 100005;
+    
+    /* 🚀 1.5px Solid Border: स्क्रीन से जोड़कर रखेगी */
+    border-right: 1.5px solid var(--border-solid);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3); /* सॉफ्ट शैडो ताकि ओवरलैप न लगे */
+    
+    /* लेआउट: ओवरलैप से बचने के लिए */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    box-sizing: border-box;
+    overflow: hidden; /* अंदर का कंटेंट बाहर नहीं निकलेगा */
+    
+    transition: left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-family: 'Inter', sans-serif;
+}
+
+#sidebar-menu.active, #sidebar-menu.open {
+    left: 0;
+}
+
+/* 2. Header Area (Search Box & Back Arrow) */
+#sidebar-menu .sidebar-header {
+    flex-shrink: 0; /* 🚀 ओवरलैप फिक्स: हेडर कभी दबेगा नहीं */
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    gap: 12px; 
+    padding: 24px 20px;
+    background: transparent;
+    
+    /* 🚀 1.5px Solid Border */
+    border-bottom: 1.5px solid var(--border-solid);
+}
+
+/* Search Box */
+#sidebar-menu .search-box {
+    flex: 1; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+    background: var(--btn-bg); 
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    
+    padding: 0 16px; 
+    height: 48px; 
+    border-radius: 16px; 
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu .search-box:focus-within { 
+    background: var(--bg-main);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#sidebar-menu .search-box i { color: var(--text-secondary); font-size: 14px; }
+
+#sidebar-menu .search-box input {
+    background: transparent; 
+    border: none; 
+    outline: none;
+    color: var(--text-primary); 
+    width: 100%; 
+    font-size: 14px;
+}
+
+/* Back Arrow Button */
+#sidebar-menu .icon-btn { 
+    width: 48px; 
+    height: 48px; 
+    min-width: 48px;
+    border-radius: 16px;
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu .icon-btn:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+    transform: translateX(-4px); 
+}
+
+/* 3. New Chat Button Area */
+#sidebar-menu .sidebar-new-chat {
+    flex-shrink: 0; /* 🚀 ओवरलैप फिक्स */
+    padding: 20px 20px 10px 20px;
+}
+
+#sidebar-menu .primary-btn.full-width {
+    width: 100%; 
+    height: 52px;
+    background-color: var(--text-primary); 
+    color: var(--bg-main);
+    border-radius: 16px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu .primary-btn.full-width:hover {
+    transform: translateY(-3px); 
+    opacity: 0.9;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* 4. Neural History Zone (जगह को अच्छे से भरने के लिए) */
+#sidebar-menu .sidebar-history {
+    flex: 1; /* बची हुई पूरी जगह भरेगा */
+    min-height: 0; /* 🚀 OVERLAP MASTER FIX: यह कंटेंट को फुटर के ऊपर नहीं जाने देगा */
+    margin: 10px 20px; 
+    padding: 15px; 
+    overflow-y: auto;
+    background-color: rgba(128, 128, 128, 0.04); 
+    
+    /* 🚀 1.5px Solid Border */
+    border: 1.5px solid var(--border-solid);
+    border-radius: 20px;
+    
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px;
+}
+
+#sidebar-menu .sidebar-history h5 {+0
+    color: var(--text-secondary); 
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    margin: 0 0 10px 0;
+    
+    /* 🚀 1.5px Solid Border */
+    border-bottom: 1.5px solid var(--border-solid); 
+    padding-bottom: 10px;
+    flex-shrink: 0;
+}
+
+#sidebar-menu .history-item {
+    background: transparent; 
+    
+    /* 🚀 1.5px Transparent Border (होवर करने पर डिज़ाइन हिलेगा नहीं) */
+    border: 1.5px solid transparent; 
+    
+    text-align: left;
+    color: var(--text-primary); 
+    padding: 14px 15px;
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+#sidebar-menu .history-item:hover { 
+    background-color: var(--btn-hover); 
+    
+    /* 🚀 1.5px Solid Border on Hover */
+    border: 1.5px solid var(--border-solid); 
+    
+    transform: translateX(4px); 
+}
+
+/* 5. Sidebar Footer (Bottom fixed area) */
+#sidebar-menu .sidebar-footer { 
+    flex-shrink: 0; /* 🚀 ओवरलैप फिक्स: फुटर कभी स्क्रीन से बाहर नहीं जाएगा */
+    padding: 15px 20px 25px 20px; 
+    background: transparent;
+    
+    /* 🚀 1.5px Solid Border */
+    border-top: 1.5px solid var(--border-solid); 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 6px; 
+}
+
+#sidebar-menu .menu-list-btn {
+    width: 100%;
+    padding: 14px 15px;
+    background: transparent;
+    color: var(--text-primary);
+    
+    /* 🚀 1.5px Transparent Border (होवर के लिए) */
+    border: 1.5px solid transparent; 
+    
+    border-radius: 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+#sidebar-menu .menu-list-btn i {
+    color: var(--text-secondary);
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+#sidebar-menu .menu-list-btn:hover {
+    background-color: var(--btn-hover);
+    
+    /* 🚀 1.5px Solid Border on Hover */
+    border: 1.5px solid var(--border-solid);
+    
+    transform: translateX(4px);
+}
+
+#sidebar-menu .menu-list-btn:hover i {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+/* Custom Scrollbar for Sidebar */
+#sidebar-menu .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+#sidebar-menu .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+#sidebar-menu .custom-scrollbar::-webkit-scrollbar-thumb { 
+    background: var(--border-solid); /* स्क्रॉलबार भी वाइट/ब्लैक होगा */
+    border-radius: 10px; 
+    opacity: 0.5;
+}
+
+
+
+
+
+
+
+
+/* ==========================================
+/* ==========================================
+   5. HOME DASHBOARD MODULE (FIXED & ENHANCED)
+   (Solid Theme Sync for Hologram & Borders)
+   ========================================== */
+
+/* ==========================================
+   5. HOME DASHBOARD MODULE (FIXED)
+   ========================================== */
+.dashboard-main-area {
+    position: relative; 
+    z-index: 1; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start; 
+    width: 100%; 
+    height: 100%; 
+    max-width: 1200px; 
+    margin: 0 auto;
+    
+    /* 🌟 FIX: Header ke theek niche laane ke liye 130px se ghata kar 85px kar diya */
+    padding-top: 70 px; 
+    box-sizing: border-box;
+    overflow: hidden; 
+}
+
+/* Hologram (Recreated accurate design) */
+.hologram-wrapper {
+    position: relative; 
+    /* 🚀 OVERLAP FIX: साइज़ 170px से बढ़ाकर 200px किया ताकि 190px वाली रिंग कभी ना कटे */
+    width: 200px; 
+    height: 200px; 
+    margin-top: 15px; /* ऊपर से हल्का सा सुरक्षित गैप */
+    margin-bottom: 20px; 
+    z-index: 10;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer;
+}
+
+.hologram-glow {
+    position: absolute; inset: 0; background: rgba(150, 150, 150, 0.1); border-radius: 50%; filter: blur(40px); animation: liquid-breathe 8s infinite ease-in-out;
+}
+.star-orbit-hologram { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.core-glow-orb {
+    width: 55px; height: 55px; border-radius: 50%; z-index: 10;
+    background: linear-gradient(135deg, var(--hologram-core-1), var(--hologram-core-2));
+    box-shadow: 0 0 30px rgba(150, 150, 150, 0.3);
+    animation: pulseCoreOrb 3s infinite alternate ease-in-out;
+}
+
+/* 🚀 SOLID RINGS FIX: लाइन्स को सॉलिड (Solid) और क्लियर किया गया है */
+.star-trail { 
+    position: absolute; border-radius: 50%; 
+    animation: spinHologramRing linear infinite; 
+}
+.trail-1 { 
+    width: 90px; height: 90px; border-style: solid; border-width: 2px; 
+    border-color: transparent var(--text-primary) transparent transparent; 
+    animation-duration: 4s; 
+}
+.trail-2 { 
+    width: 130px; height: 130px; border-style: solid; border-width: 2px; 
+    border-color: transparent transparent var(--text-primary) transparent; 
+    animation-duration: 7s; animation-direction: reverse; 
+}
+.trail-3 { 
+    width: 160px; height: 160px; 
+    border: 1.5px dashed var(--text-primary); opacity: 0.6; 
+    animation-duration: 10s; 
+}
+.trail-4 { 
+    width: 190px; height: 190px; 
+    border: 1.5px solid var(--text-primary); opacity: 0.2; 
+    animation-duration: 15s; animation-direction: reverse; 
+}
+
+/* Welcome Text */
+.welcome-heading { 
+    font-size: 32px; 
+    font-weight: 300; 
+    margin-top: 0; 
+    margin-bottom: 20px; 
+    text-align: center; 
+    color: var(--text-primary); 
+    transition: color 0.4s ease; 
+}
+
+/* 🚀 TEXT COLOR RESTORED: आपका पुराना ग्रे-ब्लू कलर वापस सेट कर दिया है */
+.user-name-text {
+    font-weight: 700; color: transparent; background: linear-gradient(to right, #64748b, #94a3b8);
+    -webkit-background-clip: text; 
+    animation: pulseText 2s infinite alternate;
+}
+
+/* ==========================================
+   🌟 RESPONSIVE FIX (Tablet aur PC ke liye)
+   ========================================== */
+@media screen and (min-width: 768px) {
+    /* Tablet Par Thoda Bada Hologram Aur Perfect Gap */
+    .dashboard-main-area { padding-top: 100px; }
+    /* 🚀 डब्बे का साइज़ बढ़ा दिया है ताकि Tablet पर भी रिंग्स ना कटें */
+    .hologram-wrapper { width: 250px; height: 250px; margin-top: 10px; } 
+    .welcome-heading { font-size: 46px; }
+}
+
+@media screen and (min-width: 1200px) {
+    /* PC Par Bada Hologram Aur Sahi Spacing */
+    .dashboard-main-area { padding-top: 110px; }
+    /* 🚀 डब्बे का साइज़ बढ़ा दिया है ताकि PC पर भी रिंग्स ना कटें */
+    .hologram-wrapper { width: 310px; height: 310px; margin-top: 15px; }
+    .welcome-heading { font-size: 56px; }
+}
+
+
+
+
+
+
+/* ==========================================
+   6. BOTTOM ACTION BUTTONS (🚀 MOBILE FRIENDLY & UP)
+   ========================================== */
+/* ==========================================
+   6. BOTTOM ACTION BUTTONS (🚀 MASTER FIX: Auto-Invert Border)
+   ========================================== */
+.floating-action-group { 
+    position: fixed; 
+    bottom: 85px; /* 🌟 मोबाइल नेविगेशन बार से काफी ऊपर */
+    right: 30px; 
+    z-index: 60; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 16px; 
+    align-items: flex-end; 
+}
+
+.floating-btn {
+    min-width: 170px; 
+    height: 55px; 
+    border-radius: 30px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px;
+    font-weight: 700; 
+    font-size: 13px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    cursor: pointer; 
+    
+    /* 🚀 MASTER FIX: यहाँ से कॉमन बॉर्डर हटा दी गई है ताकि दोनों बटन्स पर अलग-अलग रंग सेट हो सके */
+    
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 🎧 LIVE CHAT BUTTON */
+.live-chat-btn { 
+    background-color: var(--dropdown-bg); 
+    color: var(--ext-primary); 
+    box-shadow: var(--shadow); 
+    
+    /* 🚀 डार्क मोड में वाइट, लाइट मोड में ब्लैक बॉर्डर */
+    border: 1.5px solid var(--border-solid); 
+}
+
+/* Advanced Hover Effect */
+.live-chat-btn:hover { 
+    transform: translateY(-5px) scale(1.03); 
+    background-color: var(--btn-bg); 
+    box-shadow: var(--glow);
+}
+
+/* ➕ NEW CHAT BUTTON */
+.new-chat-btn { 
+    background-color: var(--active-btn-bg); 
+    color: var(--active-btn-text); 
+    box-shadow: var(--shadow); 
+    
+    /* 🚀 MAGIC FIX: जब बैकग्राउंड सफ़ेद होगा तो यह बॉर्डर ऑटोमैटिक काली हो जाएगी, और काले बैकग्राउंड पर सफ़ेद हो जाएगी! */
+    border: 1.5px solid var(--active-btn-text); 
+}
+
+.new-chat-btn:hover { 
+    transform: translateY(-5px) scale(1.05); 
+    opacity: 0.95; 
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+}
+
+/* Animations */
+@keyframes liquid-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+@keyframes pulseCoreOrb { 0% { transform: scale(0.9); } 100% { transform: scale(1.1); } }
+@keyframes spinHologramRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes pulseText { from { filter: drop-shadow(0 0 2px rgba(150,150,150,0.2)); } to { filter: drop-shadow(0 0 10px rgba(150,150,150,0.5)); } }
+
+
+
+
+
+
+
+/* ==========================================
+   7. RESPONSIVE DESIGN (TABLET & PC FIXES)
+   ========================================== */
+
+@media screen and (min-width: 768px) {
+    .header-main { padding: 20px 50px; }
+    
+    /* 🚀 Hologram ko upar khiskane ke liye padding bahut kam kar di */
+    .dashboard-main-area { padding-top: 80px; } 
+    
+    /* 🚀 margin-top: 0px kar diya taaki ye aur upar shift ho jaye */
+    .hologram-wrapper { width: 180px; height: 180px; margin-bottom: 20px; margin-top: 0px; }
+    .core-glow-orb { width: 50px; height: 50px; }
+    .trail-1 { width: 80px; height: 80px; }
+    .trail-2 { width: 120px; height: 120px; }
+    .trail-3 { width: 150px; height: 150px; }
+    .trail-4 { width: 180px; height: 180px; }
+    .welcome-heading { font-size: 42px; margin-bottom: 15px; }
+    
+    .floating-action-group { 
+        bottom: 60px; 
+        right: 50px; 
+        flex-direction: column ; 
+        align-items: flex-end; 
+    }
+    .floating-btn { min-width: 180px; height: 55px; font-size: 13px; }
+}
+
+@media screen and (min-width: 1200px) {
+    .header-main { padding: 25px 80px; }
+    
+    /* 🚀 PC par bhi padding-top ko 140px se ghata kar 90px kar diya */
+    .dashboard-main-area { padding-top: 90px; }
+    
+    /* 🚀 margin-top: 0px set kiya */
+    .hologram-wrapper { width: 220px; height: 220px; margin-bottom: 20px; margin-top: 0px; }
+    .core-glow-orb { width: 60px; height: 60px; }
+    .trail-1 { width: 100px; height: 100px; }
+    .trail-2 { width: 150px; height: 150px; }
+    .trail-3 { width: 190px; height: 190px; }
+    .trail-4 { width: 220px; height: 220px; }
+    .welcome-heading { font-size: 48px; margin-bottom: 15px; }
+    
+    .floating-action-group { 
+        flex-direction: column ; 
+        align-items: flex-end; 
+    }
+    .floating-btn { min-width: 200px; height: 60px; font-size: 14px; }
+}
+
+
+
+/* ==========================================
+   🚀 CUSTOM LOGOUT BUTTON (Premium Sync)
+========================================== */
+.custom-logout-btn {
+    width: 100%;
+    padding: 14px 15px;
+    background: transparent;
+    color: #ef4444; /* लाल रंग */
+    
+    /* 🚀 NAYA: 1.5px पारदर्शी बॉर्डर ताकि होवर करने पर बटन हिले नहीं */
+    border: 1.5px solid transparent; 
+    
+    text-align: left;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+/* आइकॉन को सेंटर करने के लिए */
+.custom-logout-btn i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+/* 🖱️ Hover Effect (माउस ले जाने पर लाल बॉर्डर और बैकग्राउंड) */
+.custom-logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1); 
+    color: #ef4444;
+    
+    /* 🚀 NAYA: होवर करने पर 1.5px लाल सॉलिड बॉर्डर */
+    border: 1.5px solid #ef4444; 
+    
+    transform: translateX(4px); /* साइड मेन्यू जैसा स्मूथ स्लाइड */
+}
+
+.custom-logout-btn:hover i {
+    transform: scale(1.1); /* आइकॉन हल्का सा बड़ा होगा */
+}
+
+/* 👆 Click Effect (क्लिक करने पर हल्का सा दबेगा) */
+.custom-logout-btn:active {
+    transform: scale(0.98) translateX(4px);
+}
+
+
+/* =========================================================
+   📱 100% RESPONSIVE DESIGN (Mobile, Tablet, PC Auto-Fix)
+   (Premium Solid Border Synced for Auth Elements)
+========================================================= */
+
+/* 🚀 NAYA: ऑथेंटिकेशन (Login/Signup) डब्बों और इनपुट्स पर 1.5px सॉलिड बॉर्डर */
+.auth-container-glass {
+    border: 1.5px solid var(--border-solid);
+}
+
+.auth-otp-input, .auth-input, .auth-btn-social, .gender-btn, .custom-dob-select {
+    border: 1.5px solid var(--border-solid);
+    transition: all 0.3s ease;
+}
+
+/* फोकस (Type) करते समय ग्लो इफ़ेक्ट */
+.auth-otp-input:focus, .auth-input:focus, .custom-dob-select:focus {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    border-color: var(--text-primary);
+    outline: none;
+}
+
+/* 💻 PC & Tablet: (Default) Card 420px ka rahega aur center mein dikhega */
+
+/* 📱 Normal Mobile Screens (480px aur usse chhote) */
+@media screen and (max-width: 480px) {
+    .auth-container-glass {
+        margin: 20px 15px; /* साइड से मार्जिन कम किया ताकि जगह मिले */
+        padding: 30px 20px; /* अंदर की पैडिंग कम की */
+        border-radius: 24px;
+    }
+
+    .auth-title {
+        font-size: 24px; /* हेडिंग थोड़ी छोटी की */
+    }
+
+    .auth-subtitle {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    /* 🚀 OTP Boxes Fix (सबसे ज़रूरी ताकि ये स्क्रीन से बाहर न जाएं) */
+    .auth-otp-row {
+        gap: 5px; /* डब्बों के बीच की दूरी कम की */
+    }
+
+    .auth-otp-input {
+        width: 38px; /* OTP बॉक्स की चौड़ाई कम की */
+        height: 45px;
+        font-size: 18px;
+    }
+
+    /* इनपुट और बटन्स को मोबाइल के हिसाब से स्लिम किया */
+    .auth-input, .auth-btn-primary, .auth-btn-social, .gender-btn {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+    
+    .custom-dob-select {
+        padding: 10px 5px;
+        font-size: 13px;
+    }
+}
+
+/* 📱 Very Small Mobile Screens (जैसे iPhone SE, Galaxy Fold - 360px se chhote) */
+@media screen and (max-width: 360px) {
+    .auth-container-glass {
+        margin: 10px;
+        padding: 25px 15px;
+    }
+    
+    .auth-title {
+        font-size: 22px;
+    }
+
+    .auth-otp-input {
+        width: 32px; /* बहुत छोटी स्क्रीन के लिए बॉक्स और छोटे किए */
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 KEYBOARD BUG FIX (NATIVE APP FEEL)
+========================================================= */
+/* =========================================================
+   📱 MASTER RESPONSIVE FIXES (Voice Room, Chat, Onboarding)
+   (Premium Solid Border Sync Applied)
+========================================================= */
+
+@media screen and (max-width: 480px) {
+    /* 🚀 1. Onboarding Text & Terms Fix */
+    #human-typing-container {
+    width: 100%;
+    box-sizing: border-box;
+}
+    #ai-text-display { 
+        font-size: 13.5px; 
+    }
+    .onboard-terms-text { 
+        font-size: 11.5px; 
+        line-height: 1.4; 
+    }
+
+    /* 🚀 2. Voice Chat Room Bottom Buttons Fix (Scrollable) */
+    .voice-bottom-nav {
+        gap: 8px;
+        padding: 10px;
+        overflow-x: auto; /* बटन्स ज्यादा होंगे तो साइड में स्क्रॉल हो जाएंगे */
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch; /* iPhone smooth scroll */
+    }
+    .voice-bottom-nav::-webkit-scrollbar {
+        display: none; /* गंदा स्क्रॉलबार छुपाने के लिए */
+    }
+    .nav-btn-group span { 
+        font-size: 10px; 
+    }
+    
+    .nav-action-btn { 
+        width: 45px; 
+        height: 45px; 
+        font-size: 16px; 
+        /* 🚀 1.5px Solid Border */
+        border: 1.5px solid var(--border-solid);
+        transition: all 0.3s ease;
+    }
+    
+    .nav-main-btn { 
+        width: 55px; 
+        height: 55px; 
+        font-size: 22px; 
+        /* 🚀 1.5px Solid Border */
+        border: 1.5px solid var(--border-solid);
+        transition: all 0.3s ease;
+    }
+
+    /* 🚀 3. Text Chat Input Box Fix (More typing space) */
+    .text-chat-input-wrapper { 
+        padding: 8px 5px; 
+        gap: 6px; 
+        /* 🚀 1.5px Solid Border */
+        border: 1.5px solid var(--border-solid);
+        border-radius: 24px;
+    }
+    .text-chat-textarea { 
+        font-size: 14px; 
+        padding: 10px 12px; 
+        border: none; /* बाहरी डब्बे पर बॉर्डर है, इसलिए इसे पारदर्शी रखा */
+    }
+    .input-icon-btn, .input-send-btn, .input-stop-btn { 
+        width: 36px; 
+        height: 36px; 
+        font-size: 15px; 
+        /* 🚀 1.5px Solid Border */
+        border: 1.5px solid var(--border-solid);
+        transition: all 0.3s ease;
+    }
+
+    /* 🚀 4. Sidebar Mobile Fix (Perfect Width) */
+    .sidebar { 
+        width: 85%; 
+        max-width: 300px; 
+        /* 🚀 1.5px Solid Border */
+        border-right: 1.5px solid var(--border-solid);
+    }
+    .sidebar-header h2 {
+        font-size: 18px;
+    }
+}
+
+/* 📱 Very Small Screens (iPhone SE, Galaxy Fold - under 360px) */
+@media screen and (max-width: 360px) {
+    .nav-action-btn { 
+        width: 40px; 
+        height: 40px; 
+        font-size: 14px; 
+    }
+    .nav-main-btn { 
+        width: 50px; 
+        height: 50px; 
+        font-size: 18px; 
+    }
+    .input-icon-btn, .input-send-btn { 
+        width: 32px; 
+        height: 32px; 
+    }
+}
+
+
+/* =========================================================
+   🚀 FIX 1: KEYBOARD OPEN BUG (Screen Pushing Up Fix)
+========================================================= */
+/* जब कीबोर्ड खुलेगा (स्क्रीन की हाइट कम होगी), तो डब्बा सेंटर से हटकर टॉप पर आ जाएगा और कटेगा नहीं */
+@media screen and (max-height: 650px) {
+    body {
+        display: flex; /* 🚀 ADDED: Iske bina align-items kaam nahi karega */
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        overflow-y: auto; 
+        padding-top: 15px;
+    }
+    .auth-container-glass, #onboarding-view {
+        margin-top: 10px;
+        margin-bottom: 50px;
+        border: 1.5px solid var(--border-solid);
+    }
+}
+
+
+
+/* =========================================================
+   🚀 FIX 2: DOB DROPDOWN OVERLAP BUG (Change DOB Anytime)
+========================================================= */
+/* ड्रॉपडाउन लिस्ट को Gender और Terms के डब्बों के ऊपर दिखाने के लिए (Z-Index Fix) */
+#dob-container {
+    position: relative;
+    z-index: 105; /* Sabse upar dikhega, katega nahi */
+}
+
+/* Responsive Rules */
+@media screen and (max-width: 768px) {
+    #onboarding-view {
+        max-width: 100%;
+        padding: 25px 15px;
+    }
+}
+#gender-container {
+    position: relative;
+    z-index: 50; /* यह DOB के नीचे रहेगा */
+}
+#terms-container {
+    position: relative;
+    z-index: 40; /* यह सबसे नीचे रहेगा */
+}
+
+
+/* =========================================================
+   🚀 KEYBOARD BUG FIX (NATIVE APP FEEL)
+========================================================= */
+/* 1. स्क्रीन को अपनी जगह लॉक कर देगा ताकि ब्राउज़र उसे ऊपर न धकेल सके */
+html, body {
+    width: 100%; 
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+
+/* 2. सभी मेन स्क्रीन्स को स्क्रीन के अंदर ही फिक्स करना */
+.text-chat-overlay, 
+.live-voice-overlay {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 3. बीच का हिस्सा (Chat Log) ही कीबोर्ड के हिसाब से छोटा होगा, हेडर नहीं कटेगा */
+.text-chat-log, 
+.live-voice-chat-log {
+    flex: 1 1 auto;
+    min-height: 0; /* 🚀 यह डब्बे को कीबोर्ड के हिसाब से छोटा होने देता है */
+    overflow-y: auto ;
+}
+
+/* 4. Onboarding में टाइपिंग एरिया के लिए फिक्स */
+#human-typing-container {
+    max-height: none ; 
+    overflow: visible ; 
+    border: none ; 
+    background: transparent ;
+    padding: 10px ;
+}
+
+
+
+
+
+/* 🚀 FIX 3: Chat Rooms Full Hide Lock */
+html body #fullscreen-chat-room.hidden,
+html body #live-voice-overlay.hidden {
+    display: none ;
+    opacity: 0 ;
+    visibility: hidden ;
+    z-index: -100 ;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================
+   🍪 COOKIE CONSENT MODAL STYLES
+========================================== */
+.cookie-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999999; /* सबसे ऊपर दिखेगा */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.cookie-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cookie-modal-content {
+    background: var(--dropdown-bg, #111827);
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    border-radius: 24px;
+    padding: 30px 24px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: var(--shadow);
+    position: relative;
+    text-align: center;
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cookie-overlay.hidden .cookie-modal-content {
+    transform: translateY(30px) scale(0.95);
+}
+
+.cookie-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.2s ease;
+}
+
+.cookie-close-btn:hover { color: var(--text-primary); }
+
+.cookie-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 16px 0;
+}
+
+.cookie-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0 0 24px 0;
+}
+
+.cookie-link {
+    color: var(--text-primary);
+    text-decoration: underline;
+    font-weight: 600;
+    text-underline-offset: 3px;
+}
+
+.cookie-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cookie-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px; /* फ़ोटो के जैसे Pill Shape बटन */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.cookie-btn.outline-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.cookie-btn.filled-btn {
+    background: var(--btn-bg); 
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.cookie-btn:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ====================================================
+   🌟 MODULE: SIDEBAR HISTORY BOX (NORMAL CSS)
+==================================================== */
+
+.sidebar-history-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 🚀 FIX: Theme Variables for Light/Dark Mode */
+    background-color: var(--dropdown-bg, #111827); 
+    padding: 16px;
+    color: var(--text-primary, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.05));
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+/* 🚀 FIX: Double dot typo (..) fixed to single dot (.) */
+.history-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary, #9ca3af);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.history-trash-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #6b7280);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.history-trash-btn:hover { 
+   color: #f87171; 
+}
+
+.history-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
+}
+
+/* 🌌 AMBIENT SYNC: Interactive History Wrapper */
+.history-item-wrapper {
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    background: transparent; 
+    border-radius: 12px; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding-right: 8px;
+    border: 1px solid transparent;
+}
+
+/* 🚀 FIX: Hover and Active states linked to Theme Variables */
+.history-item-wrapper:hover { 
+    background: var(--btn-hover, rgba(128, 128, 128, 0.1)); 
+    backdrop-filter: blur(5px); 
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.2));
+}
+
+.history-item-wrapper.active { 
+    background: var(--btn-bg, rgba(128, 128, 128, 0.05)); 
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.3)); 
+    box-shadow: 0 0 15px var(--glow, rgba(0, 0, 0, 0.1));
+}
+
+.history-btn {
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left; 
+    padding: 12px; 
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #e2e8f0); 
+    background: transparent; 
+    border: none; 
+    cursor: pointer;
+    transition: color 0.3s ease;
+    width: calc(100% - 80px);
+}
+
+.history-text {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+
+/* 🚀 FIX: Text color adapts to light/dark mode */
+.history-item-wrapper:hover .history-btn { color: var(--text-primary); }
+
+/* Icons Colors */
+.icon-text-chat { color: #60a5fa; font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.icon-voice-chat { color: #c084fc; font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.icon-normal { color: var(--text-secondary, #9ca3af); font-size: 18px; }
+
+/* ⚙️ Hover Reveal Actions */
+.history-actions { 
+    display: flex; 
+    gap: 12px; 
+    opacity: 0; 
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+    align-items: center; 
+    pointer-events: none; 
+}
+
+.history-item-wrapper:hover .history-actions,
+.history-item-wrapper.active .history-actions { 
+    opacity: 1; 
+    pointer-events: auto;
+}
+
+.history-action-btn { 
+    background: transparent; 
+    color: var(--text-secondary, #94a3b8);
+    border: none; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    font-size: 13px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.history-action-btn:hover { transform: scale(1.25); color: var(--text-primary); }
+.btn-pin:hover { color: #facc15; }
+.btn-rename:hover { color: #93c5fd; }
+.btn-delete:hover { color: #f87171; }
+
+.pin-active { 
+    color: #facc15; 
+    transform: rotate(45deg); 
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8)); 
+}
+
+/* ====================================================
+   🗑️ MODULE: TRASH MODAL (NORMAL CSS)
+==================================================== */
+
+.trash-modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(16px);
+    z-index: 100005; /* 🚀 UPGRADED: Chat Room (100000) se bada hona chahiye */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    transition: all 0.5s ease;
+}
+
+
+.trash-modal-overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.trash-modal-content {
+    /* 🚀 FIX: Connected to Theme Engine */
+    background-color: var(--dropdown-bg, #111827);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--border, rgba(239, 68, 68, 0.2));
+    border-radius: 40px;
+    width: 100%;
+    max-width: 450px;
+    padding: 32px;
+    box-shadow: var(--shadow, 0 30px 60px rgba(0, 0, 0, 0.9));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    box-sizing: border-box;
+}
+
+.trash-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--text-secondary, #9ca3af);
+    background: var(--btn-bg, rgba(128, 128, 128, 0.1));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.2));
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.trash-close-btn:hover {
+    color: var(--text-primary, #ffffff);
+    background: var(--btn-hover, rgba(239, 68, 68, 0.2));
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.trash-close-btn i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.trash-close-btn:hover i { transform: rotate(90deg); }
+
+.trash-title {
+    font-size: 24px;
+    font-weight: 300;
+    color: #f87171;
+    margin: 0 0 12px 0;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+@keyframes trashPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+.trash-icon-pulse { animation: trashPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+.trash-desc {
+    font-size: 14px;
+    color: var(--text-secondary, #9ca3af);
+    text-align: center;
+    margin: 0 0 24px 0;
+    line-height: 1.6;
+}
+
+.trash-list-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 8px;
+}
+
+/* Trash Items inside Modal */
+.trash-item {
+    /* 🚀 FIX: Linked to Theme */
+    background: var(--btn-bg, rgba(128, 128, 128, 0.05)); 
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.1));
+    padding: 14px; 
+    border-radius: 16px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.trash-item:hover {
+    transform: translateY(-2px);
+    background: var(--btn-hover, rgba(128, 128, 128, 0.1));
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.trash-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-primary, #d1d5db);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.trash-icon-voice { color: rgba(192, 132, 252, 0.6); font-size: 18px; }
+.trash-icon-text { color: rgba(96, 165, 250, 0.6); font-size: 18px; }
+.trash-text { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.trash-actions { display: flex; gap: 10px; }
+
+.trash-action-btn { 
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; 
+    transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer;
+}
+
+.btn-recover { 
+    background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); 
+}
+.btn-recover:hover { 
+    background: rgba(16, 185, 129, 0.9); color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-perm-delete { 
+    background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); 
+}
+.btn-perm-delete:hover { 
+    background: rgba(239, 68, 68, 0.9); color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* ====================================================
+   🚀 HISTORY LONG-PRESS CONTEXT MENU 
+==================================================== */
+.history-context-menu {
+    display: flex;
+    flex-direction: column;
+    background: var(--dropdown-bg, rgba(0, 0, 0, 0.8));
+    border-radius: 8px;
+    margin: 0px 10px 10px 10px;
+    padding: 6px;
+    gap: 4px;
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.2));
+    /* 🚀 FIX: Z-Index ensures clicks are registered on mobile */
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.history-context-menu.hidden {
+    display: none ;
+}
+
+.ctx-btn {
+    background: transparent;
+    border: none;
+    padding: 12px 14px; /* 🚀 Click area thoda bada kiya gaya hai */
+    text-align: left;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 110;
+}
+
+.ctx-btn:hover, .ctx-btn:active {
+    background: var(--btn-hover, rgba(128, 128, 128, 0.15));
+}
+
+
+
+
+
+
+
+/* 🚀 FIX: Voice Chat और Text Chat दोनों की डिज़ाइन और कलर को एक समान करने के लिए */
+
+/* दोनों आइकन्स का साइज़ और अलाइनमेंट बिल्कुल बराबर कर दिया है */
+.icon-text-chat,
+.icon-voice-chat {
+    font-size: 18px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    width: 24px; /* दोनों आइकन्स बराबर जगह लेंगे */
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* आइकन्स के कलर्स (आप चाहें तो दोनों को एक ही कलर दे सकते हैं) */
+.icon-text-chat { 
+    color: #60a5fa; /* Text Chat के लिए Blue */
+}
+
+.icon-voice-chat { 
+    color: #c084fc; /* Voice Chat के लिए Purple */
+}
+
+/* टेक्स्ट और आइकॉन के बीच का गैप और कलर फिक्स */
+.history-btn {
+    color: var(--text-primary, #ffffff);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+/* ====================================================
+   🌟 HISTORY MENU CLEAN STYLES (No JS Inline Styles)
+==================================================== */
+
+.clean-wrapper {
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.history-btn-clean {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 14px 12px;
+    color: inherit;
+    position: relative;
+    z-index: 10;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.history-text-clean {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.pinned-text-active {
+    color: #facc15 ;
+}
+
+/* Context Menu Base */
+.clean-menu {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--dropdown-bg, #111827);
+    padding: 8px;
+    border-radius: 8px;
+    position: relative;
+    z-index: 9999;
+    margin-top: 5px;
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    pointer-events: auto;
+}
+
+.clean-ctx-btn {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.clean-ctx-btn i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Context Menu Colors */
+.pin-btn { color: var(--text-secondary, #d1d5db); }
+.rename-btn { color: #c084fc; }
+.copy-btn { color: #60a5fa; }
+.delete-btn { color: #f87171; }
+.help-btn { color: #4ade80; }
+
+/* ====================================================
+   🗑️ TRASH MODAL CLEAN STYLES
+==================================================== */
+
+.empty-trash-msg {
+    text-align: center;
+    color: gray;
+    margin-top: 20px;
+}
+
+.clean-trash-item {
+    background: var(--btn-bg, rgba(128,128,128,0.1));
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+}
+
+.clean-trash-header {
+    display: flex;
+    gap: 10px;
+    color: var(--text-primary, #ffffff);
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.clean-trash-text {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.clean-trash-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.clean-action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    border: 1px solid transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.recover-btn {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.perm-delete-btn {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+
+
+
+
+
+/* 🚀 NEW: Trash Box Scroll Fix */
+#trash-list-container {
+    max-height: 55vh; /* बॉक्स की ऊंचाई फिक्स कर दी है */
+    overflow-y: auto; /* ज्यादा आइटम होने पर अपने आप स्क्रॉल आ जाएगा */
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+
+/* स्क्रॉलबार की डिज़ाइन ताकि वह सुंदर दिखे */
+#trash-list-container::-webkit-scrollbar {
+    width: 5px;
+}
+#trash-list-container::-webkit-scrollbar-thumb {
+    background: var(--border, rgba(255, 255, 255, 0.2));
+    border-radius: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 🚀 MASTER FIX: Home Screen ko poori screen par lock karne ke liye */
+html body #app-home-screen-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh; /* Mobile browser height fix */
+    background-color: var(--bg-main);
+    z-index: 10; /* Ye Login container (z-index 50) se niche rahega */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.4s ease;
+}
+
+/* 🚀 Jab JS 'hidden' class lagaye, toh root se gayab ho jaye (No !important) */
+html body div#app-home-screen-wrapper.hidden {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 1. HIGH-SPECIFICITY HIDE LOGIC (NO !important)
+   (Ye code bina !important ke overlap ko poori tarah rokega)
+========================================================= */
+/* =========================================================
+   🚀 1. HIGH-SPECIFICITY HIDE LOGIC (MASTER FIX)
+   (Auth-container ko isse azaad kar diya taaki logout par atak na jaye)
+========================================================= */
+html body div.hidden:not(#auth-container), /* 🚀 MASTER FIX: Auth container is hide rule ko nahi maanega agar uspar JS override chalu hai */
+html body div#app-home-screen-wrapper.hidden,
+html body div.floating-action-group.hidden,
+html body div#login-view.hidden,
+html body div#signup-view.hidden,
+html body div#forgot-view.hidden,
+html body div#twostep-view.hidden,
+html body div#login-mobile-flow.hidden,
+html body div#login-email-flow.hidden,
+html body div#signup-mobile-flow.hidden,
+html body div#signup-email-flow.hidden,
+html body div#login-mobile-pass-section.hidden,
+html body div#login-mobile-otp-section.hidden,
+html body div#login-otp-section.hidden,
+html body div#signup-otp-section.hidden,
+html body div#signup-mobile-pass-section.hidden,
+html body div#forgot-otp-section.hidden,
+html body div#forgot-step-1.hidden,
+html body div#forgot-step-2.hidden,
+html body div#twostep-intro.hidden,
+html body div#twostep-setup.hidden,
+html body div#login-options-row.hidden {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    z-index: -99999;
+}
+
+
+
+
+
+
+
+/* =========================================================
+   🌟 PREMIUM AUTHENTICATION ENGINE (V3.0 - AI APP STYLE)
+   (Theme Engine Synced | 100% Fluid Responsive | No !important)
+========================================================= */
+
+/* ---------------------------------------------------------
+   1. MASTER WRAPPER (Light/Dark Auto-Sync)
+--------------------------------------------------------- */
+html body #auth-container {
+    position: fixed;
+    inset: 0; /* top, left, right, bottom 0 */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Mobile Browser Scroll Fix */
+    background-color: var(--bg-main); /* 🚀 THEME SYNC */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ---------------------------------------------------------
+   2. THE PREMIUM CARD (Slim, Elegant Layout)
+--------------------------------------------------------- */
+html body #auth-container .auth-container-glass {
+    width: 100%;
+    max-width: 480px; /* 🚀 PC par thoda slim kiya taaki premium lage */
+    margin: auto; 
+    background-color: transparent; /* Card background transparent for blending */
+    border: 1.5px solid var(--border-solid); /* 🚀 THEME SYNC */
+    border-radius: 28px;
+    padding: 50px 40px; 
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ---------------------------------------------------------
+   3. TYPOGRAPHY (Clean AI Font Weight)
+--------------------------------------------------------- */
+html body #auth-container .auth-title {
+    font-size: 32px; 
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-primary); /* 🚀 THEME SYNC */
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+    transition: color 0.3s ease;
+}
+
+html body #auth-container .auth-subtitle {
+    font-size: 15px;
+    text-align: center;
+    color: var(--text-secondary); /* 🚀 THEME SYNC */
+    margin: 0 0 35px 0;
+    font-weight: 500;
+    line-height: 1.5;
+    transition: color 0.3s ease;
+}
+
+/* ---------------------------------------------------------
+   4. RADIO BUTTONS & TABS
+--------------------------------------------------------- */
+html body #auth-container .auth-tab-group {
+    display: flex;
+    justify-content: center;
+    gap: 30px; 
+    margin-bottom: 30px;
+}
+
+html body #auth-container .auth-radio-label {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; font-size: 15px; font-weight: 600;
+    color: var(--text-secondary); transition: color 0.3s ease;
+}
+
+html body #auth-container .auth-radio-custom {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border-solid);
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; transition: all 0.3s ease;
+}
+
+html body #auth-container .auth-radio-custom::after {
+    content: ''; width: 12px; height: 12px; border-radius: 50%;
+    background-color: var(--text-primary);
+    transform: scale(0); transition: all 0.3s ease;
+}
+
+html body #auth-container input[type="radio"]:checked + .auth-radio-custom { border-color: var(--text-primary); }
+html body #auth-container input[type="radio"]:checked + .auth-radio-custom::after { transform: scale(1); }
+html body #auth-container input[type="radio"]:checked ~ .auth-radio-text { color: var(--text-primary); }
+
+/* ---------------------------------------------------------
+   5. INPUT FIELDS (Sleek 56px Height)
+--------------------------------------------------------- */
+html body #auth-container .auth-input-group {
+    position: relative;
+    margin-bottom: 24px; 
+    width: 100%;
+}
+
+html body #auth-container .auth-input {
+    width: 100%;
+    height: 56px; 
+    background-color: transparent;
+    border: 1.5px solid var(--border-solid);
+    color: var(--text-primary);
+    padding: 0 20px; 
+    border-radius: 16px;
+    font-size: 16px; font-weight: 500; outline: none;
+    box-sizing: border-box; font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+html body #auth-container input[type="password"].auth-input,
+html body #auth-container input[id*="pass"].auth-input {
+    padding-right: 50px; /* Eye button ke liye jagah */
+}
+
+html body #auth-container .auth-input:focus {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.15);
+}
+html body #auth-container .auth-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+
+html body #auth-container .auth-eye-btn {
+    position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+    background: transparent; border: none; color: var(--text-secondary);
+    cursor: pointer; font-size: 18px; padding: 0; transition: color 0.3s ease;
+}
+html body #auth-container .auth-eye-btn:hover { color: var(--text-primary); }
+
+/* ---------------------------------------------------------
+   6. OTP BOXES (Auto-Fit Engine)
+--------------------------------------------------------- */
+html body #auth-container .auth-otp-row {
+    display: flex; justify-content: space-between; 
+    gap: 10px; margin-bottom: 30px; width: 100%;
+}
+
+html body #auth-container .auth-otp-input {
+    flex: 1; /* 🚀 Auto width distribution */
+    height: 60px; text-align: center; font-size: 24px; font-weight: 700;
+    background-color: transparent; border: 1.5px solid var(--border-solid);
+    border-radius: 14px; color: var(--text-primary); outline: none;
+    transition: all 0.3s ease;
+}
+html body #auth-container .auth-otp-input:focus {
+    border-color: var(--text-primary); box-shadow: 0 0 10px rgba(128, 128, 128, 0.15);
+    transform: translateY(-3px); 
+}
+
+/* ---------------------------------------------------------
+   7. OPTIONS, CHECKBOXES & LINKS
+--------------------------------------------------------- */
+html body #auth-container .auth-options-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 30px; font-size: 14px; padding: 0 4px; width: 100%; gap: 15px;
+}
+
+html body #auth-container .auth-checkbox-label {
+    display: flex; align-items: center; gap: 8px; color: var(--text-secondary);
+    cursor: pointer; font-weight: 500; transition: color 0.3s ease;
+}
+
+html body #auth-container .auth-link {
+    color: var(--text-primary); background: transparent; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px;
+    padding: 0; transition: opacity 0.3s ease;
+}
+html body #auth-container .auth-link:hover { opacity: 0.7; }
+
+/* ---------------------------------------------------------
+   8. BUTTONS & DIVIDERS
+--------------------------------------------------------- */
+html body #auth-container .auth-btn-primary {
+    width: 100%; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 700;
+    background-color: var(--text-primary); /* Dark=White, Light=Black */
+    color: var(--bg-main); 
+    border: 1.5px solid var(--border-solid); 
+    cursor: pointer; transition: all 0.2s ease; margin-bottom: 25px;
+}
+html body #auth-container .auth-btn-primary:active { transform: scale(0.98); }
+html body #auth-container .auth-btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+html body #auth-container .auth-divider {
+    display: flex; align-items: center; color: var(--text-secondary); font-size: 13px;
+    margin-bottom: 25px; opacity: 0.6; transition: color 0.3s ease;
+}
+html body #auth-container .auth-divider::before, 
+html body #auth-container .auth-divider::after {
+    content: ''; flex: 1; border-bottom: 1.5px solid var(--border-solid); 
+}
+html body #auth-container .auth-divider span { padding: 0 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+html body #auth-container .auth-btn-social {
+    width: 100%; padding: 15px; border-radius: 16px; font-size: 15px; font-weight: 600;
+    background-color: transparent; color: var(--text-primary); 
+    border: 1.5px solid var(--border-solid); cursor: pointer;
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+    transition: all 0.3s ease; margin-bottom: 25px;
+}
+html body #auth-container .auth-btn-social:hover { background-color: var(--btn-hover); border-color: var(--text-primary); }
+
+html body #auth-container .auth-back-btn {
+    position: absolute; top: 25px; left: 25px; background: transparent; border: none;
+    color: var(--text-secondary); font-size: 20px; cursor: pointer; transition: all 0.3s ease;
+}
+html body #auth-container .auth-back-btn:hover { color: var(--text-primary); transform: translateX(-4px); }
+
+
+/* =========================================================
+   📱 9. DEVICE FRIENDLY (Mobile, Tablet, Landscape Fixes)
+========================================================= */
+
+/* 📱 TABLET VIEW */
+@media screen and (max-width: 768px) {
+    html body #auth-container .auth-container-glass {
+        max-width: 420px; padding: 40px 30px;
+    }
+}
+
+/* 📱 MOBILE VIEW (Native App Feel - Borders Removed) */
+@media screen and (max-width: 480px) {
+    html body #auth-container {
+        justify-content: flex-start; /* Keyboard khulne par upar shift hoga */
+        padding: 0; /* Padding hata di taaki natural flow bane */
+    }
+    
+    html body #auth-container .auth-container-glass {
+        max-width: 100%; margin-top: 15px; padding: 30px 20px;
+        border: none; /* 🚀 MOBILE FIX: Dabba gayab, natural background */
+        border-radius: 0; box-shadow: none; min-height: auto;
+    }
+    
+    html body #auth-container .auth-title { font-size: 26px; }
+    html body #auth-container .auth-subtitle { font-size: 14px; margin-bottom: 25px; }
+    
+    /* Inputs Resize */
+    html body #auth-container .auth-input { height: 52px; font-size: 15px; border-radius: 14px; }
+    html body #auth-container .auth-btn-primary, 
+    html body #auth-container .auth-btn-social { padding: 14px; font-size: 15px; border-radius: 14px; }
+    
+    html body #auth-container .auth-otp-input { height: 55px; font-size: 22px; border-radius: 12px; }
+    
+    /* Back Button Placement */
+    html body #auth-container .auth-back-btn { top: 15px; left: 15px; }
+}
+
+/* 📱 TINY SCREENS (iPhone SE / Galaxy Fold) */
+@media screen and (max-width: 360px) {
+    html body #auth-container .auth-container-glass { padding: 25px 15px; }
+    html body #auth-container .auth-title { font-size: 22px; }
+    html body #auth-container .auth-otp-row { gap: 6px; }
+    html body #auth-container .auth-otp-input { height: 48px; font-size: 18px; }
+}
+
+/* 🔄 LANDSCAPE / KEYBOARD OPEN FIX */
+@media screen and (max-height: 620px) {
+    html body #auth-container { justify-content: flex-start; padding: 10px; }
+    html body #auth-container .auth-container-glass { margin-top: 0; padding: 25px; border: none; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 1. HOLOGRAM TOP CUT-OFF FIX
+========================================================= */
+/* Upar se thoda aur space diya taaki ring na kate aur overflow visible kiya */
+html body .dashboard-main-area {
+    padding-top: 110px; 
+}
+html body .hologram-wrapper {
+    margin-top: 25px; 
+    overflow: visible; 
+}
+
+
+
+/* =========================================================
+   🌌 1. MASTER ONBOARDING WRAPPER (Claude Style - Top Left)
+========================================================= */
+/* =========================================================
+   🌌 1. MASTER ONBOARDING WRAPPER (Black Cut-off Fix)
+========================================================= */
+html body div#onboarding-view.auth-container-glass {
+    /* 🚀 MASTER FIX: 'absolute' hatakar 'relative' kiya aur margin set kiya */
+    position: relative; 
+    margin: 0 auto; /* Dabba perfectly center mein rahega */
+    
+    /* Purane top, left aur transform commands hata diye gaye hain */
+    
+    width: 100%;
+    max-width: 850px; /* PC/Laptop par perfect padhne layack width */
+    height: auto;
+    min-height: 100vh; /* Screen par pura niche tak jayega */
+    
+    /* Transparent Background (No Box Design) */
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    
+    /* Top-Left Flow Alignment */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    text-align: left;
+    
+    padding: 10vh 25px 50px 25px; /* Upar se thoda gap taaki chhat se na lage */
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   🤖 2. AI TYPING AREA & CURSOR (Theme Synced)
+========================================================= */
+html body .onboard-typing-area,
+html body #human-typing-container {
+    width: 100%;
+    text-align: left; 
+    font-size: 18px; /* PC par bada dikhega */
+    line-height: 1.7;
+    margin-bottom: 35px;
+    padding: 0;
+    max-height: none; 
+    overflow: visible;
+    color: var(--text-primary); /* 🚀 THEME SYNC: Light/Dark auto text */
+    font-weight: 500;
+}
+
+html body .onboard-cursor {
+    color: #3b82f6; /* Premium Blue Accent */
+    font-weight: bold;
+    margin-left: 4px;
+    display: inline-block;
+    animation: onboardBlink 0.8s step-end infinite;
+}
+@keyframes onboardBlink { 50% { opacity: 0; } }
+
+/* =========================================================
+   📝 3. FORM ELEMENTS (Name, DOB, Gender, Terms)
+========================================================= */
+html body #name-container,
+html body #dob-container,
+html body #gender-container,
+html body #terms-container {
+    width: 100%;
+    max-width: 600px; /* Input box PC par lamba nahi khichega */
+    margin-left: 0; 
+}
+
+/* Labels */
+html body .onboard-label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 700;
+    color: var(--text-secondary); /* 🚀 THEME SYNC */
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 12px; padding-left: 5px;
+}
+
+/* Name Input Box */
+html body #onboarding-view input[type="text"] {
+    width: 100%; height: 56px;
+    background-color: transparent;
+    border: 1.5px solid var(--border-solid); /* 🚀 THEME SYNC */
+    color: var(--text-primary); /* 🚀 THEME SYNC */
+    padding: 0 20px; border-radius: 14px;
+    font-size: 16px; font-weight: 500; outline: none;
+    box-sizing: border-box; font-family: inherit; margin-bottom: 25px;
+    transition: 0.3s ease;
+}
+html body #onboarding-view input[type="text"]:focus {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(128, 128, 128, 0.2);
+}
+
+/* =========================================================
+   📅 4. DOB DROPDOWN (UPWARD POPUP FIX)
+========================================================= */
+html body .custom-dob-wrapper { display: flex; gap: 15px; width: 100%; margin-bottom: 25px; }
+html body .custom-select-box { position: relative; flex: 1; font-family: inherit; }
+
+html body .select-selected {
+    background-color: transparent;
+    border: 1.5px solid var(--border-solid); /* 🚀 THEME SYNC */
+    color: var(--text-primary); /* 🚀 THEME SYNC */
+    padding: 16px 12px; border-radius: 14px; text-align: center; 
+    cursor: pointer; font-weight: 600; font-size: 15px;
+    display: flex; justify-content: center; align-items: center; gap: 8px;
+    transition: 0.3s ease;
+}
+html body .select-selected::after { content: '▾'; font-size: 14px; color: var(--text-secondary); }
+html body .select-selected:hover { border-color: var(--text-primary); background-color: var(--btn-hover); }
+html body .select-selected.select-active { border-color: #3b82f6; }
+html body .select-selected.select-active::after { transform: rotate(180deg); color: #3b82f6; }
+
+/* Dropdown hamesha UPAR khulega */
+html body .select-items {
+    position: absolute; bottom: calc(100% + 8px); top: auto; left: 0; right: 0;
+    background-color: var(--dropdown-bg); /* 🚀 THEME SYNC */
+    border: 1.5px solid var(--border-solid); /* 🚀 THEME SYNC */
+    z-index: 999999; border-radius: 16px; max-height: 200px; overflow-y: auto;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15); overscroll-behavior: contain;
+    transform-origin: bottom center; 
+    animation: popUpward 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes popUpward { 0% { opacity: 0; transform: scaleY(0.8) translateY(10px); } 100% { opacity: 1; transform: scaleY(1) translateY(0); } }
+
+html body .select-items div {
+    padding: 14px 10px; cursor: pointer; text-align: center; 
+    color: var(--text-primary); /* 🚀 THEME SYNC */
+    font-weight: 500; font-size: 14px; border-bottom: 1px solid var(--border-solid); transition: 0.2s ease;
+}
+html body .select-items div:hover { background-color: var(--btn-hover); }
+html body .select-items div:last-child { border-bottom: none; }
+
+/* =========================================================
+   ⚧ 5. GENDER BUTTONS (Theme Synced)
+========================================================= */
+html body .gender-wrapper { display: flex; gap: 15px; width: 100%; margin-bottom: 25px; }
+html body .gender-btn {
+    flex: 1; padding: 16px; text-align: center; font-weight: 600; font-size: 15px; cursor: pointer;
+    background-color: transparent; 
+    border: 1.5px solid var(--border-solid); /* 🚀 THEME SYNC */
+    color: var(--text-primary); /* 🚀 THEME SYNC */
+    border-radius: 14px; transition: 0.3s ease; font-family: inherit;
+}
+html body .gender-btn:hover { background-color: var(--btn-hover); border-color: var(--text-primary); }
+html body #onboarding-view .gender-btn.active {
+    background-color: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   📜 6. TERMS & CONDITIONS
+========================================================= */
+html body .onboard-terms-box {
+    background-color: transparent; padding: 20px 25px; border-radius: 16px;
+    border: 1.5px dashed var(--border-solid); /* 🚀 THEME SYNC */
+    margin-top: 10px; transition: 0.3s ease; cursor: pointer;
+}
+html body .onboard-terms-box:hover { border-color: var(--text-primary); background-color: var(--btn-hover); }
+
+html body .onboard-terms-content { display: flex; align-items: flex-start; gap: 15px; }
+html body .onboard-checkbox-wrapper { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+html body .onboard-hidden-checkbox { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+
+html body .onboard-custom-checkbox {
+    width: 24px; height: 24px; border: 2px solid var(--text-secondary); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; transition: 0.3s ease; background-color: transparent;
+}
+html body .onboard-custom-checkbox i { color: var(--bg-main); font-size: 13px; opacity: 0; transform: scale(0.5); transition: 0.3s ease; }
+html body input[type="checkbox"]:checked ~ .onboard-custom-checkbox { background-color: var(--text-primary); border-color: var(--text-primary); }
+html body input[type="checkbox"]:checked ~ .onboard-custom-checkbox i { opacity: 1; transform: scale(1); }
+
+html body .onboard-terms-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; font-weight: 500; transition: 0.3s ease; }
+html body .onboard-terms-text:hover { color: var(--text-primary); }
+
+/* =========================================================
+   ✅ 7. ACCEPT BUTTON
+========================================================= */
+html body .onboard-accept-btn {
+    margin-top: 25px; margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px; font-size: 16px; width: 100%; border-radius: 14px;
+    background-color: var(--text-primary); /* 🚀 THEME SYNC: Dark me White, Light me Black */
+    color: var(--bg-main); /* 🚀 THEME SYNC */
+    border: 1.5px solid var(--border-solid);
+    font-weight: 700; cursor: pointer; transition: 0.2s ease;
+}
+html body .onboard-accept-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+html body .onboard-accept-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: translateY(0); }
+
+/* Fade Animation */
+.onboard-fade-in-up { animation: onboardFadeUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
+@keyframes onboardFadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
+/* =========================================================
+   📱 8. MOBILE & TABLET RESPONSIVE ENGINE (FIXED)
+========================================================= */
+/* Tablet View */
+@media screen and (max-width: 768px) {
+    html body div#onboarding-view.auth-container-glass {
+        padding: 5vh 20px 40px 20px;
+        max-width: 100%;
+    }
+    html body .onboard-typing-area, html body #human-typing-container { font-size: 16px; margin-bottom: 25px; }
+    html body #onboarding-view input[type="text"], html body .onboard-accept-btn { height: 52px; font-size: 15px; }
+    html body .select-selected { padding: 14px 8px; font-size: 14px; }
+    html body .gender-btn { padding: 14px 10px; font-size: 13px; }
+    html body .custom-dob-wrapper, html body .gender-wrapper { gap: 10px; }
+    html body .onboard-terms-box { padding: 15px; }
+}
+
+/* Mobile View (Below 480px) */
+@media screen and (max-width: 480px) {
+    html body div#onboarding-view.auth-container-glass {
+        padding: 4vh 15px 30px 15px; /* Mobile par gap kam kiya */
+    }
+    html body .onboard-typing-area, html body #human-typing-container { font-size: 15px; line-height: 1.5; }
+    html body .custom-dob-wrapper { flex-direction: row; gap: 8px; } 
+    
+    /* 🚀 MOBILE GENDER FIX: Chhoti screen par Gender buttons upar-neeche stack ho jayenge taaki sikude na */
+    html body .gender-wrapper { flex-direction: column; gap: 10px; } 
+    html body .gender-btn { width: 100%; }
+    
+    html body .onboard-terms-text { font-size: 13px; }
+}
+
+
+
+
+
+/* =========================================================
+   🚀 DOB DROPDOWN UPWARD FIX & PREMIUM SCROLLBAR
+========================================================= */
+
+/* 1. Dropdown ko UPAR (Upward) kholne ka logic */
+html body .select-items {
+    position: absolute;
+    bottom: calc(100% + 8px); /* 🚀 Niche khulne ke bajaye, ab dabbe ke theek UPAR khulega */
+    top: auto; /* Purane top logic ko disable kiya */
+    left: 0;
+    right: 0;
+    background-color: var(--dropdown-bg, #ffffff);
+    border: 1.5px solid var(--border-solid);
+    z-index: 999999;
+    border-radius: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15); /* 🚀 Shadow bhi upar ki taraf shift kar di */
+    overscroll-behavior: contain;
+    transform-origin: bottom center; 
+    animation: popUpward 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Upar khulne ka smooth animation */
+@keyframes popUpward {
+    0% { opacity: 0; transform: scaleY(0.8) translateY(10px); }
+    100% { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+/* 2. 🚀 Modern Premium Scrollbar (Sirf Dropdown ke liye) */
+html body .select-items::-webkit-scrollbar {
+    width: 5px; /* Ekdum patla aur sleek */
+}
+html body .select-items::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0; /* Upar-niche thoda gap */
+}
+html body .select-items::-webkit-scrollbar-thumb {
+    background: var(--text-secondary); /* Theme connected color */
+    border-radius: 10px;
+    opacity: 0.5;
+}
+html body .select-items::-webkit-scrollbar-thumb:hover {
+    background: var(--text-primary);
+}
+
+/* Mobile & Tablet Auto-Adjust */
+@media screen and (max-width: 768px) {
+    html body .select-items {
+        max-height: 180px; /* Mobile par thoda chhota khulega taaki screen bahar na jaye */
+    }
+}
+
+
+
+
+
+
+/* =========================================================
+   🚀 UNIVERSAL PREMIUM SCROLLBAR (Light/Dark Sync)
+========================================================= */
+/* Sabhi browsers ke liye default scrollbar chhupana aur custom lagana */
+* {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: var(--border-solid) transparent; /* For Firefox */
+}
+
+/* Chrome, Edge, Safari ke liye */
+::-webkit-scrollbar {
+    width: 6px; /* Patla aur sleek design */
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent; /* Track invisible rahega */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-solid); /* 🚀 Theme Engine se connect kiya */
+    border-radius: 10px;
+    opacity: 0.3;
+    border: 2px solid transparent; /* Padding effect */
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-primary); /* Hover karne par dark/light highlight */
+}
+
+/* Onboarding box ke liye thoda special spacing */
+.quantum-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--text-secondary);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================
+   🎙️ LIVE VOICE CHAT ROOM (THEME ENGINE CONNECTED)
+   (Premium 1.5px Solid Border & No !important)
+========================================== */
+
+.live-voice-overlay,
+#live-voice-overlay {
+    /* Full Screen Setup - 🚀 Connected strictly to Main Theme Engine Variables */
+    position: fixed; 
+    inset: 0;
+    width: 100vw; 
+    height: 100dvh;
+    background: var(--bg-main); 
+    color: var(--text-primary);
+    z-index: 999999; 
+    display: flex; 
+    flex-direction: column;
+    box-sizing: border-box; 
+    overflow: hidden; 
+    font-family: 'Inter', sans-serif; 
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* 🚀 Hide Room without !important (High Specificity) */
+html body .live-voice-overlay.hidden,
+html body #live-voice-overlay.hidden { 
+    display: none; 
+    opacity: 0; 
+    visibility: hidden; 
+    pointer-events: none; 
+}
+
+/* --- 3. BUTTONS (Premium Sync) --- */
+#live-voice-overlay .voice-action-btn {
+    background: var(--btn-bg); 
+    color: var(--text-primary); 
+    
+    /* 🚀 1.5px Solid Border (Theme Sync) */
+    border: 1.5px solid var(--border-solid); 
+    
+    padding: 8px 16px; 
+    border-radius: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-weight: 600; 
+    font-size: 12px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    backdrop-filter: blur(10px);
+    position: relative; 
+    z-index: 100; 
+    pointer-events: auto;
+}
+
+#live-voice-overlay .voice-action-btn:hover { 
+    background: var(--btn-hover); 
+    transform: translateY(-2px); 
+    box-shadow: var(--shadow);
+}
+
+/* --- 4. 🚀 TOP ALIGNED HOLOGRAM (Matching Home Screen Design) --- */
+#live-voice-overlay .voice-hologram-glow { 
+    position: absolute; 
+    inset: 0; 
+    border-radius: 50%; 
+    background: var(--btn-hover); 
+    filter: blur(25px); 
+    animation: pulseVoiceOrb 4s infinite; 
+}
+
+#live-voice-overlay .star-orbit-hologram { 
+    position: relative; 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+#live-voice-overlay .star-trail { 
+    position: absolute; 
+    border-radius: 50%; 
+    animation: spinHologramRing linear infinite; 
+}
+
+/* 🚀 Trail 1 (होम स्क्रीन जैसी 2px सॉलिड लाइन) */
+#live-voice-overlay .trail-1 { 
+    width: 90px; 
+    height: 90px; 
+    border-style: solid; 
+    border-width: 2px; 
+    border-color: transparent var(--border-solid) transparent transparent; 
+    animation-duration: 4s; 
+    opacity: 1; 
+}
+
+/* 🚀 Trail 2 (होम स्क्रीन जैसी रिवर्स 2px सॉलिड लाइन) */
+#live-voice-overlay .trail-2 { 
+    width: 130px; 
+    height: 130px; 
+    border-style: solid; 
+    border-width: 2px; 
+    border-color: transparent transparent var(--border-solid) transparent; 
+    animation-duration: 7s; 
+    animation-direction: reverse; 
+    opacity: 0.9; 
+}
+
+/* 🚀 Trail 3 (होम स्क्रीन जैसी 1.5px डैश लाइन) */
+#live-voice-overlay .trail-3 { 
+    width: 160px; 
+    height: 160px; 
+    border: 1.5px dashed var(--border-solid); 
+    animation-duration: 10s; 
+    opacity: 0.6; 
+}
+
+/* 🚀 Trail 4 (होम स्क्रीन जैसी बाहरी 1.5px सॉलिड लाइन) */
+#live-voice-overlay .trail-4 { 
+    width: 190px; 
+    height: 190px; 
+    border: 1.5px solid var(--border-solid); 
+    animation-duration: 15s; 
+    animation-direction: reverse; 
+    opacity: 0.4; 
+}
+
+/* 🚀 बीच का सॉलिड गोला (Core Orb) */
+#live-voice-overlay .core-glow-orb { 
+    width: 55px; 
+    height: 55px; 
+    border-radius: 50%; 
+    z-index: 20; 
+    background: var(--border-solid); 
+    box-shadow: 0 0 25px var(--border-solid); 
+    animation: pulseVoiceOrb 2s infinite alternate ease-in-out; 
+}
+
+@keyframes spinHologramRing { 100% { transform: rotate(360deg); } }
+@keyframes pulseVoiceOrb { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
+
+/* 🚀 AI Talking Animation */
+html body #live-voice-overlay.ai-talking .star-trail { 
+    animation-duration: 1.5s; 
+}
+html body #live-voice-overlay.ai-talking .core-glow-orb { 
+    animation-duration: 0.5s; 
+    transform: scale(1.2); 
+}
+
+/* Status Text */
+#live-voice-overlay .live-voice-status { 
+    flex-shrink: 0; 
+    font-size: 15px; 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+    color: var(--text-primary); 
+    margin-bottom: 10px; 
+    animation: pulseText 2s infinite alternate; 
+}
+
+#live-voice-overlay .live-voice-chat-log {
+    flex: 1; 
+    width: 100%; overflow-y: auto; margin-bottom: 10px;
+    background: var(--dropdown-bg); 
+    
+    /* 🚀 1.5px Solid Border Sync */
+    border: 1.5px solid var(--border-solid); 
+    
+    border-radius: 20px; padding: 15px; display: flex; flex-direction: column; gap: 15px; 
+    box-shadow: var(--shadow); box-sizing: border-box;
+    position: relative; z-index: 10; 
+}
+
+#live-voice-overlay .secure-voice-badge { 
+    text-align: center; font-size: 11px; font-weight: 600; text-transform: uppercase; 
+    color: var(--text-secondary); margin-bottom: 10px; 
+}
+
+#live-voice-overlay .chat-message-row { display: flex; gap: 10px; width: 100%; animation: popupFadeInUp 0.4s ease forwards; list-style: none; }
+#live-voice-overlay .chat-message-row.user { justify-content: flex-end; }
+#live-voice-overlay .chat-message-row.ai { justify-content: flex-start; }
+
+#live-voice-overlay .bubble-container { position: relative; max-width: 85%; display: flex; flex-direction: column; }
+#live-voice-overlay .chat-message-row.user .bubble-container { align-items: flex-end; }
+#live-voice-overlay .chat-message-row.ai .bubble-container { align-items: flex-start; }
+
+#live-voice-overlay .chat-bubble { 
+    padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; font-weight: 500; 
+    border: 1.5px solid var(--border-solid);
+}
+
+/* 🌙 USING THEME COLORS FOR BUBBLES INSTEAD OF HARDCODED ONES */
+#live-voice-overlay .chat-bubble.user-bubble { 
+    background-color: var(--btn-hover); color: var(--text-primary); 
+    border-bottom-right-radius: 4px; box-shadow: var(--shadow); 
+}
+#live-voice-overlay .chat-bubble.ai-bubble { 
+    background-color: var(--dropdown-bg); color: var(--text-primary); 
+    border-bottom-left-radius: 4px; box-shadow: var(--shadow); 
+}
+
+#live-voice-overlay .chat-name-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px; display: inline-block; }
+
+#live-voice-overlay .mini-ai-hologram { width: 28px; height: 28px; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; filter: grayscale(100%); }
+#live-voice-overlay .mini-ai-hologram .mini-core { width: 8px; height: 8px; border-radius: 50%; background: var(--text-primary); animation: pulseVoiceOrb 1.5s infinite alternate; }
+#live-voice-overlay .mini-ai-hologram .mini-ring { 
+    position: absolute; width: 22px; height: 22px; 
+    border: 1.5px dashed var(--border-solid); 
+    border-radius: 50%; animation: spinHologramRing 4s linear infinite; 
+}
+
+#live-voice-overlay .chat-feedback-row { 
+    margin-top: 8px; padding-top: 6px; 
+    border-top: 1.5px solid var(--border-solid); 
+    display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-secondary); 
+}
+#live-voice-overlay .chat-feedback-row button { background: transparent; border: none; color: inherit; cursor: pointer; transition: 0.2s; padding: 0; }
+#live-voice-overlay .chat-feedback-row button:hover { transform: scale(1.2); color: var(--text-primary); }
+#live-voice-overlay .ai-gen-tag { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+
+/* 🚀 AUTO-FIT SMART MENUS */
+#live-voice-overlay .smart-msg-menu {
+    position: absolute; bottom: calc(100% + 5px); background: var(--header-bg);
+    border: 1.5px solid var(--border-solid); 
+    border-radius: 10px; padding: 4px; display: flex; gap: 4px; box-shadow: var(--shadow); z-index: 99999; backdrop-filter: blur(20px); 
+}
+#live-voice-overlay .chat-message-row.user .smart-msg-menu { right: 0; }
+#live-voice-overlay .chat-message-row.ai .smart-msg-menu { left: 0; }
+
+html body #live-voice-overlay .smart-msg-menu.hidden { display: none; }
+
+#live-voice-overlay .menu-btn { background: transparent; border: none; color: var(--text-primary); padding: 6px 10px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; gap: 5px; align-items: center; }
+#live-voice-overlay .menu-btn:hover { background: var(--btn-hover); }
+
+/* --- 6. 🚀 FIXED: 10-LINE ZOOM INPUT AREA --- */
+#live-voice-overlay .live-voice-type-input { 
+    flex-shrink: 0; width: 100%; max-width: 900px; margin: 0 auto 10px auto; display: flex; align-items: flex-end; 
+    background: var(--dropdown-bg); 
+    border: 1.5px solid var(--border-solid); 
+    padding: 8px 15px; border-radius: 25px; z-index: 999995; box-sizing: border-box; position: relative; pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+html body #live-voice-overlay .live-voice-type-input.hidden { display: none; }
+
+#live-voice-overlay .live-voice-type-input textarea { 
+    flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); 
+    font-size: 14px; padding: 8px; resize: none; max-height: 100px; font-family: inherit; 
+    transition: height 0.3s ease;
+}
+#live-voice-overlay .type-input-controls { display: flex; flex-direction: column; gap: 6px; margin-left: 10px; padding-bottom: 4px; }
+#live-voice-overlay .zoom-textarea-btn, 
+#live-voice-overlay .send-text-btn { 
+    width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; 
+}
+#live-voice-overlay .zoom-textarea-btn { background: var(--btn-bg); color: var(--text-primary); }
+#live-voice-overlay .zoom-textarea-btn:hover { background: var(--btn-hover); }
+#live-voice-overlay .send-text-btn { background: var(--text-primary); color: var(--bg-main); }
+#live-voice-overlay .send-text-btn:hover { transform: scale(1.1); }
+
+/* 🚀 FIXED: 10-LINE ZOOM (Bina !important ke High Specificity) */
+html body #live-voice-overlay .live-voice-type-input.fullscreen-mode {
+    position: absolute;
+    bottom: 85px; left: 10px; right: 10px; width: auto; 
+    border-radius: 20px; padding: 15px; box-shadow: var(--shadow);
+}
+html body #live-voice-overlay .live-voice-type-input.fullscreen-mode textarea { 
+    height: 220px; max-height: 35vh; font-size: 15px;
+}
+html body #live-voice-overlay .live-voice-type-input.fullscreen-mode .type-input-controls { flex-direction: column; justify-content: flex-end; }
+
+/* --- 7. 🚀 FIXED: BOTTOM NAV BAR & CLICKS --- */
+#live-voice-overlay .voice-bottom-nav {
+    flex-shrink: 0; width: 100%; max-width: 900px; margin: 0 auto 15px auto; 
+    display: flex; justify-content: space-between; align-items: flex-end;
+    background: var(--header-bg); 
+    border: 1.5px solid var(--border-solid); 
+    padding: 12px 15px; border-radius: 35px; box-shadow: var(--shadow); position: relative; 
+    z-index: 999996; backdrop-filter: blur(25px); box-sizing: border-box; pointer-events: auto;
+}
+
+#live-voice-overlay .nav-btn-group { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; pointer-events: auto; }
+#live-voice-overlay .nav-btn-group span { font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
+
+#live-voice-overlay .nav-action-btn { 
+    width: 44px; height: 44px; border-radius: 50%; background: var(--btn-bg); color: var(--text-primary); 
+    border: 1.5px solid var(--border-solid); 
+    display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; transition: 0.3s; position: relative; z-index: 10;
+}
+#live-voice-overlay .nav-action-btn:hover { background: var(--text-primary); color: var(--bg-main); transform: scale(1.1); }
+
+#live-voice-overlay .nav-main-btn { 
+    width: 58px; height: 58px; border-radius: 50%; background: var(--text-primary); color: var(--bg-main); 
+    border: 1.5px solid var(--border-solid); 
+    display: flex; align-items: center; justify-content: center; font-size: 20px; 
+    cursor: pointer; transition: 0.3s; transform: translateY(-8px); box-shadow: var(--glow); 
+    position: relative; z-index: 10;
+}
+#live-voice-overlay .nav-main-btn:hover { transform: translateY(-12px) scale(1.05); }
+
+/* --- 8. 🚀 FIXED: AUTO-FITTING ATTACHMENT MENU (+) --- */
+#live-voice-overlay .attachment-menu {
+    position: absolute; bottom: calc(100% + 10px); left: 10px; 
+    background: var(--header-bg); backdrop-filter: blur(25px);
+    border: 1.5px solid var(--border-solid); 
+    border-radius: 16px; padding: 8px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow);
+    z-index: 999999; min-width: 160px; max-height: 45vh; overflow-y: auto; 
+}
+
+html body #live-voice-overlay .attachment-menu.hidden { display: none; }
+
+#live-voice-overlay .attachment-btn { 
+    background: transparent; color: var(--text-primary); border: none; padding: 10px 12px; 
+    text-align: left; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; 
+    transition: 0.2s; display: flex; align-items: center; gap: 10px; 
+}
+#live-voice-overlay .attachment-btn:hover { background: var(--btn-hover); transform: translateX(5px); }
+#live-voice-overlay .menu-divider { height: 1.5px; background: var(--border-solid); margin: 4px 0; opacity: 0.3; } 
+
+/* Custom Scrollbars */
+#live-voice-overlay .quantum-scrollbar::-webkit-scrollbar { width: 4px; }
+#live-voice-overlay .quantum-scrollbar::-webkit-scrollbar-track { background: transparent; }
+#live-voice-overlay .quantum-scrollbar::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 10px; opacity: 0.5;}
+
+@keyframes popupFadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+
+/* --- 9. DEVICE FRIENDLY (Tablet & PC) --- */
+@media screen and (min-width: 768px) {
+    #live-voice-overlay .voice-header-actions, 
+    #live-voice-overlay .voice-middle-container, 
+    #live-voice-overlay .voice-bottom-nav, 
+    #live-voice-overlay .live-voice-type-input { padding-left: 30px; padding-right: 30px; }
+    
+    #live-voice-overlay .voice-hologram-wrapper { width: 140px; height: 140px; }
+    #live-voice-overlay .nav-action-btn { width: 50px; height: 50px; font-size: 18px; }
+    #live-voice-overlay .nav-main-btn { width: 70px; height: 70px; font-size: 26px; }
+    
+    html body #live-voice-overlay .live-voice-type-input.fullscreen-mode { width: 600px; margin: 0 auto; left: 0; right: 0; } 
+}
+
+
+
+
+
+
+
+/* ==========================================
+   🚀 1. HEADER BUTTONS FIX (Connect & Hide Chat)
+========================================== */
+#live-voice-overlay .voice-header-actions {
+    flex-shrink: 0; 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 20px 20px 5px 20px; 
+    width: 100%; 
+    max-width: 1000px; 
+    margin: 0 auto; 
+    box-sizing: border-box;
+    pointer-events: none; 
+}
+
+/* ==========================================
+   🚀 2. FIX: INLINE MINI HOLOGRAM & BUBBLE ALIGNMENT
+   (Theme Synced & No !important)
+========================================== */
+#live-voice-overlay .ai-header-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+html body #live-voice-overlay .chat-name-tag {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin: 0; 
+}
+
+#live-voice-overlay .inline-mini-hologram {
+    width: 18px; 
+    height: 18px; 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-shrink: 0;
+    filter: grayscale(100%);
+}
+
+#live-voice-overlay .inline-mini-hologram .mini-core {
+    width: 6px; 
+    height: 6px; 
+    border-radius: 50%; 
+    /* 🚀 Theme Engine Border Color */
+    background: var(--border-solid); 
+    animation: pulseVoiceOrb 1.5s infinite alternate; 
+}
+
+#live-voice-overlay .inline-mini-hologram .mini-ring {
+    position: absolute; 
+    width: 16px; 
+    height: 16px; 
+    /* 🚀 1.5px Dashed Border (Theme Sync) */
+    border: 1.5px dashed var(--border-solid); 
+    border-radius: 50%; 
+    animation: spinHologramRing 4s linear infinite; 
+}
+
+#live-voice-overlay .chat-msg-text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+html body #live-voice-overlay .mini-ai-hologram { 
+    display: none; 
+}
+
+/* =========================================================
+   🚀 3. CLEAN FIX: LIVE VOICE HOLOGRAM & SCROLL BUG
+========================================================= */
+html body #live-voice-overlay #voice-middle-container .voice-hologram-wrapper {
+    margin-top: 10px; 
+}
+
+html body #live-voice-overlay #voice-middle-container .live-voice-chat-log {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0; 
+    height: 100%; 
+    padding-bottom: 20px;
+}
+
+html body #live-voice-overlay .voice-bottom-nav {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 999999;
+}
+
+/* =========================================================
+   🚀 1. FIX: MENU VISIBILITY ASSURANCE
+========================================================= */
+html body #live-voice-overlay .voice-bottom-nav #attachment-menu {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 15px;
+    z-index: 9999999;
+    /* 🚀 Theme Engine variables */
+    background: var(--dropdown-bg);
+    border: 1.5px solid var(--border-solid);
+    box-shadow: var(--shadow);
+}
+
+/* =========================================================
+   🚀 2. TARGETED FIX: GEMINI STYLE CAMERA UI (THEME CONNECTED)
+========================================================= */
+html body #live-voice-overlay video#live-stream-preview:not(.hidden) {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; 
+    z-index: 1; 
+    opacity: 0.85; 
+}
+
+html body #live-voice-overlay .voice-middle-container,
+html body #live-voice-overlay .voice-bottom-nav {
+    position: relative;
+    z-index: 10; 
+    background: transparent; 
+}
+
+html body #live-voice-overlay #camera-controls:not(.hidden) {
+    position: absolute;
+    bottom: 120px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    display: flex;
+    gap: 20px;
+    z-index: 999; 
+    padding: 10px 20px;
+    border-radius: 40px;
+    backdrop-filter: blur(10px); 
+    
+    /* 🚀 Theme Connected Background & 1.5px Solid Border */
+    background: var(--dropdown-bg); 
+    border: 1px solid var(--border-solid);
+    box-shadow: var(--shadow);
+}
+
+html body #live-voice-overlay #camera-controls button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* 🚀 Theme Connected Button Colors & 1.5px Solid Border */
+    background: var(--btn-bg);
+    border: 1.5px solid var(--border-solid);
+    color: var(--text-primary);
+}
+
+html body #live-voice-overlay #camera-controls button:hover {
+    transform: scale(1.1);
+    background: var(--btn-hover);
+}
+
+html body #live-voice-overlay #camera-controls button.close-camera-btn {
+    background: #ef4444; 
+    border-color: #ef4444;
+    color: #ffffff;
+}
+html body #live-voice-overlay #camera-controls button.close-camera-btn:hover {
+    background: #dc2626; 
+}
+
+/* =========================================================
+   🚀 3. CLEAN FIX: COMPLETELY HIDE CHAT BOX & CENTER HOLOGRAM
+========================================================= */
+html body #live-voice-overlay #live-voice-chat-log.hidden {
+    display: none;
+    margin: 0; padding: 0; height: 0;
+    border: none; background: transparent; box-shadow: none;
+}
+
+html body #live-voice-overlay #voice-middle-container.chat-hidden-mode {
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    margin-bottom: 20px; 
+}
+
+html body #live-voice-overlay #voice-middle-container.chat-hidden-mode .voice-hologram-wrapper {
+    transform: scale(1.3);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+html body #live-voice-overlay #voice-middle-container:not(.chat-hidden-mode) .voice-hologram-wrapper {
+    transform: scale(1);
+    transition: transform 0.5s ease-out;
+}
+
+/* =========================================================
+   🚀 1. CLEAN FIX: HOLOGRAM & CHAT BOX OVERLAP BUG
+========================================================= */
+html body #live-voice-overlay #voice-middle-container:not(.chat-hidden-mode) .voice-hologram-wrapper {
+    margin-bottom: 50px; 
+    transform: scale(0.85); 
+    transition: all 0.4s ease-out;
+}
+
+html body #live-voice-overlay #live-voice-chat-log:not(.hidden) {
+    max-height: 40vh; 
+    margin-top: auto; 
+}
+
+/* =========================================================
+   🚀 2. CLEAN FIX: MIC BUTTON CUT-OFF BUG (Aligning perfectly)
+========================================================= */
+html body #live-voice-overlay .voice-bottom-nav .nav-main-btn {
+    transform: translateY(0); 
+    box-shadow: none; 
+    
+    /* 🚀 1.5px Solid Border Sync */
+    border: 1.5px solid var(--border-solid);
+}
+
+html body #live-voice-overlay .voice-bottom-nav .nav-main-btn:hover {
+    transform: translateY(-2px) scale(1.05); 
+}
+
+/* =========================================================
+   🚀 3. CLEAN FIX: PERFECT ROUND HEADER ICON BUTTONS
+========================================================= */
+html body #live-voice-overlay .voice-header-actions .voice-action-btn {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 🚀 1.5px Solid Border Sync */
+    border: 1.5px solid var(--border-solid);
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+html body #live-voice-overlay .voice-header-actions .voice-action-btn:hover {
+    background: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+html body #live-voice-overlay .voice-header-actions .voice-action-btn i {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* =========================================================
+   🚀 4. RESTORE FIX: MIDDLE CONTAINER (PUSH BUTTONS DOWN)
+========================================================= */
+html body #live-voice-overlay #voice-middle-container {
+    flex: 1 1 0; 
+    min-height: 0; 
+    overflow: visible; 
+    padding-top: 25px; 
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+html body #live-voice-overlay .voice-bottom-nav {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 999999;
+    margin-top: auto; 
+    
+    /* 🚀 1.5px Solid Border Sync */
+    border: 1.5px solid var(--border-solid);
+}
+
+/* =========================================================
+   🚀 LIVE VOICE ROOM BUTTONS: AUTO-INVERT BORDER FIX
+========================================================= */
+html body #live-voice-overlay .voice-bottom-nav .nav-action-btn,
+html body #live-voice-overlay .voice-bottom-nav .nav-main-btn {
+    border: 1.5px solid currentColor;
+}
+
+html body #live-voice-overlay .voice-bottom-nav .nav-action-btn:hover,
+html body #live-voice-overlay .voice-bottom-nav .nav-main-btn:hover,
+html body #live-voice-overlay .voice-bottom-nav .nav-action-btn.active,
+html body #live-voice-overlay .voice-bottom-nav .nav-main-btn.active {
+    border: 1.5px solid currentColor;
+}
+
+
+
+
+
+
+/* =========================================================
+   🚀 LIVE VOICE ROOM LAYOUT FIXES (PC, Tablet & Mobile)
+========================================================= */
+
+/* 1. 🚀 HOLOGRAM CENTER FIX (Hologram hamesha beech mein rahega) */
+html body #live-voice-overlay .voice-hologram-wrapper {
+    align-self: center; /* Flexbox ke andar perfect center karega */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 2. 🚀 CHAT BOX OVERFLOW FIX (Dabba screen se bahar nahi bhagega) */
+html body #live-voice-overlay #voice-middle-container {
+    box-sizing: border-box; /* Padding ko width ke andar hi lock karega */
+    max-width: 900px; /* PC par chat box bahut zyada chauda (wide) nahi hoga, premium lagega */
+    margin: 0 auto; /* Pure chat area ko screen ke bilkul center mein set karega */
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* 3. 🚀 CHAT BUBBLES FIX (Messages limit ke andar rahenge) */
+html body #live-voice-overlay .live-voice-chat-log {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%; /* Parent div se bahar kabhi nahi jayega */
+    overflow-x: hidden; /* Horizontal scroll ya katne ki problem khatam */
+}
+
+html body #live-voice-overlay .chat-message-row {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   🚀 HOLOGRAM CUT-OFF & CHAT BOX RESIZE FIX
+========================================================= */
+
+/* 1. 🚀 Hologram Cut-off Fix (Hologram kabhi nahi katega) */
+html body #live-voice-overlay .voice-hologram-wrapper,
+html body .hologram-wrapper {
+    flex-shrink: 0; /* Chat box ab isko dabakar chhota nahi kar payega */
+    margin-bottom: 30px; /* Chat box aur hologram ke beech safe gap */
+    overflow: visible; /* Agar glow/ring bahar jayega toh screen se katega nahi */
+    z-index: 20; /* Dabba hamesha chat box ke upar dikhega */
+}
+
+/* 2. 🚀 Chat Box Resize (PC par Bada, Mobile par auto) */
+html body #live-voice-overlay #voice-middle-container,
+html body .chat-main-container,
+html body .text-chat-container {
+    max-width: 900px; /* 🚀 900px se badhakar 1100px kar diya jisse PC par lamba aur wide lage */
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+
+/* 3. 🚀 User aur AI Messages ke Bubbles ko bhi bada karein */
+html body #live-voice-overlay .bubble-container,
+html body .bubble-container {
+    max-width: 92%; /* 85% se badha kar 92% kar diya taaki lamba text 1-2 line me theek se aa jaye */
+}
+
+/* =========================================================
+   📱 MOBILE & TABLET AUTO-ADJUST ENGINE
+========================================================= */
+@media screen and (max-width: 768px) {
+    html body #live-voice-overlay #voice-middle-container,
+    html body .chat-main-container,
+    html body .text-chat-container {
+        max-width: 100%; /* Tablet/Mobile par dabba poori screen lega */
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    
+    html body #live-voice-overlay .bubble-container,
+    html body .bubble-container {
+        max-width: 95%; /* Mobile par message thode aur wide honge taaki padhne me aasaani ho */
+    }
+    
+    html body #live-voice-overlay .voice-hologram-wrapper,
+    html body .hologram-wrapper {
+        margin-bottom: 15px; /* Mobile par gap thoda kam hoga taaki jagah bache */
+    }
+}
+
+
+
+
+/* =========================================================
+   🚀 MESSAGE INPUT & BOTTOM NAV WIDTH SYNC FIX
+========================================================= */
+
+/* 1. Type Message wale dabbe ko Chat Box ke barabar karna */
+html body #live-voice-overlay .live-voice-type-input {
+    max-width: 900px; /* Ise 900px se 1100px kar diya */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* 2. Bottom Nav (Mic/Icons) wale dabbe ko Chat Box ke barabar karna */
+html body #live-voice-overlay .voice-bottom-nav {
+    max-width: 900px; /* Ise bhi 900px se 1100px kar diya */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* 📱 Mobile aur Tablet ke liye Auto-Adjust */
+@media screen and (max-width: 768px) {
+    html body #live-voice-overlay .live-voice-type-input,
+    html body #live-voice-overlay .voice-bottom-nav {
+        max-width: 100%; /* Chhoti screen par poori width le lenge */
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   💬 FULLSCREEN TEXT CHAT ROOM (LAYOUT & BUBBLES)
+   (Premium Gemini Style, 100% Responsive, Theme Synced)
+========================================================= */
+
+/* 1. MASTER VISIBILITY & BACKGROUND */
+html body #fullscreen-chat-room {
+    position: fixed; inset: 0; width: 100vw; height: 100dvh;
+    background-color: var(--bg-main); color: var(--text-primary);
+    z-index: 100000; display: flex; flex-direction: column; overflow: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+html body #fullscreen-chat-room.glassmorphism-ultra {
+    background: linear-gradient(135deg, var(--header-bg), var(--bg-main));
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+}
+
+/* 2. HEADER */
+html body #fullscreen-chat-room .text-chat-header {
+    flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; background: transparent; border-bottom: none;
+    width: 100%; max-width: 950px; margin: 0 auto; /* 🚀 PC par center fix */
+    box-sizing: border-box;
+}
+
+html body #fullscreen-chat-room .voice-action-btn {
+    width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: var(--btn-bg); color: var(--text-primary);
+    border: 1.5px solid var(--border-solid); cursor: pointer; transition: all 0.3s ease;
+}
+html body #fullscreen-chat-room .voice-action-btn:hover { background: var(--btn-hover); transform: scale(1.05); }
+
+/* 3. CHAT LOG AREA (Center Locked for PC) */
+html body #fullscreen-chat-room #chat-box {
+    flex: 1 1 auto; overflow-y: auto; padding: 20px 15px;
+    display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth;
+    align-items: center; /* 🚀 Messages ko center me align karega */
+}
+
+#fullscreen-chat-room #chat-box::-webkit-scrollbar { width: 5px; }
+#fullscreen-chat-room #chat-box::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 10px; opacity: 0.5; }
+
+/* 4. PREMIUM CHAT BUBBLES (Width Limited for PC) */
+html body #fullscreen-chat-room .chat-message-row { 
+    display: flex; width: 100%; max-width: 900px; /* 🚀 PC par failne se rokega */
+    animation: popupFadeInUp 0.4s ease forwards; 
+}
+html body #fullscreen-chat-room .chat-message-row.user { justify-content: flex-end; }
+html body #fullscreen-chat-room .chat-message-row.ai { justify-content: flex-start; flex-direction: column; }
+
+html body #fullscreen-chat-room .bubble-container { max-width: 88%; position: relative; display: flex; flex-direction: column; }
+html body #fullscreen-chat-room .chat-message-row.user .bubble-container { align-items: flex-end; }
+html body #fullscreen-chat-room .chat-message-row.ai .bubble-container { align-items: flex-start; }
+
+html body #fullscreen-chat-room .chat-bubble {
+    padding: 12px 18px; border-radius: 20px; font-size: 15px; line-height: 1.6; font-weight: 500;
+    word-wrap: break-word;
+}
+
+/* User Bubble (Theme Synced) */
+html body #fullscreen-chat-room .chat-bubble.user-bubble {
+    background-color: var(--btn-bg); color: var(--text-primary);
+    border: 1.5px solid var(--border-solid); border-bottom-right-radius: 4px;
+}
+
+/* AI Bubble (Transparent Theme Synced) */
+html body #fullscreen-chat-room .chat-bubble.ai-bubble {
+    background-color: transparent; color: var(--text-primary);
+    border: 1.5px solid var(--border-solid); border-bottom-left-radius: 4px; 
+}
+
+/* 5. USER ACTION BUTTONS */
+html body #fullscreen-chat-room .user-action-bar,
+html body #fullscreen-chat-room .chat-action-bar {
+    display: flex; gap: 8px; margin-top: 8px; padding: 0 5px;
+}
+html body #fullscreen-chat-room .user-action-bar { opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none; }
+html body #fullscreen-chat-room .chat-message-row.user:hover .user-action-bar,
+html body #fullscreen-chat-room .chat-message-row.user:active .user-action-bar { opacity: 1; visibility: visible; pointer-events: auto; }
+
+html body #fullscreen-chat-room .action-icon-btn {
+    background: var(--btn-bg); border: 1.5px solid var(--border-solid); color: var(--text-primary);
+    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer; transition: all 0.2s ease;
+}
+html body #fullscreen-chat-room .action-icon-btn:hover { background: var(--btn-hover); transform: scale(1.1); }
+
+/* 6. AI HOLOGRAM STATUS */
+html body #fullscreen-chat-room .hologram-status-bar { margin-bottom: 8px; }
+html body #fullscreen-chat-room .inline-mini-hologram { position: relative; display: flex; align-items: center; justify-content: center; }
+html body #fullscreen-chat-room .inline-mini-hologram .mini-ring { 
+    position: absolute; border-radius: 50%; border-style: dashed; border-width: 1.5px; 
+    border-color: var(--border-solid); animation: spinHologramRing 4s linear infinite; 
+}
+html body #fullscreen-chat-room .inline-mini-hologram .mini-core { 
+    border-radius: 50%; background: var(--text-primary); animation: pulseVoiceOrb 1.5s infinite alternate; 
+}
+html body #fullscreen-chat-room .inline-mini-hologram.stopped .mini-core,
+html body #fullscreen-chat-room .inline-mini-hologram.stopped .mini-ring { animation: none; opacity: 0.8; }
+
+@keyframes popupFadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+
+/* =========================================================
+   💬 GEMINI INPUT BOX (Expanding, Scrollable & Centered)
+========================================================= */
+
+/* 1. BOTTOM AREA WRAPPER (Center Lock for PC) */
+html body #fullscreen-chat-room .text-chat-bottom-area {
+    flex-shrink: 0; padding: 10px 15px 20px 15px; background: transparent; position: relative; z-index: 20;
+    width: 100%; max-width: 900px; margin: 0 auto; box-sizing: border-box; /* 🚀 PC Par Center Lock */
+}
+
+/* 2. OUTER WRAPPER */
+html body #fullscreen-chat-room .text-chat-input-wrapper {
+    display: flex; flex-direction: column; gap: 5px;
+    background: var(--dropdown-bg); border: 1.5px solid var(--border-solid);
+    border-radius: 26px; padding: 15px; box-shadow: var(--shadow); transition: all 0.3s ease;
+    backdrop-filter: blur(20px);
+}
+html body #fullscreen-chat-room .text-chat-input-wrapper:focus-within { border-color: var(--text-primary); }
+
+html body #fullscreen-chat-room .attachment-preview-area { width: 100%; display: flex; gap: 10px; padding: 5px; overflow-x: auto; }
+
+/* 3. GEMINI GRID LAYOUT */
+html body #fullscreen-chat-room .input-controls-row {
+    display: grid; grid-template-columns: auto auto 1fr auto; grid-template-rows: auto auto; align-items: center; width: 100%;
+}
+
+/* 4. MAGIC TEXTAREA */
+html body #fullscreen-chat-room #chat-user-input {
+    grid-column: 1 / -1; grid-row: 1; width: 100%; min-height: 50px; 
+    background: transparent; border: none; outline: none;
+    color: var(--text-primary); font-size: 16px; padding: 0 0 15px 0; 
+    resize: none; line-height: 1.5; max-height: 250px; overflow-y: auto; word-wrap: break-word;
+}
+html body #fullscreen-chat-room #chat-user-input::placeholder { color: var(--text-secondary); font-size: 16px; }
+html body #fullscreen-chat-room #chat-user-input::-webkit-scrollbar { width: 4px; }
+html body #fullscreen-chat-room #chat-user-input::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 4px; opacity: 0.5; }
+
+/* 5. BUTTON ALIGNMENTS */
+html body #fullscreen-chat-room .input-action-group:nth-child(1) { grid-column: 1; grid-row: 2; }
+html body #fullscreen-chat-room .input-action-group:nth-child(2) { grid-column: 2; grid-row: 2; margin-left: 8px; }
+html body #fullscreen-chat-room .input-submit-group { grid-column: 4; grid-row: 2; display: flex; justify-content: flex-end; gap: 10px; }
+
+html body #fullscreen-chat-room .input-icon-btn, 
+html body #fullscreen-chat-room .input-send-btn, 
+html body #fullscreen-chat-room .input-stop-btn {
+    width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; background: var(--btn-bg); color: var(--text-primary);
+    border: 1.5px solid var(--border-solid); transition: all 0.3s ease;
+}
+html body #fullscreen-chat-room .input-icon-btn:hover { background: var(--btn-hover); transform: scale(1.08); }
+html body #fullscreen-chat-room .input-send-btn { background: var(--active-btn-bg); color: var(--active-btn-text); border-color: var(--active-btn-text); }
+html body #fullscreen-chat-room .hidden { display: none; }
+
+/* 6. POPUP MENUS */
+html body #fullscreen-chat-room .text-chat-popup-menu {
+    position: absolute; bottom: calc(100% + 20px); left: 0; width: 240px;
+    background: var(--dropdown-bg); border: 1.5px solid var(--border-solid);
+    border-radius: 16px; padding: 10px; box-shadow: var(--shadow); z-index: 100;
+    display: flex; flex-direction: column; gap: 4px; backdrop-filter: blur(25px);
+}
+html body #fullscreen-chat-room .popup-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px; padding-left: 10px; }
+
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn {
+    width: 100%; text-align: left; background: transparent; color: var(--text-primary);
+    border: 1.5px solid transparent; padding: 12px 15px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease;
+}
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn i { width: 20px; text-align: center; color: var(--text-secondary); transition: all 0.2s ease; }
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn:hover { background: var(--btn-hover); border: 1.5px solid var(--border-solid); transform: translateX(4px); }
+html body #fullscreen-chat-room .text-chat-popup-menu .popup-item-btn:hover i { color: var(--text-primary); }
+html body #fullscreen-chat-room .menu-divider { height: 1.5px; background: var(--border-solid); opacity: 0.2; margin: 4px 0; }
+
+/* =========================================================
+   📱 RESPONSIVE ENGINE (Tablet & Mobile Fits)
+========================================================= */
+@media screen and (max-width: 768px) {
+    /* Tablet Adjustments */
+    html body #fullscreen-chat-room .text-chat-input-wrapper { padding: 12px; border-radius: 22px; }
+    html body #fullscreen-chat-room #chat-user-input { font-size: 15px; padding-bottom: 10px; }
+    html body #fullscreen-chat-room .input-icon-btn, 
+    html body #fullscreen-chat-room .input-send-btn, 
+    html body #fullscreen-chat-room .input-stop-btn { width: 40px; height: 40px; font-size: 16px; }
+}
+
+@media screen and (max-width: 480px) {
+    /* Mobile Constraints */
+    html body #fullscreen-chat-room .text-chat-header { padding: 10px 15px; }
+    html body #fullscreen-chat-room .text-chat-bottom-area { padding: 10px; }
+    
+    html body #fullscreen-chat-room .bubble-container { max-width: 95%; } /* Use more screen space */
+    html body #fullscreen-chat-room .chat-bubble { padding: 10px 14px; font-size: 14px; }
+    
+    html body #fullscreen-chat-room .text-chat-input-wrapper { padding: 10px; border-radius: 20px; }
+    html body #fullscreen-chat-room #chat-user-input { font-size: 14px; padding-bottom: 8px; min-height: 40px; }
+    
+    html body #fullscreen-chat-room .input-icon-btn, 
+    html body #fullscreen-chat-room .input-send-btn, 
+    html body #fullscreen-chat-room .input-stop-btn { width: 38px; height: 38px; font-size: 15px; }
+    
+    html body #fullscreen-chat-room .action-icon-btn { width: 28px; height: 28px; font-size: 11px; }
+    html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visible; pointer-events: auto; } /* Mobile par buttons hamesha dikhenge */
+}
+
+
+
+
+
+/* =========================================================
+   🚀 GEMINI STYLE: USER MESSAGE SHOW MORE / LESS
+========================================================= */
+.user-msg-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.user-msg-content {
+    width: 100%;
+    word-wrap: break-word;
+    transition: max-height 0.3s ease;
+}
+
+/* 🚀 4-Line Lock & Auto Dot-Dot-Dot (...) */
+.clamped-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Sirf 4 line dikhayega */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; /* End mein ... automatically aayega */
+}
+
+/* Toggle Icon Button */
+.user-msg-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    align-self: flex-end; /* Button ekdum right side niche hoga */
+}
+
+.user-msg-toggle-btn:hover {
+    background: var(--btn-hover);
+    color: var(--text-primary);
+}
+
+.user-msg-toggle-btn i {
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 15px;
+}

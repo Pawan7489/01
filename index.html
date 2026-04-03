@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+        <meta name="color-scheme" content="light dark">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link href="style.css" rel="stylesheet">
+        <title>A1</title>     
+ </head>
+<body>
+<div id="app-home-screen-wrapper" class="home-screen-container">
+
+    <header id="header" class="header-main" role="banner">
+        <button id="Sidemenubar" onclick="toggleMenu()" class="menu-btn" aria-label="Toggle Navigation Menu">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+
+        <div class="header-right-group">
+            <button id="Voice-icon" onclick="toggleVoice()" class="menu-btn" aria-label="Toggle Voice Assistant">
+                <i class="fas fa-volume-up" aria-hidden="true"></i>
+            </button>
+
+            <div class="profile-container" style="position: relative;">
+                <button id="Profile" onclick="toggleProfile()" class="avatar-3d-wrapper" aria-label="User Profile" aria-haspopup="true" aria-expanded="false">
+                    <img id="Profile-image" src="" class="avatar-img" onerror='this.style.display="none"' alt="Profile Image">
+                    <i class="fas fa-user profile-icon-placeholder" aria-hidden="true"></i>
+                </button>
+                
+                <div id="profile-dropdown" class="hidden glass-dropdown-3d" role="menu">
+                    <button onclick="showProfileDetails()" class="dropdown-link" role="menuitem">
+                        <i class="fas fa-id-card" aria-hidden="true"></i> Account Details
+                    </button>
+                    
+                    <div id="Theme-control" class="theme-panel">
+                        <span class="panel-label">Interface Theme</span>
+                        <div class="theme-switch-grid" role="group" aria-label="Theme Selection">
+                            <button id="theme-btn-light" onclick="changeAppTheme('light')" class="mode-btn">
+                                <i class="fas fa-sun" aria-hidden="true"></i> Light
+                            </button>
+                            <button id="theme-btn-dark" onclick="changeAppTheme('dark')" class="mode-btn">
+                                <i class="fas fa-moon" aria-hidden="true"></i> Dark
+                            </button>
+                            <button id="theme-btn-system" onclick="changeAppTheme('system')" class="mode-btn">
+                                <i class="fas fa-desktop" aria-hidden="true"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showSettings()" class="dropdown-link" role="menuitem">
+                        <i class="fas fa-cog" aria-hidden="true"></i> Settings
+                    </button>
+                    <button onclick="window.logoutUser(event)" class="custom-logout-btn">
+                       <i class="fas fa-sign-out-alt"></i> 
+                       <span>Logout</span>
+                      </button>
+
+
+                </div>
+            </div>
+        </div>
+    </header>
+ <div id="chat-context-menu" class="hidden glass-dropdown-3d context-menu-style" role="menu">
+        <button class="dropdown-link context-btn" role="menuitem">
+            <i class="fas fa-pen" aria-hidden="true"></i> Rename
+        </button>
+        <button class="dropdown-link context-btn" role="menuitem">
+            <i class="fas fa-share-alt" aria-hidden="true"></i> Share
+        </button>
+        <button class="dropdown-link context-btn" role="menuitem">
+            <i class="fas fa-tools" aria-hidden="true"></i> Tech Support
+        </button>
+        <div class="menu-divider" role="separator"></div>
+        <button class="dropdown-link context-btn text-danger" role="menuitem">
+            <i class="fas fa-trash" aria-hidden="true"></i> Delete
+        </button>
+    </div>
+
+    <main id="main-dashboard" class="dashboard-main-area" role="main">
+        
+        <div id="ai-hologram" class="hologram-wrapper" onclick="if(typeof triggerVibration === 'function') triggerVibration()" role="button" tabindex="0">
+            <div class="hologram-glow"></div>
+            <div class="star-orbit-hologram">
+                <div class="core-glow-orb"></div>
+                <div class="star-trail trail-1"></div>
+                <div class="star-trail trail-2"></div>
+                <div class="star-trail trail-3"></div>
+                <div class="star-trail trail-4"></div>
+            </div>
+        </div>
+        
+        <h2 class="welcome-heading">
+            Swagat hai, 
+            <span id="User-name" class="user-name-text">    
+                rohan
+            </span>!
+        </h2>
+
+        <div id="dynamic-prompts" class="prompts-container" aria-live="polite"></div>
+        
+    </main>
+
+</div>
+
+<aside class="floating-action-group" aria-label="Quick Actions">
+    <button id="live-voice-chatroom" onclick="document.getElementById('live-voice-overlay').classList.remove('hidden');" class="floating-btn live-chat-btn" aria-label="Open Live Chat">
+        <i class="fas fa-headset pulse-icon" aria-hidden="true"></i> Live Chat
+    </button>
+    
+    <button id="New-Chatroom" onclick="openNewChatRoom()" class="floating-btn new-chat-btn" aria-label="Create New Chat">
+         <i class="fas fa-plus drop-shadow-icon" aria-hidden="true"></i> New Chat
+    </button>
+</aside>
+
+
+
+
+
+
+
+
+
+<aside id="sidebar-menu" class="sidebar glass-effect hidden-sidebar">
+        <div class="sidebar-header">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Quantum Web...">
+            </div>
+            <button onclick="window.toggleMenu(event)" class="icon-btn"><i class="fas fa-arrow-left"></i></button>
+        </div>
+        
+        <div class="sidebar-new-chat">
+            <button onclick="window.openNewChatRoom()" class="primary-btn full-width"><i class="fas fa-plus"></i> New Chat Room</button>
+        </div>
+
+                <div class="sidebar-history custom-scrollbar">
+            <h5><i class="fas fa-history"></i> Neural History</h5>
+            
+            <div id="history-list-container" class="history-list-container" style="display:flex; flex-direction:column; gap:8px;">
+               <div class="history-item" data-type="text">
+   💬 Purani Text Chat
+</div>
+
+<div class="history-item" data-type="voice">
+   🎤 Purani Voice Chat
+</div>
+                
+            
+            </div>
+            
+              
+
+        <div class="sidebar-footer">
+            <button class="menu-list-btn" onclick="window.showTrashModal()">
+               <i class="fas fa-trash-restore"></i> Recover Deleted
+            </button>
+
+            <button class="menu-list-btn"><i class="fas fa-headset"></i> Support</button>
+            <button onclick="window.showSidebarSettings()" class="menu-list-btn"><i class="fas fa-cog"></i> App Settings</button>
+        </div>
+    </aside>
+
+    <div id="sidebar-settings-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-effect">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog fa-spin"></i> App Settings</h2>
+                <button onclick="window.hideSidebarSettings()" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body custom-scrollbar">
+                <p>Advanced control room settings will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+
+
+<div id="cookie-consent-overlay" class="cookie-overlay hidden">
+    <div class="cookie-modal-content">
+        <button onclick="window.handleCookieConsent('close')" class="cookie-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3 class="cookie-title">We use cookies</h3>
+        <p class="cookie-desc">
+            We use cookies to help this site function, understand service usage, and support marketing efforts. Visit <a href="#" class="cookie-link">Manage Cookies</a> to change preferences anytime. View our <a href="#" class="cookie-link">Cookie Policy</a> for more info.
+        </p>
+        <div class="cookie-btn-group">
+            <button onclick="window.handleCookieConsent('manage')" class="cookie-btn outline-btn">Manage Cookies</button>
+            <button onclick="window.handleCookieConsent('accept')" class="cookie-btn filled-btn">Accept all</button>
+            <button onclick="window.handleCookieConsent('reject')" class="cookie-btn outline-btn">Reject non-essential</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div id="trash-modal" class="trash-modal-overlay hidden" data-web4-vault="trash-bin">
+    
+    <div class="trash-modal-content">
+        
+        <button onclick="window.hideTrashModal()" class="trash-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <h2 class="trash-title">
+            <i class="fas fa-trash-restore trash-icon-pulse"></i> Deleted Chats
+        </h2>
+        
+        <p class="trash-desc">
+            Yahan se aap delete kiye gaye chats ko wapas la sakte hain ya hamesha ke liye mita sakte hain.
+        </p>
+        
+        <div id="trash-list-container" class="trash-list-container quantum-scrollbar" data-security-node="encrypted">
+            
+            </div>
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+<div id="auth-container" class="hidden auth-container-glass fade-in pace-aware" data-web4-vault="encrypted" data-auto-heal="true">
+    
+    <div id="login-view" class="fade-in">
+        
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to your account</p>
+        
+        <div class="auth-tab-group">
+            <label class="auth-radio-label">
+                <input type="radio" name="loginType" value="mobile" checked onchange="toggleLoginType()" style="display:none;">
+                <div class="auth-radio-custom"></div>
+                <span class="auth-radio-text">Mobile</span>
+            </label>
+            <label class="auth-radio-label">
+                <input type="radio" name="loginType" value="email" onchange="toggleLoginType()" style="display:none;">
+                <div class="auth-radio-custom"></div>
+                <span class="auth-radio-text">Email</span>
+            </label>
+        </div>
+
+        <div id="login-mobile-flow">
+            <div class="auth-input-group">
+                <input type="tel" id="login-mobile-input" placeholder="Enter Mobile Number" maxlength="10" class="auth-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')" data-security-node="active">
+            </div>
+            
+            <div class="auth-tab-group">
+                <label class="auth-radio-label">
+                    <input type="radio" name="mobileLoginMethod" value="otp" onchange="window.switchMobileLoginMethod()" checked style="display:none;">
+                    <div class="auth-radio-custom"></div>
+                    <span class="auth-radio-text">Login via OTP</span>
+                </label>
+                <label class="auth-radio-label">
+                    <input type="radio" name="mobileLoginMethod" value="password" onchange="window.switchMobileLoginMethod()" style="display:none;">
+                    <div class="auth-radio-custom"></div>
+                    <span class="auth-radio-text">Login via Password</span>
+                </label>
+            </div>
+
+            <div id="login-mobile-otp-section">
+                <button id="login-send-otp-btn" onclick="sendLoginOTP()" class="auth-btn-primary ios-btn">Send OTP</button>
+                <div id="login-otp-section" class="hidden fade-in">
+                    <p class="auth-subtitle" style="margin-bottom: 10px; color: #4ade80;"><i class="fas fa-shield-alt"></i> Enter 6-digit Secure OTP</p>
+                    <div class="auth-otp-row" id="login-otp-boxes"></div>
+                    <button onclick="verifyLoginOTP()" class="auth-btn-primary ios-btn">Verify & Login</button>
+                </div>
+            </div>
+
+            <div id="login-mobile-pass-section" class="hidden fade-in">
+                <div class="auth-input-group">
+                    <input type="password" id="login-mobile-password" placeholder="Enter Password" class="auth-input" data-security-node="encrypted">
+                    <button onclick="togglePassword('login-mobile-password', 'login-mobile-eye')" class="auth-eye-btn"><i class="fas fa-eye" id="login-mobile-eye"></i></button>
+                </div>
+                <div class="auth-options-row" style="flex-wrap: wrap; gap: 15px;">
+                 <label class="auth-checkbox-label" style="display: flex; align-items: center; gap: 8px;">
+                     <input type="checkbox" id="remember-me" style="margin: 0;"> Remember me
+                 </label>
+                    <button onclick="switchView('forgot-view')" class="auth-link">Forgot password?</button>
+                </div>
+                <button onclick="window.processMobilePassLogin()" class="auth-btn-primary ios-btn">Login</button>
+            </div>
+        </div>
+
+        <div id="login-email-flow" class="hidden">
+            <div class="auth-input-group">
+                <input type="email" id="login-email-input" placeholder="Email Address" class="auth-input" data-security-node="active" style="height: 56px; display: flex; align-items: center; padding: 0 20px;">
+            </div>
+            
+            <div class="auth-input-group">
+                <input type="password" id="login-password-input" placeholder="Password" class="auth-input" data-security-node="encrypted">
+                <button onclick="togglePassword('login-password-input', 'login-eye')" class="auth-eye-btn"><i class="fas fa-eye" id="login-eye"></i></button>
+            </div>
+
+            <div class="auth-options-row">
+                <label class="auth-checkbox-label">
+                    <input type="checkbox" id="remember-me"> Remember me
+                </label>
+                <button onclick="switchView('forgot-view')" class="auth-link">Forgot password?</button>
+            </div>
+
+            <button onclick="processEmailLogin()" class="auth-btn-primary ios-btn">Sign In</button>
+        </div>
+
+        <div class="auth-divider"><span>or continue with</span></div>
+        <button onclick="simulateGoogleAuth('Login')" class="auth-btn-social ios-btn">
+            <i class="fab fa-google"></i> Google
+        </button>
+
+        <p class="auth-footer">
+            Don't have an account? <button onclick="switchView('signup-view')" class="auth-link" style="margin-left: 5px;">Sign up</button>
+        </p>
+    </div>
+
+    <div id="signup-view" class="hidden fade-in">
+        
+        <button onclick="switchView('login-view')" class="auth-back-btn ios-btn"><i class="fas fa-arrow-left"></i></button>
+        
+        <h2 class="auth-title">Welcome</h2>
+        <p class="auth-subtitle">Create your new account</p>
+
+        <div class="auth-tab-group">
+            <label class="auth-radio-label">
+                <input type="radio" name="signupType" value="mobile" checked onchange="window.toggleSignupType()" style="display:none;">
+                <div class="auth-radio-custom"></div>
+                <span class="auth-radio-text">Mobile</span>
+            </label>
+            <label class="auth-radio-label">
+                <input type="radio" name="signupType" value="email" onchange="window.toggleSignupType()" style="display:none;">
+                <div class="auth-radio-custom"></div>
+                <span class="auth-radio-text">Email</span>
+            </label>
+        </div>
+
+        <div id="signup-mobile-flow">
+            <div class="auth-input-group">
+                <input type="tel" id="signup-mobile-input" placeholder="Enter Mobile Number" maxlength="10" class="auth-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')" data-security-node="active">
+            </div>
+            
+            <button id="signup-send-btn" onclick="sendSignupOTP()" class="auth-btn-primary ios-btn">Send OTP</button>
+
+            <div id="signup-otp-section" class="hidden fade-in">
+                <p class="auth-subtitle" style="margin-bottom: 10px; color: #facc15;"><i class="fas fa-fingerprint"></i> Enter 6-digit OTP</p>
+                <div class="auth-otp-row" id="signup-otp-boxes"></div>
+                <button onclick="window.verifySignupOTP()" class="auth-btn-primary ios-btn">Verify OTP</button>
+            </div>
+
+            <div id="signup-mobile-pass-section" class="hidden fade-in">
+                <p class="auth-subtitle" style="color: #4ade80; margin-bottom: 15px; font-weight: 600;"><i class="fas fa-check-circle"></i> Mobile Verified. Create Password.</p>
+                <div class="auth-input-group">
+                    <input type="password" id="signup-pass-mobile" placeholder="Create Password (8-20 chars)" maxlength="20" class="auth-input" data-security-node="encrypted">
+                    <button onclick="togglePassword('signup-pass-mobile', 'signup-eye-mobile-1')" class="auth-eye-btn"><i class="fas fa-eye" id="signup-eye-mobile-1"></i></button>
+                </div>
+                <div class="auth-input-group">
+                    <input type="password" id="signup-conf-pass-mobile" placeholder="Confirm Password" maxlength="20" class="auth-input" data-security-node="encrypted">
+                    <button onclick="togglePassword('signup-conf-pass-mobile', 'signup-eye-mobile-2')" class="auth-eye-btn"><i class="fas fa-eye" id="signup-eye-mobile-2"></i></button>
+                </div>
+                <button onclick="window.completeSignup('mobile')" class="auth-btn-primary ios-btn">Create Account</button>
+            </div>
+        </div>
+
+        <div id="signup-email-flow" class="hidden fade-in">
+            
+            <div id="signup-email-step-1">
+                <div class="auth-input-group">
+                    <input type="email" id="signup-email-input" placeholder="Enter Email Address" class="auth-input" data-security-node="active">
+                </div>
+                
+                <p id="email-verify-msg" class="auth-subtitle" style="font-size: 13px; color: #3b82f6; margin-bottom: 20px;">
+                    <i class="fas fa-envelope"></i> A verification link will be sent to this email.
+                </p>
+                
+                <button id="signup-send-email-btn" onclick="sendEmailVerification()" class="auth-btn-primary ios-btn">Send Verification Link</button>
+            </div>
+
+            <div id="signup-email-pass-section" class="hidden fade-in">
+                <p class="auth-subtitle" style="color: #4ade80; margin-bottom: 15px; font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> Email Verified. Create Password.
+                </p>
+                <div class="auth-input-group">
+                    <input type="password" id="signup-pass-email" placeholder="Create Password (8-20 chars)" maxlength="20" class="auth-input" data-security-node="encrypted">
+                    <button onclick="togglePassword('signup-pass-email', 'signup-eye-email-1')" class="auth-eye-btn"><i class="fas fa-eye" id="signup-eye-email-1"></i></button>
+                </div>
+                <div class="auth-input-group">
+                    <input type="password" id="signup-conf-pass-email" placeholder="Confirm Password" maxlength="20" class="auth-input" data-security-node="encrypted">
+                    <button onclick="togglePassword('signup-conf-pass-email', 'signup-eye-email-2')" class="auth-eye-btn"><i class="fas fa-eye" id="signup-eye-email-2"></i></button>
+                </div>
+                <button onclick="window.completeSignup('email')" class="auth-btn-primary ios-btn">Create Account</button>
+            </div>
+            
+        </div>
+        
+        <div class="auth-divider"><span>or continue with</span></div>
+        <button onclick="simulateGoogleAuth('Signup')" class="auth-btn-social ios-btn">
+            <i class="fab fa-google"></i> Create with Google
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div id="onboarding-view" class="hidden auth-container-glass fade-in pace-aware" data-web4-vault="onboarding" data-auto-heal="true">
+            
+    <div id="human-typing-container" class="onboard-typing-area">
+        <span id="ai-text-display" class="onboard-ai-text"></span>
+       
+    </div>
+
+    <div id="profile-form" class="onboard-form-group">
+        
+        <div id="name-container" class="hidden onboard-fade-in-up">
+            <input type="text" id="profile-name" placeholder="Apna Full Name Dalein" class="auth-input ios-btn" data-security-node="active">
+        </div>
+
+                                <div id="dob-container" class="hidden onboard-fade-in-up mt-4">
+            <label class="onboard-label">
+                <i class="fas fa-calendar-alt" style="color: #60a5fa;"></i> Date of Birth
+            </label>
+            <div class="custom-dob-wrapper">
+                <div class="custom-select-box" id="dob-day-box">
+                    <div class="select-selected">DD</div>
+                    <div class="select-items hidden" id="dob-day-items"></div>
+                </div>
+                <div class="custom-select-box" id="dob-month-box">
+                    <div class="select-selected">MM</div>
+                    <div class="select-items hidden" id="dob-month-items"></div>
+                </div>
+                <div class="custom-select-box" id="dob-year-box">
+                    <div class="select-selected">YYYY</div>
+                    <div class="select-items hidden" id="dob-year-items"></div>
+                </div>
+            </div>
+            <input type="hidden" id="profile-dob" value="">
+        </div>
+
+
+
+        <div id="gender-container" class="hidden onboard-fade-in-up mt-4">
+            <label class="onboard-label"><i class="fas fa-venus-mars" style="color: #c084fc;"></i> Gender</label>
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <button type="button" class="gender-btn auth-input ios-btn" data-val="male" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Male</button>
+                <button type="button" class="gender-btn auth-input ios-btn" data-val="female" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Female</button>
+                <button type="button" class="gender-btn auth-input ios-btn" data-val="other" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Other</button>
+            </div>
+            <input type="hidden" id="profile-gender" value="">
+        </div>
+
+
+        <div id="terms-container" class="hidden onboard-fade-in-up onboard-terms-box">
+            
+            <div class="onboard-terms-content">
+                <div class="onboard-checkbox-wrapper">
+                    <input type="checkbox" id="terms-agree" class="onboard-hidden-checkbox">
+                    <div class="onboard-custom-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <label for="terms-agree" class="onboard-terms-text">
+                    Main Terms & Conditions aur Privacy Policy se agree karta hun. Main janta hun ki AI se galti ho sakti hai.
+                </label>
+            </div>
+            
+            <button id="accept-btn" onclick="finishOnboarding()" class="auth-btn-primary onboard-accept-btn ios-btn" disabled>
+                <span>Accept & Continue <i class="fas fa-arrow-right"></i></span>
+            </button>
+
+        </div>
+    </div>
+</div>
+    
+
+
+
+
+
+<div id="live-voice-overlay" class="live-voice-overlay hidden" data-web4-vault="voice-session" data-auto-heal="true">
+    
+    <video id="live-stream-preview" autoplay playsinline muted class="live-stream-preview hidden"></video>
+    
+    <div id="camera-controls" class="camera-controls hidden">
+        <button onclick="switchCameraMode()" class="switch-camera-btn ios-btn" title="Switch Camera">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button onclick="stopCamera()" class="close-camera-btn ios-btn" title="Close Camera">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+     <div class="voice-header-actions">
+        
+        <div style="display: flex; gap: 12px;">
+            <button onclick="document.getElementById('close-live-voice')?.click()" class="voice-action-btn ios-btn" title="Go Back">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <button id="voice-share-btn" class="voice-action-btn ios-btn" title="Share">
+    <i class="fas fa-share-alt"></i>
+</button>
+
+        </div>
+
+        <button id="toggle-voice-chat-btn" class="voice-action-btn ios-btn" title="Toggle Chat">
+            <i class="fas fa-comment-slash"></i>
+            <span style="display: none;">Hide Chat</span> 
+        </button>
+
+    </div>
+
+
+    <div id="voice-middle-container" class="voice-middle-container">
+        
+        <div id="voice-hologram-wrapper" class="voice-hologram-wrapper">
+            <div class="voice-hologram-glow"></div>
+            <div id="voice-hologram" class="star-orbit-hologram ios-btn">
+                <div class="core-glow-orb"></div>
+                <div class="star-trail trail-1"></div>
+                <div class="star-trail trail-2"></div>
+                <div class="star-trail trail-3"></div>
+                <div class="star-trail trail-4"></div>
+            </div>
+        </div>
+
+    
+
+        <div id="live-voice-chat-log" class="live-voice-chat-log quantum-scrollbar" data-security-node="encrypted">
+
+
+<div class="chat-message-row user">
+    <div class="chat-bubble user-bubble">Hello Quantum!</div>
+</div>
+
+<div class="chat-message-row ai">
+    <div class="mini-hologram">
+        <div class="mini-ring-1"></div>
+        <div class="mini-ring-2"></div>
+        <div class="mini-core"></div>
+    </div>
+    
+    <div class="chat-bubble ai-bubble">Hello Commander! Main sun raha hoon.</div>
+</div>
+            
+
+
+            
+            <div class="secure-voice-badge">
+                <i class="fas fa-shield-alt"></i> Secure Voice Session
+            </div>
+        </div>
+    </div> 
+
+    <div id="live-voice-type-input" class="live-voice-type-input hidden">
+        <textarea id="chat-textarea" rows="1" placeholder="Type a message to A1 AI..." class="quantum-scrollbar"></textarea>
+        <div class="type-input-controls">
+            <button id="zoom-textarea-btn" class="zoom-textarea-btn ios-btn">
+                <i class="fas fa-expand-alt"></i>
+            </button>
+            <button id="send-text-btn" class="send-text-btn ios-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="voice-bottom-nav">
+        
+        <div id="attachment-menu" class="attachment-menu hidden">
+            <input type="file" id="file-photo" accept="image/*" class="hidden">
+            <input type="file" id="file-video" accept="video/*" class="hidden">
+            <input type="file" id="file-music" accept="audio/*" class="hidden">
+            <input type="file" id="file-doc" accept=".pdf,.doc,.docx,.txt" class="hidden">
+
+            <button onclick="document.getElementById('file-photo').click()" class="attachment-btn ios-btn"><i class="fas fa-image"></i> Photo</button>
+            <button onclick="document.getElementById('file-video').click()" class="attachment-btn ios-btn"><i class="fas fa-video"></i> Video</button>
+            <button onclick="document.getElementById('file-music').click()" class="attachment-btn ios-btn"><i class="fas fa-music"></i> Music</button>
+            <button onclick="document.getElementById('file-doc').click()" class="attachment-btn ios-btn"><i class="fas fa-file-alt"></i> File</button>
+            <div class="menu-divider"></div>
+            <button onclick="startLiveCamera()" class="attachment-btn ios-btn"><i class="fas fa-camera"></i> Live Cam</button>
+            <button onclick="startScreenShare()" class="attachment-btn ios-btn"><i class="fas fa-desktop"></i> Screen</button>
+        </div>
+
+        <div class="nav-btn-group">
+                    <button id="attach-media-btn" onclick="window.toggleVoiceAttachMenu(event)" class="nav-action-btn ios-btn">
+            <i class="fas fa-plus"></i>
+        </button>
+
+            <span>Attach</span>
+        </div>
+
+        <div class="nav-btn-group">
+            <button id="keyboard-voice-btn" class="nav-action-btn ios-btn">
+                <i class="fas fa-keyboard"></i>
+            </button>
+            <span>Type</span>
+        </div>
+
+        <div class="nav-btn-group">
+            <button id="play-voice-btn" onclick="startManualListening()" class="nav-main-btn ios-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <span>Speak</span>
+        </div>
+
+        <div class="nav-btn-group">
+            <button id="stop-voice-btn" onclick="stopAITalking()" class="nav-action-btn stop-btn ios-btn">
+                <i class="fas fa-stop"></i>
+            </button>
+            <span>Stop AI</span>
+        </div>
+
+        <div class="nav-btn-group">
+            <button id="jump-chat-btn" class="nav-action-btn ios-btn">
+                <i class="fas fa-comments"></i>
+            </button>
+            <span>Chat Room</span>
+        </div>
+
+        <div class="nav-btn-group">
+            <button id="close-live-voice" class="nav-action-btn close-btn ios-btn">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+            <span>End Call</span>
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="fullscreen-chat-room" class="text-chat-overlay hidden fade-in quantum-responsive pace-aware glassmorphism-ultra" data-web4-vault="chat-room" data-auto-heal="true">
+        
+        <div class="text-chat-header">
+        
+        <div style="display: flex; gap: 12px;">
+            <button onclick="window.closeChatRoomFullscreen()" class="voice-action-btn ios-btn" title="Go Back">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <button id="text-chat-share-btn" class="voice-action-btn ios-btn" title="Share">
+    <i class="fas fa-share-alt"></i>
+</button>
+
+        </div>
+
+        <div class="header-right-actions">
+            </div>
+
+    </div>
+
+
+    <div class="text-chat-log quantum-scrollbar scroll-smooth" id="chat-box" data-security-node="encrypted">
+
+        <input type="file" id="universal-file-upload" class="hidden" multiple accept="*/*" data-security-node="active">
+
+        <div id="website-preview-modal" class="website-preview-modal hidden fade-in pace-aware">
+            <div class="preview-modal-header">
+                <div class="preview-header-bg"></div>
+                <div class="preview-title-group">
+                    <i class="fas fa-globe preview-icon"></i>
+                    <div>
+                        <h3>Live Website Preview</h3>
+                        <p><i class="fas fa-shield-alt"></i> Running inside A1 Environment</p>
+                    </div>
+                </div>
+                <button onclick="closeWebsitePreview()" class="preview-modal-close-btn ios-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="preview-modal-body">
+                <iframe id="live-preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+        </div>
+        
+        <div id="welcome-banner" class="text-chat-welcome-banner fade-in-up">
+            <div class="welcome-bg-glow"></div>
+            <h2>Welcome, <span class="commander-text">Commander</span></h2>
+            <p>Aapki kya sahayata karu?</p>
+        </div>
+        
+        <div id="ai-thinking-indicator" class="text-chat-thinking-indicator hidden fade-in-up">
+            <div class="thinking-shimmer"></div>
+            <div class="thinking-spinner-box">
+                <div class="spinner-glow"></div>
+                <div class="ios-spinner"></div>
+            </div>
+            <span id="dynamic-thinking-text" class="thinking-text">🧠 Processing...</span>
+        </div>
+    </div>
+
+    <div class="text-chat-bottom-area">
+        
+    <div id="active-tool-indicator" class="active-tool-indicator hidden fade-in-up">
+        <i class="fas fa-magic"></i> 
+        <span id="active-tool-text">Photo Generate</span>
+        <button onclick="window.clearActiveTool()" class="tool-close-btn ios-btn"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="text-chat-input-wrapper">
+        
+        <div class="attachment-preview-area hidden" id="attachment-preview-area"></div>
+
+        <div class="input-controls-row">
+
+            <div class="input-action-group">
+                <button id="chat-plus-btn" onclick="window.toggleChatMenu('chat-plus-menu', event)" class="input-icon-btn ios-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div id="chat-plus-menu" class="text-chat-popup-menu hidden">
+                    <div class="popup-title">Attach Anything</div>
+                    <button onclick="triggerUniversalUpload()" class="popup-item-btn ios-btn">
+                        <i class="fas fa-camera"></i> Camera (Photo)
+                    </button>
+                    <button onclick="triggerUniversalUpload()" class="popup-item-btn ios-btn">
+                        <i class="fas fa-video"></i> Upload Video
+                    </button>
+                    <button onclick="triggerUniversalUpload()" class="popup-item-btn ios-btn">
+                        <i class="fas fa-file-pdf"></i> PDF / Document
+                    </button>
+                    <button onclick="triggerUniversalUpload()" class="popup-item-btn ios-btn">
+                        <i class="fas fa-code"></i> HTML / Code File
+                    </button>
+                    <div class="menu-divider"></div>
+                    <button onclick="triggerUniversalUpload()" class="popup-item-btn ios-btn">
+                        <i class="fas fa-folder-open"></i> All File Formats
+                    </button>
+                </div>
+            </div>
+            
+            <div class="input-action-group">
+                <button id="chat-link-btn" onclick="window.toggleChatMenu('chat-tools-menu', event)" class="input-icon-btn ios-btn">
+                    <i class="fas fa-link"></i>
+                </button>
+                <div id="chat-tools-menu" class="text-chat-popup-menu hidden" data-healing-node>
+                    <div class="popup-title">
+                        <i class="fas fa-microchip"></i> A1 Modes
+                    </div>
+                    <button onclick="window.selectActiveTool(this, event)" class="tool-select-btn popup-item-btn ios-btn">
+                        <i class="fas fa-image"></i> Photo Generate
+                    </button>
+                    <button onclick="window.selectActiveTool(this, event)" class="tool-select-btn popup-item-btn ios-btn">
+                        <i class="fas fa-video"></i> Video Generate
+                    </button>
+                    <button onclick="window.selectActiveTool(this, event)" class="tool-select-btn popup-item-btn ios-btn">
+                        <i class="fas fa-code"></i> Coding Mode
+                    </button>
+                    <button onclick="window.selectActiveTool(this, event)" class="tool-select-btn popup-item-btn ios-btn">
+                        <i class="fas fa-globe"></i> Web Search
+                    </button>
+                    <button onclick="window.selectActiveTool(this, event)" class="tool-select-btn popup-item-btn ios-btn">
+                        <i class="fas fa-brain"></i> Deep Thinking
+                    </button>
+                </div>
+            </div>
+
+            <textarea id="chat-user-input" oninput="window.autoResizeInput(this)" onkeydown="window.handleChatEnter(event)" placeholder="Message A1..." rows="1" class="text-chat-textarea custom-input-scroll" data-security-node="active"></textarea>
+
+            <div class="input-submit-group">
+                <button id="chat-mic-btn" onclick="window.toggleChatMic()" class="input-icon-btn ios-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <button id="chat-send-btn" onclick="window.sendChatMessage()" class="input-send-btn hidden ios-btn">
+                    <div class="send-btn-shimmer"></div>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                
+                <button id="chat-stop-btn" onclick="window.stopChatGeneration()" class="input-stop-btn hidden ios-btn">
+                    <i class="fas fa-square"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="script.js"></script>  
+    </body>
+</html>
