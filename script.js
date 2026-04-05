@@ -2313,12 +2313,22 @@ window.toggleHologramTalking = (isTalking) => {
 // ==========================================
 // 🚀 GEMINI STYLE: USER MESSAGE FORMATTER (Top Button Fix)
 // ==========================================
+window.escapeHtml = function(text) {
+    return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
 window.formatUserMessage = function(text) {
-    // Text ko secure aur format karna
-    let formattedText = text.replace(/\n/g, '<br>');
+    const safeSource = String(text ?? '');
+    const escaped = window.escapeHtml(safeSource);
+    let formattedText = escaped.replace(/\n/g, '<br>');
     
     // Agar message lamba hai (4 line se jyada ya 150 words se bada)
-    if (text.split('\n').length > 4 || text.length > 150) {
+    if (safeSource.split('\n').length > 4 || safeSource.length > 150) {
         return `
         <div class="user-msg-wrapper">
             <div class="user-msg-header">
@@ -2336,8 +2346,10 @@ window.formatUserMessage = function(text) {
 
 // 🚀 LONG MESSAGE FORMATTER (shared for voice/user bubbles)
 window.formatLongMessage = function(text) {
-    const safe = String(text ?? '').replace(/\n/g, '<br>');
-    const isLong = safe.split('<br>').length > 4 || safe.length > 220;
+    const source = String(text ?? '');
+    const escaped = window.escapeHtml(source);
+    const safe = escaped.replace(/\n/g, '<br>');
+    const isLong = source.split('\n').length > 4 || source.length > 220;
     if (!isLong) return safe;
     return `
         <div class="long-msg-wrapper">
