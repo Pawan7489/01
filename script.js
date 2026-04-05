@@ -1728,11 +1728,23 @@ window.grantAccess = function(rememberMe) {
         const floatingBtns = document.querySelector('.floating-action-group');
 
         // JS will only add/remove 'hidden' class, CSS does the rest.
-        if (authContainer) authContainer.classList.add('hidden');
+        if (authContainer) {
+            authContainer.classList.add('hidden');
+            authContainer.style.removeProperty('display');
+            authContainer.style.removeProperty('visibility');
+            authContainer.style.removeProperty('pointer-events');
+            authContainer.style.removeProperty('z-index');
+        }
 
         if (localStorage.getItem('a1_pending_onboarding') === 'true') {
-            if (dash) dash.classList.add('hidden');
-            if (floatingBtns) floatingBtns.classList.add('hidden');
+            if (dash) {
+                dash.classList.add('hidden');
+                dash.style.removeProperty('display');
+            }
+            if (floatingBtns) {
+                floatingBtns.classList.add('hidden');
+                floatingBtns.style.removeProperty('display');
+            }
             
             if (typeof window.startAIOnboarding === 'function') { 
                 window.startAIOnboarding(); 
@@ -1741,9 +1753,22 @@ window.grantAccess = function(rememberMe) {
             }
         } 
         else {
-            if (onboardBox) onboardBox.classList.add('hidden');
-            if (dash) dash.classList.remove('hidden'); 
-            if (floatingBtns) floatingBtns.classList.remove('hidden'); 
+            if (onboardBox) {
+                onboardBox.classList.add('hidden');
+                onboardBox.style.removeProperty('display');
+            }
+            if (dash) {
+                dash.classList.remove('hidden');
+                dash.style.removeProperty('display');
+                dash.style.removeProperty('visibility');
+                dash.style.removeProperty('pointer-events');
+                dash.style.removeProperty('z-index');
+            }
+            if (floatingBtns) {
+                floatingBtns.classList.remove('hidden');
+                floatingBtns.style.removeProperty('display');
+                floatingBtns.style.removeProperty('z-index');
+            }
             
             let storedName = localStorage.getItem('a1_user_name') || "Commander";
             const dashNameEl = document.getElementById('User-name');
@@ -1926,10 +1951,33 @@ window.startAIOnboarding = async function() {
 
 // 🚀 SEQUENTIAL REVEAL LOGIC & UI EVENTS
 document.addEventListener('DOMContentLoaded', () => {
-    
-    if (!localStorage.getItem('a1_ai_logged_in') || localStorage.getItem('a1_ai_logged_in') !== 'true') {
-        const floatingBtns = document.querySelector('.floating-action-group');
-        if (floatingBtns) floatingBtns.style.setProperty('display', 'none', 'important');
+    const isLoggedIn = localStorage.getItem('a1_ai_logged_in') === 'true';
+    const authContainer = document.getElementById('auth-container');
+    const dash = document.getElementById('app-home-screen-wrapper');
+    const onboardBox = document.getElementById('onboarding-view');
+    const floatingBtns = document.querySelector('.floating-action-group');
+
+    // 🚀 Startup route guard: ek hi correct screen dikhani hai
+    if (!isLoggedIn) {
+        if (dash) {
+            dash.classList.add('hidden');
+            dash.style.removeProperty('display');
+        }
+        if (onboardBox) {
+            onboardBox.classList.add('hidden');
+            onboardBox.style.removeProperty('display');
+        }
+        if (floatingBtns) {
+            floatingBtns.classList.add('hidden');
+            floatingBtns.style.removeProperty('display');
+        }
+        if (authContainer) {
+            authContainer.classList.remove('hidden');
+            authContainer.style.removeProperty('display');
+        }
+        if (typeof window.switchView === 'function') window.switchView('login-view');
+    } else if (typeof window.grantAccess === 'function') {
+        window.grantAccess(true);
     }
 
     function closeAllSelects(exceptBox) {
