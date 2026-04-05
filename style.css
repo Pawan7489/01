@@ -934,7 +934,7 @@ html, body {
 
 .gender-btn-row {
     display: flex;
-    gap: 10px;
+    gap: var(--space-3);
     margin-top: var(--space-2);
 }
 
@@ -3526,13 +3526,6 @@ html body #auth-container .auth-input-group {
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-}
-
-/* onboarding controls row consistency */
-.gender-btn-row {
-    display: flex;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
 }
 
 @media screen and (max-width: 480px) {
