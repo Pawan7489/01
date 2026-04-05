@@ -1117,9 +1117,12 @@ window.switchView = function(viewName) {
             const el = document.getElementById(v);
             if (el) el.classList.add('hidden'); 
         });
-        const targetView = document.getElementById(viewName) || document.getElementById('login-view');
-        if (!targetView || !targetView.classList) return;
-        targetView.classList.remove('hidden');
+        const isKnownView = views.includes(viewName);
+        const targetView = document.getElementById(viewName);
+        if (isKnownView && (!targetView || !targetView.classList)) return;
+        const finalView = isKnownView ? targetView : document.getElementById('login-view');
+        if (!finalView || !finalView.classList) return;
+        finalView.classList.remove('hidden');
         window.resetForms();
     } catch(e) {}
 };
