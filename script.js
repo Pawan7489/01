@@ -3009,10 +3009,28 @@ window.processLiveVoiceQuery = (text) => {
         const status = document.getElementById('live-voice-status');
         if(status) status.innerText = "Processing...";
         window.toggleHologramTalking(true); 
+        const voiceTraceId = `voice-trace-${Date.now()}`;
+        const voiceBreakdown = window.createThinkingBreakdownData(text, 'voice');
+        const logBox = document.getElementById('live-voice-chat-log');
+        if (logBox) {
+            const badge = logBox.querySelector('.secure-voice-badge');
+            if (badge) badge.style.display = 'none';
+            const traceRow = document.createElement('div');
+            traceRow.className = 'chat-message-row ai';
+            traceRow.innerHTML = `
+                <div class="bubble-container">
+                    ${window.renderThinkingTraceHtml(voiceTraceId, voiceBreakdown, { title: 'Live Thinking Details', badge: 'Listening + Reasoning', live: true })}
+                </div>
+            `;
+            logBox.appendChild(traceRow);
+            logBox.scrollTo({ top: logBox.scrollHeight, behavior: 'smooth' });
+            window.startThinkingTraceAnimation(voiceTraceId, voiceBreakdown.steps.length, 650);
+        }
 
         setTimeout(() => {
             if(!isLiveVoiceMode) return; 
             let aiResponse = `Aapne kaha: "${text}". Main is data ko sync kar raha hoon.`; 
+            window.finishThinkingTrace(voiceTraceId, true);
             window.appendLiveVoiceLog(aiResponse, "ai"); 
             window.playAIVoice(aiResponse); 
         }, 2000); 
@@ -3082,6 +3100,9 @@ window.stopAITalking = () => {
     window.toggleHologramTalking(false);
     const status = document.getElementById('live-voice-status');
     if(status) status.innerText = "Stopped";
+    document.querySelectorAll('#live-voice-chat-log .thinking-trace[data-live="1"]').forEach(trace => {
+        window.finishThinkingTrace(trace.id, false);
+    });
 };
 
 // ==========================================
@@ -3821,6 +3842,138 @@ function buildCollapsibleUI(text) {
 // 5. 🚀 MASTER SEND LOGIC & AI HOLOGRAM
 window.isGenerating = false;
 window.thinkingInterval = null;
+window.thinkingTraceIntervals = window.thinkingTraceIntervals || {};
+
+window.createThinkingBreakdownData = function(userText, mode = 'text') {
+    const sourceText = String(userText || '').trim();
+    const rawWords = sourceText
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .split(/\s+/)
+        .filter(Boolean);
+    const topicWords = [...new Set(rawWords.filter(w => w.length > 3))].slice(0, 3);
+    const topics = topicWords.length ? topicWords : ['context', 'intent', mode === 'voice' ? 'speech' : 'response'];
+    const styleKey = String(window.futurePreviewStyle || 'gemini').toLowerCase();
+    const styleLabel = styleKey === 'chatgpt' ? 'ChatGPT Style' : styleKey === 'claude' ? 'Claude Style' : styleKey === 'groq' ? 'Groq Style' : 'Gemini Style';
+    const modeLabel = mode === 'voice' ? 'Live Voice' : 'Text Chat';
+
+    return {
+        styleLabel,
+        modeLabel,
+        steps: [
+            {
+                title: 'Question समझना',
+                detail: `User prompt se main topic identify kiya: ${topics.map(t => `"${t}"`).join(', ')}`,
+                source: mode === 'voice' ? 'Mic/Text Input' : 'Chat Input',
+                safety: 'Clarity Check'
+            },
+            {
+                title: 'Relevant data चुनना',
+                detail: `Current chat context aur recent messages ke basis par response path banaya gaya (${styleLabel}).`,
+                source: 'Conversation Context',
+                safety: 'Relevance Filter'
+            },
+            {
+                title: 'Answer structure बनाना',
+                detail: `${modeLabel} ke liye छोटे-छोटे actionable topics mein draft तैयार kiya.`,
+                source: 'Reasoning Pipeline',
+                safety: 'Topic Segmentation'
+            },
+            {
+                title: 'Safety & final polish',
+                detail: 'Unsafe, unclear ya misleading output ko filter karke final response ready kiya.',
+                source: 'Safety Rules',
+                safety: 'Policy Guard'
+            }
+        ]
+    };
+};
+
+window.renderThinkingTraceHtml = function(traceId, breakdown, options = {}) {
+    const steps = Array.isArray(breakdown?.steps) ? breakdown.steps : [];
+    const title = options.title || 'Thinking Timeline';
+    const badge = options.badge || 'Analyzing';
+    const styleLabel = breakdown?.styleLabel || 'AI Style';
+    const modeLabel = breakdown?.modeLabel || 'Session';
+    const live = options.live ? '1' : '0';
+
+    const rows = steps.map((step, index) => `
+        <li class="thinking-trace-step ${index === 0 ? 'is-active' : ''}" data-step-index="${index}">
+            <div class="thinking-step-head">
+                <strong>${window.escapeHtml(step.title || `Step ${index + 1}`)}</strong>
+                <span class="thinking-step-index">#${index + 1}</span>
+            </div>
+            <p>${window.escapeHtml(step.detail || '')}</p>
+            <div class="thinking-step-meta">
+                <span class="thinking-chip"><i class="fas fa-database"></i> ${window.escapeHtml(step.source || 'Source')}</span>
+                <span class="thinking-chip"><i class="fas fa-shield-alt"></i> ${window.escapeHtml(step.safety || 'Safety')}</span>
+            </div>
+        </li>
+    `).join('');
+
+    return `
+        <div id="${traceId}" class="thinking-trace" data-live="${live}">
+            <div class="thinking-trace-header">
+                <div class="thinking-trace-title-wrap">
+                    <div class="thinking-trace-title">${window.escapeHtml(title)}</div>
+                    <div class="thinking-trace-subtitle">${window.escapeHtml(modeLabel)} • ${window.escapeHtml(styleLabel)}</div>
+                </div>
+                <div class="thinking-trace-actions">
+                    <span class="thinking-trace-badge">${window.escapeHtml(badge)}</span>
+                    <button class="thinking-trace-toggle ios-btn" onclick="window.toggleThinkingTrace(this)" aria-label="Toggle thinking details">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="thinking-trace-body quantum-scrollbar">
+                <ul class="thinking-trace-list">${rows}</ul>
+            </div>
+        </div>
+    `;
+};
+
+window.toggleThinkingTrace = function(btn) {
+    const wrap = btn?.closest('.thinking-trace');
+    if (!wrap) return;
+    wrap.classList.toggle('is-collapsed');
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = wrap.classList.contains('is-collapsed') ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+};
+
+window.startThinkingTraceAnimation = function(traceId, totalSteps, stepDuration = 2200) {
+    const trace = document.getElementById(traceId);
+    if (!trace) return;
+    const steps = Array.from(trace.querySelectorAll('.thinking-trace-step'));
+    if (!steps.length) return;
+    const safeLen = Math.max(1, Number(totalSteps) || steps.length);
+    let index = 0;
+    const tick = () => {
+        steps.forEach((el, i) => {
+            el.classList.toggle('is-active', i === index);
+            if (i < index) el.classList.add('is-done');
+        });
+        index = (index + 1) % safeLen;
+    };
+    tick();
+    if (window.thinkingTraceIntervals[traceId]) clearInterval(window.thinkingTraceIntervals[traceId]);
+    window.thinkingTraceIntervals[traceId] = setInterval(tick, stepDuration);
+};
+
+window.finishThinkingTrace = function(traceId, isComplete = true) {
+    const trace = document.getElementById(traceId);
+    if (!trace) return;
+    if (window.thinkingTraceIntervals[traceId]) {
+        clearInterval(window.thinkingTraceIntervals[traceId]);
+        delete window.thinkingTraceIntervals[traceId];
+    }
+    const steps = trace.querySelectorAll('.thinking-trace-step');
+    steps.forEach((el) => {
+        el.classList.remove('is-active');
+        if (isComplete) el.classList.add('is-done');
+    });
+    const badge = trace.querySelector('.thinking-trace-badge');
+    if (badge) badge.textContent = isComplete ? 'Completed' : 'Stopped';
+    trace.dataset.live = '0';
+};
 
 // =========================================================
 // 🚀 FIX: MASTER STOP LOGIC (Thinking & Typing Both)
@@ -3860,6 +4013,9 @@ window.stopChatGeneration = function() {
                 if(actions) actions.classList.remove('hidden'); // 3-dots, feedback बटन वापस लाएं
             }
         }
+    });
+    document.querySelectorAll('.thinking-trace[data-live="1"]').forEach(trace => {
+        window.finishThinkingTrace(trace.id, false);
     });
 };
 
@@ -3944,6 +4100,8 @@ window.sendChatMessage = function() {
 
     // 2. CREATE SEPARATE AI MESSAGE CONTAINER WITH HOLOGRAM ON TOP
     let msgId = 'msg-' + Date.now();
+    const traceId = `trace-${msgId}`;
+    const thinkingBreakdown = window.createThinkingBreakdownData(text, 'text');
     const aiDiv = document.createElement("div");
     aiDiv.className = "chat-message-row ai";
     
@@ -3955,6 +4113,7 @@ window.sendChatMessage = function() {
                 <div class="mini-ring" style="width:18px; height:18px; border-color:#3b82f6;"></div> <div class="mini-core" style="width:6px; height:6px; background:#3b82f6;"></div> </div>
             <span id="status-${msgId}" style="font-weight:600; font-size:13px; color:var(--text-primary);">Connecting to Server...</span>
         </div>
+        ${window.renderThinkingTraceHtml(traceId, thinkingBreakdown, { title: 'AI Thinking Details', badge: 'Analyzing', live: true })}
         
         <div class="bubble-container hidden" id="bubble-wrap-${msgId}" style="width: 100%;">
             <div class="chat-bubble ai-bubble" style="width: 100%; max-width: 95%;">
@@ -3979,6 +4138,7 @@ window.sendChatMessage = function() {
     aiIndicator.classList.add("hidden"); // पुराना डिफ़ॉल्ट इंडिकेटर छुपा दिया
     chatBox.insertBefore(aiDiv, aiIndicator);
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+    window.startThinkingTraceAnimation(traceId, thinkingBreakdown.steps.length, 2400);
 
     const statusText = document.getElementById(`status-${msgId}`);
     let phases = ["🌐 Routing Request...", "🔍 Deep Searching Server...", "📊 Fetching AI Models..."];
@@ -3997,6 +4157,7 @@ window.sendChatMessage = function() {
         clearInterval(window.thinkingInterval);
         
         if(statusText) statusText.innerText = "A1 is Typing...";
+        window.finishThinkingTrace(traceId, true);
         document.getElementById(`bubble-wrap-${msgId}`).classList.remove("hidden"); // अब मैसेज बॉक्स दिखेगा
 
         let rawResponse = `Main A1 AI hoon. Aapka [${window.currentAITool}] request process ho gaya hai.`;
