@@ -4189,9 +4189,12 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     margin: 10px 0;
     border: 1px solid var(--border-solid);
     border-radius: 12px;
-    background: var(--card-bg);
+    background: linear-gradient(165deg, color-mix(in srgb, var(--btn-bg) 82%, transparent), transparent 65%), var(--bg-main);
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--bg-main) 70%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
 }
 
 .premium-code-box .code-header {
@@ -4200,8 +4203,9 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     justify-content: space-between;
     gap: 10px;
     padding: 8px 10px;
-    border-bottom: 1px solid var(--border-solid);
-    background: var(--btn-bg);
+    border-bottom: 1px solid color-mix(in srgb, var(--lang-accent) 42%, var(--border-solid));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--lang-accent-soft) 72%, transparent), var(--btn-bg));
+    position: relative;
 }
 
 .premium-code-box .code-lang {
@@ -4224,11 +4228,11 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-fast) var(--ease-standard);
 }
 
 .premium-code-box .code-copy-btn:hover {
-    background: var(--btn-hover);
+    background: color-mix(in srgb, var(--lang-accent-soft) 78%, var(--btn-hover));
 }
 
 .premium-code-box {
@@ -4238,7 +4242,6 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
 
 .premium-code-box .code-header {
     border-left: 3px solid var(--lang-accent);
-    background: linear-gradient(180deg, var(--lang-accent-soft), var(--btn-bg));
 }
 
 .premium-code-box .code-lang {
@@ -4252,6 +4255,25 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
 
 .premium-code-box .code-copy-btn:hover {
     background: var(--lang-accent-soft);
+}
+
+.premium-code-box:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--lang-accent) 22%, transparent);
+}
+
+.premium-code-box .code-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 0%, color-mix(in srgb, var(--lang-accent) 20%, transparent) 46%, transparent 58%);
+    transform: translateX(-115%);
+    opacity: 0;
+}
+
+.premium-code-box:hover .code-header::after {
+    animation: codeHeaderSweep 1.2s var(--ease-standard) 1;
 }
 
 .premium-code-box.lang-javascript { --lang-accent: #f59e0b; --lang-accent-soft: rgba(245, 158, 11, 0.16); }
@@ -4281,6 +4303,7 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     overflow-y: hidden;
     max-height: none;
     -webkit-overflow-scrolling: touch;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--lang-accent-soft) 18%, transparent));
 }
 
 .premium-code-box .code-body.many-lines {
@@ -4295,6 +4318,7 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     font-size: 13px;
     white-space: pre;
     min-width: max-content;
+    tab-size: 4;
 }
 
 .premium-code-box code {
@@ -4334,6 +4358,46 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     }
     .premium-code-box .code-body.many-lines {
         max-height: 28em;
+    }
+}
+
+body.device-mobile .premium-code-box {
+    border-radius: 10px;
+}
+
+body.device-mobile .premium-code-box .code-header {
+    padding: 7px 8px;
+}
+
+body.device-tablet .premium-code-box .code-header {
+    padding: 8px 9px;
+}
+
+body.pointer-coarse .premium-code-box .code-copy-btn {
+    min-height: 30px;
+}
+
+body.theme-light .premium-code-box {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+body.theme-dark .premium-code-box {
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.28);
+}
+
+@keyframes codeHeaderSweep {
+    0% { transform: translateX(-115%); opacity: 0; }
+    35% { opacity: 0.65; }
+    100% { transform: translateX(115%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .premium-code-box,
+    .premium-code-box .code-copy-btn,
+    .premium-code-box .code-header::after {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
     }
 }
 

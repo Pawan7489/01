@@ -46,11 +46,26 @@ window.prompt = function(message, defaultValue) {
 
 // सिस्टम थीम को रियल-टाइम ट्रैक करने के लिए मॉडर्न API
 const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+window.updateDeviceThemeEngine = () => {
+    const w = window.innerWidth || document.documentElement.clientWidth || 0;
+    document.body.classList.remove('device-mobile', 'device-tablet', 'device-desktop');
+    if (w <= 768) document.body.classList.add('device-mobile');
+    else if (w <= 1024) document.body.classList.add('device-tablet');
+    else document.body.classList.add('device-desktop');
+
+    document.body.classList.toggle('pointer-coarse', window.matchMedia('(pointer: coarse)').matches);
+    document.body.classList.toggle('reduced-motion', reducedMotionQuery.matches);
+};
 
 window.changeAppTheme = (mode) => {
     let isDark = mode === 'dark' || (mode === 'system' && systemThemeQuery.matches);
     
     document.body.classList.toggle('light-mode', !isDark);
+    document.body.classList.toggle('theme-dark', isDark);
+    document.body.classList.toggle('theme-light', !isDark);
+    document.body.classList.toggle('theme-system', mode === 'system');
     localStorage.setItem('a1_os_theme', mode);
 
     document.querySelectorAll('.theme-switch-grid .mode-btn').forEach(btn => {
@@ -68,6 +83,10 @@ systemThemeQuery.addEventListener('change', () => {
     if (localStorage.getItem('a1_os_theme') === 'system') {
         window.changeAppTheme('system');
     }
+});
+
+reducedMotionQuery.addEventListener('change', () => {
+    window.updateDeviceThemeEngine();
 });
 
 // ==========================================
@@ -366,6 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. सही थीम लोड करना
     const savedTheme = localStorage.getItem('a1_os_theme') || 'system';
     window.changeAppTheme(savedTheme);
+    window.updateDeviceThemeEngine();
+    window.addEventListener('resize', window.updateDeviceThemeEngine, { passive: true });
 
     // 2. राईट-क्लिक मेनू सेट करना
     const dashboard = document.getElementById('main-dashboard');
