@@ -410,7 +410,7 @@
         <p class="auth-subtitle">Verify OTP and set a new password</p>
 
         <div class="auth-input-group">
-            <input type="tel" id="forgot-mobile-input" placeholder="Enter Mobile Number" maxlength="10" class="auth-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="tel" id="forgot-mobile-input" placeholder="Enter Mobile Number" maxlength="10" class="auth-input" aria-label="Mobile Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
 
         <button id="forgot-send-otp-btn" onclick="window.sendForgotOTP()" class="auth-btn-primary ios-btn">Send OTP</button>

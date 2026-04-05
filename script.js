@@ -1154,7 +1154,7 @@ window.switchView = function(viewName) {
             if (el) el.classList.add('hidden'); 
         });
         const targetView = document.getElementById(viewName) || document.getElementById('login-view');
-        if (targetView) targetView.classList.remove('hidden');
+        if (targetView && targetView.classList) targetView.classList.remove('hidden');
         window.resetForms();
     } catch(e) {}
 };
@@ -1395,8 +1395,9 @@ window.completeSignup = function(type) {
 window.sendForgotOTP = function() {
     const mobile = (document.getElementById('forgot-mobile-input')?.value || '').trim();
     if (mobile.length !== 10) {
-        return window.showA1Modal?.('alert', 'Invalid Input', 'Enter valid 10-digit mobile number.');
+        return window.showA1Modal?.('alert', 'Invalid Input', 'Please enter a valid 10-digit mobile number.');
     }
+    // UI-only simulation flow: backend OTP API is not wired yet.
     window.initializeAllPinBoxes();
     document.getElementById('forgot-send-otp-btn')?.classList.add('hidden');
     document.getElementById('forgot-otp-section')?.classList.remove('hidden');
