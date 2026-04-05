@@ -1968,6 +1968,19 @@ html body #live-voice-overlay.hidden {
     padding-right: 8px;
 }
 
+.trash-bulk-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 6px;
+    animation: trashBulkPopIn 0.35s var(--ease-standard) both;
+}
+
+@keyframes trashBulkPopIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Trash Items inside Modal */
 .trash-item {
     /* 🚀 FIX: Linked to Theme */
@@ -1979,6 +1992,12 @@ html body #live-voice-overlay.hidden {
     flex-direction: column; 
     gap: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    animation: trashItemFadeUp 0.3s var(--ease-standard) both;
+}
+
+@keyframes trashItemFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .trash-item:hover {

@@ -998,6 +998,7 @@ window.loadSpecificChat = function(id) {
 
     window.currentSessionId = chat.id;
     window.currentChatType = chat.type;
+    window.syncRoomUrl(chat.type === 'voice' ? 'voice' : 'text', chat.id);
     
     const sidebar = document.getElementById('sidebar-menu');
     if(sidebar) { sidebar.classList.remove('active'); sidebar.classList.add('-translate-x-full'); }
@@ -1054,6 +1055,12 @@ window.loadSpecificChat = function(id) {
             setTimeout(() => chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }), 100);
         }
     }
+    
+    if(chat.type === 'voice') {
+        window.openLiveChat({ roomId: chat.id, fromHistory: true });
+        const status = document.getElementById('live-voice-status');
+        if (status) status.innerText = "History voice room opened";
+    }
     window.renderHistoryList(); 
 };
 
@@ -1079,11 +1086,20 @@ window.renderTrashList = function() {
         const container = document.getElementById('trash-list-container');
         if(!container) return;
         
-        let html = '';
+        let html = `
+            <div class="trash-bulk-actions">
+                <button onclick="window.actionRecoverAll(event)" class="trash-action-btn btn-recover">
+                    <i class="fas fa-undo-alt"></i> Recover All
+                </button>
+                <button onclick="window.actionPermDeleteAll(event)" class="trash-action-btn btn-perm-delete">
+                    <i class="fas fa-trash-alt"></i> Delete All
+                </button>
+            </div>
+        `;
         const deletedChats = window.chatSessions.filter(c => c.isDeleted);
 
         if(deletedChats.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:var(--text-secondary); margin-top: 20px;">No deleted chats.</p>';
+            container.innerHTML = `${html}<p style="text-align:center; color:var(--text-secondary); margin-top: 20px;">No deleted chats.</p>`;
             return;
         }
 
@@ -1460,6 +1476,42 @@ window.sendLoginOTP = function() {
     })
     .finally(() => {
         if (sendBtn) sendBtn.disabled = false;
+    });
+};
+
+window.actionRecoverAll = function(event) {
+    if(event) { event.preventDefault(); event.stopPropagation(); }
+    Web4_Data_Quantum_Core.healDataSystem("Recover_All_Chats", () => {
+        let changed = false;
+        window.chatSessions.forEach(chat => {
+            if (chat.isDeleted) {
+                chat.isDeleted = false;
+                changed = true;
+            }
+        });
+        if (changed) {
+            window.saveHistory();
+            window.showA1Modal('alert', 'Recovered All', '✅ All deleted chats recovered.');
+        } else {
+            window.showA1Modal('alert', 'No Deleted Chats', 'ℹ️ Recover karne ke liye koi deleted chat nahi mila.');
+        }
+    });
+};
+
+window.actionPermDeleteAll = function(event) {
+    if(event) { event.preventDefault(); event.stopPropagation(); }
+    Web4_Data_Quantum_Core.healDataSystem("Permanent_Delete_All", () => {
+        window.showA1Modal('confirm', 'Permanent Delete All', 'Kya aap sab deleted histories ko hamesha ke liye mitaana chahte hain?', (isConfirmed) => {
+            if(!isConfirmed) return;
+            const before = window.chatSessions.length;
+            window.chatSessions = window.chatSessions.filter(c => !c.isDeleted);
+            if (window.chatSessions.length !== before) {
+                window.saveHistory();
+                window.showA1Modal('alert', 'Deleted', '🗑️ All deleted chats permanently removed.');
+            } else {
+                window.showA1Modal('alert', 'No Deleted Chats', 'ℹ️ Permanent delete ke liye koi deleted chat nahi mila.');
+            }
+        });
     });
 };
 
