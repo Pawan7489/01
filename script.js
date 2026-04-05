@@ -1401,60 +1401,22 @@ window.grantAccess = function(rememberMe) {
     } catch (error) { console.error("Access Error:", error); }
 };
 
-// ==========================================
-// 🚀 FIXED LOGOUT FUNCTION (Micro Deep Search Fix)
-// ==========================================
 window.logoutUser = function(event) {
     if(event) { event.preventDefault(); event.stopPropagation(); }
-    if(typeof window.safeVibrate === 'function') window.safeVibrate("medium");
-
-    // 1. Session clear karein
+    window.safeVibrate("medium");
     localStorage.removeItem('a1_ai_logged_in');
-    localStorage.removeItem('a1_is_logged_in');
-    localStorage.removeItem('a1_pending_onboarding');
-
-    // 2. Sabhi main dabbo ko pakdein
-    const dash = document.getElementById('app-home-screen-wrapper') || document.getElementById('main-dashboard');
-    const authContainer = document.getElementById('auth-container');
+    
+    const dash = document.getElementById('app-home-screen-wrapper');
     const floatingBtns = document.querySelector('.floating-action-group');
     const onboardBox = document.getElementById('onboarding-view');
-    const sidebar = document.getElementById('sidebar-menu');
-
-    // 3. 🚀 MASTER FIX: Purane atke hue inline styles delete karein aur CSS ko kaam karne dein
-    if (dash) {
-        dash.removeAttribute('style'); // Atka hua 'display: flex' jad se delete
-        dash.classList.add('hidden');  // Ab CSS aaram se ise chupa degi
-    }
-
-    if (floatingBtns) {
-        floatingBtns.removeAttribute('style');
-        floatingBtns.classList.add('hidden');
-    }
-
-    if (onboardBox) {
-        onboardBox.removeAttribute('style');
-        onboardBox.classList.add('hidden');
-    }
-
-    if (sidebar) {
-        sidebar.classList.remove('active');
-    }
-
-    // 4. 🚀 LOGIN SCREEN KO WAPAS LAAYEIN
-    if (authContainer) {
-        authContainer.removeAttribute('style'); // Atka hua 'display: none' jad se delete
-        authContainer.classList.remove('hidden'); // Ab CSS automatically isko wapas dikha degi
-    }
-
-    // 5. Baaki sab Popups/Menus band karein
-    document.getElementById('profile-dropdown')?.classList.add('hidden');
-    document.getElementById('fullscreen-chat-room')?.classList.add('hidden');
-    document.getElementById('live-voice-overlay')?.classList.add('hidden');
-
-    // 6. Login view form reset
-    if(typeof window.switchView === 'function') {
-        window.switchView('login-view');
-    }
+    const authContainer = document.getElementById('auth-container');
+    
+    if (dash) dash.classList.add('hidden');
+    if (floatingBtns) floatingBtns.classList.add('hidden');
+    if (onboardBox) onboardBox.classList.add('hidden');
+    
+    if (authContainer) authContainer.classList.remove('hidden');
+    window.switchView('login-view');
 };
 
 window.simulateGoogleAuth = function(actionText) {
@@ -2036,23 +1998,26 @@ window.toggleHologramTalking = (isTalking) => {
 
 
 // ==========================================
-// 🚀 GEMINI STYLE: USER MESSAGE FORMATTER
+// 🚀 GEMINI STYLE: USER MESSAGE FORMATTER (Top Button Fix)
 // ==========================================
 window.formatUserMessage = function(text) {
+    // Text ko secure aur format karna
     let formattedText = text.replace(/\n/g, '<br>');
     
     // Agar message lamba hai (4 line se jyada ya 150 words se bada)
     if (text.split('\n').length > 4 || text.length > 150) {
         return `
         <div class="user-msg-wrapper">
+            <div class="user-msg-header">
+                <button onclick="window.toggleUserMsg(this)" class="user-msg-toggle-btn" title="Show More">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
             <div class="user-msg-content clamped-text">${formattedText}</div>
-            <button onclick="window.toggleUserMsg(this)" class="user-msg-toggle-btn" title="Show More">
-                <i class="fas fa-chevron-down"></i>
-            </button>
         </div>`;
     }
     
-    // Agar chhota message hai toh normal dikhao
+    // Chhota message
     return `<div class="user-msg-content">${formattedText}</div>`;
 };
 
@@ -2060,24 +2025,23 @@ window.formatUserMessage = function(text) {
 window.toggleUserMsg = function(btn) {
     if(typeof triggerVibration === 'function') triggerVibration("light");
     
-    const contentDiv = btn.previousElementSibling;
+    // 🚀 FIX: Ab content button ke niche hai, toh relative dhoondhna padega
+    const wrapper = btn.closest('.user-msg-wrapper');
+    const contentDiv = wrapper.querySelector('.user-msg-content');
     const icon = btn.querySelector('i');
     
-    // Text ko bada/chhota karna
+    // Text ko kholna/band karna
     contentDiv.classList.toggle('clamped-text');
     
-    // Icon Rotation (Right/Left Flow jaisa aapne manga)
+    // Icon Rotation (Gemini Style)
     if (contentDiv.classList.contains('clamped-text')) {
-        // Hide More State
-        icon.style.transform = "rotate(0deg)"; 
+        icon.style.transform = "rotate(0deg)"; // Niche dekhega
         btn.title = "Show More";
     } else {
-        // Show More State (Icon ghumkar upar/ulti disha me jayega)
-        icon.style.transform = "rotate(180deg)"; 
+        icon.style.transform = "rotate(180deg)"; // Upar dekhega
         btn.title = "Show Less";
     }
 };
-
 
 /* =========================================================
    🎙️ 100% FIXED: APPEND LIVE VOICE LOG (No Button Errors)
@@ -2623,7 +2587,92 @@ document.addEventListener('click', async (e) => {
 
 
 
+// ==========================================
+// 🚀 GEMINI STYLE: SMART TEXT & CODE PARSER
+// ==========================================
 
+// Syntax Highlighter (Colors lagane ke liye)
+window.applyNativeHighlighting = function(code) {
+    return code
+        // Comments (// yahan comment hai)
+        .replace(/(\/\/.*)/g, '<span class="tok-comment">$1</span>')
+        // Strings ("hello" ya 'hello' ya `hello`)
+        .replace(/('.*?'|".*?"|`[\s\S]*?`)/g, '<span class="tok-string">$1</span>')
+        // Keywords (const, let, function, if, etc)
+        .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|from|await|async|new)\b/g, '<span class="tok-keyword">$1</span>')
+        // Numbers (123)
+        .replace(/\b(\d+)\b/g, '<span class="tok-number">$1</span>')
+        // Booleans (true, false, null)
+        .replace(/\b(true|false|null|undefined)\b/g, '<span class="tok-bool">$1</span>');
+};
+
+// Copy Button Logic
+window.copyCodeBlock = async function(btn, encodedCode) {
+    try {
+        let code = decodeURIComponent(encodedCode);
+        await navigator.clipboard.writeText(code); // Code copy karna
+        
+        let originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> <span>Copied!</span>';
+        btn.style.color = '#10b981'; // Green color success ke liye
+        
+        if(typeof triggerVibration === 'function') triggerVibration("light");
+        
+        // 2 second baad wapas normal kar do
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.color = ''; 
+        }, 2000);
+    } catch(e) { console.error("Copy failed", e); }
+};
+
+// 🚀 MASTER FORMATTER (Text + Code Box Maker)
+window.formatChatText = function(rawText) {
+    if (!rawText) return "";
+
+    // 1. Text ko safe banana (XSS prevention)
+    let text = rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // 2. Text ko ` ``` ` ke hisaab se tukdo mein todna
+    let parts = text.split(/(```[\s\S]*?```)/g);
+    let finalHtml = "";
+
+    parts.forEach(part => {
+        if (part.startsWith('```') && part.endsWith('```')) {
+            // 💻 YE CODE BLOCK HAI
+            let match = part.match(/```(\w*)\n?([\s\S]*?)```/);
+            if (match) {
+                let lang = match[1] ? match[1].toUpperCase() : 'CODE';
+                let codeContent = match[2];
+                let rawCodeToCopy = codeContent.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                
+                // Color lagana
+                let coloredCode = window.applyNativeHighlighting(codeContent);
+
+                // Premium Code Box HTML
+                finalHtml += `
+                <div class="premium-code-box">
+                    <div class="code-header">
+                        <span class="code-lang">${lang}</span>
+                        <button class="code-copy-btn" onclick="window.copyCodeBlock(this, '${encodeURIComponent(rawCodeToCopy)}')">
+                            <i class="far fa-copy"></i> <span>Copy</span>
+                        </button>
+                    </div>
+                    <div class="code-body custom-scrollbar">
+                        <pre><code>${coloredCode}</code></pre>
+                    </div>
+                </div>`;
+            }
+        } else {
+            // 📝 YE NORMAL TEXT HAI
+            let formatted = part.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold text
+            formatted = formatted.replace(/\n/g, '<br>'); // Line breaks
+            finalHtml += `<span class="normal-text-span">${formatted}</span>`;
+        }
+    });
+
+    return finalHtml;
+};
 
 
 
@@ -3048,19 +3097,8 @@ window.sendChatMessage = function() {
     const userDiv = document.createElement("div");
     userDiv.className = "chat-message-row user";
     const safeEncodedUser = encodeURIComponent(text); 
-    userDiv.innerHTML = `
-    <div class="bubble-container" style="display: flex; flex-direction: column; align-items: flex-end;">
-      <div class="chat-bubble user-bubble">${window.formatUserMessage(text)}</div><div class="user-action-bar">
-        <button class="action-icon-btn" onclick="window.handleSafeAction('edit', this)" data-text="${safeEncodedUser}">
-          <i class="fas fa-pen">
-          </i>
-        </button>
-        <button class="action-icon-btn" onclick="window.handleSafeAction('copy', this)" data-text="${safeEncodedUser}">
-          <i class="fas fa-copy">
-          </i>
-        </button>
-      </div>
-    </div>`;
+    userDiv.innerHTML = `<div class="bubble-container" style="display: flex; flex-direction: column; align-items: flex-end;"><div class="chat-bubble user-bubble">${window.formatUserMessage(text)}</div><div class="user-action-bar"><button class="action-icon-btn" onclick="window.handleSafeAction('edit', this)" data-text="${safeEncodedUser}"><i class="fas fa-pen"></i></button><button class="action-icon-btn" onclick="window.handleSafeAction('copy', this)" data-text="${safeEncodedUser}"><i class="fas fa-copy"></i></button></div></div>`;
+    
     chatBox.insertBefore(userDiv, aiIndicator);
 
     // 2. CREATE SEPARATE AI MESSAGE CONTAINER WITH HOLOGRAM ON TOP
@@ -3315,7 +3353,6 @@ window.saveMessageToSession = function(sessionId, sender, text) {
         window.saveHistory();
     }
 };
-
 
 
 
