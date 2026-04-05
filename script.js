@@ -1119,7 +1119,10 @@ window.switchView = function(viewName) {
         });
         const isKnownView = views.includes(viewName);
         const targetView = document.getElementById(viewName);
-        if (isKnownView && (!targetView || !targetView.classList)) return;
+        if (isKnownView && (!targetView || !targetView.classList)) {
+            console.warn(`switchView: known view "${viewName}" is missing in DOM.`);
+            return;
+        }
         const finalView = isKnownView ? targetView : document.getElementById('login-view');
         if (!finalView || !finalView.classList) return;
         finalView.classList.remove('hidden');
