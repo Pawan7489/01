@@ -23,7 +23,7 @@
                 <i class="fas fa-volume-up" aria-hidden="true"></i>
             </button>
 
-            <div class="profile-container" style="position: relative;">
+            <div class="profile-container">
                 <button id="Profile" onclick="toggleProfile()" class="avatar-3d-wrapper" aria-label="User Profile" aria-haspopup="true" aria-expanded="false">
                     <img id="Profile-image" src="" class="avatar-img" onerror='this.style.display="none"' alt="Profile Image">
                     <i class="fas fa-user profile-icon-placeholder" aria-hidden="true"></i>
@@ -138,7 +138,7 @@
                 <div class="sidebar-history custom-scrollbar">
             <h5><i class="fas fa-history"></i> Neural History</h5>
             
-            <div id="history-list-container" class="history-list-container" style="display:flex; flex-direction:column; gap:8px;">
+            <div id="history-list-container" class="history-list-container">
                <div class="history-item" data-type="text">
    💬 Purani Text Chat
 </div>
@@ -237,12 +237,12 @@
         
         <div class="auth-tab-group">
             <label class="auth-radio-label">
-                <input type="radio" name="loginType" value="mobile" checked onchange="toggleLoginType()" style="display:none;">
+                <input type="radio" name="loginType" value="mobile" checked onchange="toggleLoginType()" class="visually-hidden-control">
                 <div class="auth-radio-custom"></div>
                 <span class="auth-radio-text">Mobile</span>
             </label>
             <label class="auth-radio-label">
-                <input type="radio" name="loginType" value="email" onchange="toggleLoginType()" style="display:none;">
+                <input type="radio" name="loginType" value="email" onchange="toggleLoginType()" class="visually-hidden-control">
                 <div class="auth-radio-custom"></div>
                 <span class="auth-radio-text">Email</span>
             </label>
@@ -255,12 +255,12 @@
             
             <div class="auth-tab-group">
                 <label class="auth-radio-label">
-                    <input type="radio" name="mobileLoginMethod" value="otp" onchange="window.switchMobileLoginMethod()" checked style="display:none;">
+                    <input type="radio" name="mobileLoginMethod" value="otp" onchange="window.switchMobileLoginMethod()" checked class="visually-hidden-control">
                     <div class="auth-radio-custom"></div>
                     <span class="auth-radio-text">Login via OTP</span>
                 </label>
                 <label class="auth-radio-label">
-                    <input type="radio" name="mobileLoginMethod" value="password" onchange="window.switchMobileLoginMethod()" style="display:none;">
+                    <input type="radio" name="mobileLoginMethod" value="password" onchange="window.switchMobileLoginMethod()" class="visually-hidden-control">
                     <div class="auth-radio-custom"></div>
                     <span class="auth-radio-text">Login via Password</span>
                 </label>
@@ -269,7 +269,7 @@
             <div id="login-mobile-otp-section">
                 <button id="login-send-otp-btn" onclick="sendLoginOTP()" class="auth-btn-primary ios-btn">Send OTP</button>
                 <div id="login-otp-section" class="hidden fade-in">
-                    <p class="auth-subtitle" style="margin-bottom: 10px; color: #4ade80;"><i class="fas fa-shield-alt"></i> Enter 6-digit Secure OTP</p>
+                    <p class="auth-subtitle auth-status auth-status-success auth-status-compact"><i class="fas fa-shield-alt"></i> Enter 6-digit Secure OTP</p>
                     <div class="auth-otp-row" id="login-otp-boxes"></div>
                     <button onclick="verifyLoginOTP()" class="auth-btn-primary ios-btn">Verify & Login</button>
                 </div>
@@ -280,9 +280,9 @@
                     <input type="password" id="login-mobile-password" placeholder="Enter Password" class="auth-input" data-security-node="encrypted">
                     <button onclick="togglePassword('login-mobile-password', 'login-mobile-eye')" class="auth-eye-btn"><i class="fas fa-eye" id="login-mobile-eye"></i></button>
                 </div>
-                <div class="auth-options-row" style="flex-wrap: wrap; gap: 15px;">
-                 <label class="auth-checkbox-label" style="display: flex; align-items: center; gap: 8px;">
-                     <input type="checkbox" id="remember-me" style="margin: 0;"> Remember me
+                <div class="auth-options-row auth-options-wrap">
+                 <label class="auth-checkbox-label auth-checkbox-inline">
+                     <input type="checkbox" id="remember-me" class="checkbox-no-margin"> Remember me
                  </label>
                     <button onclick="switchView('forgot-view')" class="auth-link">Forgot password?</button>
                 </div>
@@ -292,7 +292,7 @@
 
         <div id="login-email-flow" class="hidden">
             <div class="auth-input-group">
-                <input type="email" id="login-email-input" placeholder="Email Address" class="auth-input" data-security-node="active" style="height: 56px; display: flex; align-items: center; padding: 0 20px;">
+                <input type="email" id="login-email-input" placeholder="Email Address" class="auth-input auth-input-standard" data-security-node="active">
             </div>
             
             <div class="auth-input-group">
@@ -316,7 +316,7 @@
         </button>
 
         <p class="auth-footer">
-            Don't have an account? <button onclick="switchView('signup-view')" class="auth-link" style="margin-left: 5px;">Sign up</button>
+            Don't have an account? <button onclick="switchView('signup-view')" class="auth-link auth-link-inline">Sign up</button>
         </p>
     </div>
 
@@ -329,12 +329,12 @@
 
         <div class="auth-tab-group">
             <label class="auth-radio-label">
-                <input type="radio" name="signupType" value="mobile" checked onchange="window.toggleSignupType()" style="display:none;">
+                <input type="radio" name="signupType" value="mobile" checked onchange="window.toggleSignupType()" class="visually-hidden-control">
                 <div class="auth-radio-custom"></div>
                 <span class="auth-radio-text">Mobile</span>
             </label>
             <label class="auth-radio-label">
-                <input type="radio" name="signupType" value="email" onchange="window.toggleSignupType()" style="display:none;">
+                <input type="radio" name="signupType" value="email" onchange="window.toggleSignupType()" class="visually-hidden-control">
                 <div class="auth-radio-custom"></div>
                 <span class="auth-radio-text">Email</span>
             </label>
@@ -348,13 +348,13 @@
             <button id="signup-send-btn" onclick="sendSignupOTP()" class="auth-btn-primary ios-btn">Send OTP</button>
 
             <div id="signup-otp-section" class="hidden fade-in">
-                <p class="auth-subtitle" style="margin-bottom: 10px; color: #facc15;"><i class="fas fa-fingerprint"></i> Enter 6-digit OTP</p>
+                <p class="auth-subtitle auth-status auth-status-warning auth-status-compact"><i class="fas fa-fingerprint"></i> Enter 6-digit OTP</p>
                 <div class="auth-otp-row" id="signup-otp-boxes"></div>
                 <button onclick="window.verifySignupOTP()" class="auth-btn-primary ios-btn">Verify OTP</button>
             </div>
 
             <div id="signup-mobile-pass-section" class="hidden fade-in">
-                <p class="auth-subtitle" style="color: #4ade80; margin-bottom: 15px; font-weight: 600;"><i class="fas fa-check-circle"></i> Mobile Verified. Create Password.</p>
+                <p class="auth-subtitle auth-status auth-status-success auth-status-verified"><i class="fas fa-check-circle"></i> Mobile Verified. Create Password.</p>
                 <div class="auth-input-group">
                     <input type="password" id="signup-pass-mobile" placeholder="Create Password (8-20 chars)" maxlength="20" class="auth-input" data-security-node="encrypted">
                     <button onclick="togglePassword('signup-pass-mobile', 'signup-eye-mobile-1')" class="auth-eye-btn"><i class="fas fa-eye" id="signup-eye-mobile-1"></i></button>
@@ -374,7 +374,7 @@
                     <input type="email" id="signup-email-input" placeholder="Enter Email Address" class="auth-input" data-security-node="active">
                 </div>
                 
-                <p id="email-verify-msg" class="auth-subtitle" style="font-size: 13px; color: #3b82f6; margin-bottom: 20px;">
+                <p id="email-verify-msg" class="auth-subtitle auth-status auth-status-info auth-status-email-msg">
                     <i class="fas fa-envelope"></i> A verification link will be sent to this email.
                 </p>
                 
@@ -382,7 +382,7 @@
             </div>
 
             <div id="signup-email-pass-section" class="hidden fade-in">
-                <p class="auth-subtitle" style="color: #4ade80; margin-bottom: 15px; font-weight: 600;">
+                <p class="auth-subtitle auth-status auth-status-success auth-status-verified">
                     <i class="fas fa-check-circle"></i> Email Verified. Create Password.
                 </p>
                 <div class="auth-input-group">
@@ -416,7 +416,7 @@
         <button id="forgot-send-otp-btn" onclick="window.sendForgotOTP()" class="auth-btn-primary ios-btn">Send OTP</button>
 
         <div id="forgot-otp-section" class="hidden fade-in">
-            <p class="auth-subtitle" style="margin-bottom: 10px;"><i class="fas fa-shield-alt"></i> Enter 6-digit OTP</p>
+            <p class="auth-subtitle auth-status auth-status-compact"><i class="fas fa-shield-alt"></i> Enter 6-digit OTP</p>
             <div class="auth-otp-row" id="forgot-otp-boxes"></div>
             <button onclick="window.verifyForgotOTP()" class="auth-btn-primary ios-btn">Verify OTP</button>
         </div>
@@ -456,7 +456,7 @@
 
                                 <div id="dob-container" class="hidden onboard-fade-in-up mt-4">
             <label class="onboard-label">
-                <i class="fas fa-calendar-alt" style="color: #60a5fa;"></i> Date of Birth
+                <i class="fas fa-calendar-alt onboard-icon-dob"></i> Date of Birth
             </label>
             <div class="custom-dob-wrapper">
                 <div class="custom-select-box" id="dob-day-box">
@@ -478,11 +478,11 @@
 
 
         <div id="gender-container" class="hidden onboard-fade-in-up mt-4">
-            <label class="onboard-label"><i class="fas fa-venus-mars" style="color: #c084fc;"></i> Gender</label>
-            <div style="display: flex; gap: 10px; margin-top: 8px;">
-                <button type="button" class="gender-btn auth-input ios-btn" data-val="male" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Male</button>
-                <button type="button" class="gender-btn auth-input ios-btn" data-val="female" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Female</button>
-                <button type="button" class="gender-btn auth-input ios-btn" data-val="other" style="flex:1; padding: 12px; text-align:center; font-weight:600; cursor:pointer;">Other</button>
+            <label class="onboard-label"><i class="fas fa-venus-mars onboard-icon-gender"></i> Gender</label>
+            <div class="gender-btn-row">
+                <button type="button" class="gender-btn auth-input ios-btn gender-btn-base" data-val="male">Male</button>
+                <button type="button" class="gender-btn auth-input ios-btn gender-btn-base" data-val="female">Female</button>
+                <button type="button" class="gender-btn auth-input ios-btn gender-btn-base" data-val="other">Other</button>
             </div>
             <input type="hidden" id="profile-gender" value="">
         </div>
@@ -530,7 +530,7 @@
     
      <div class="voice-header-actions">
         
-        <div style="display: flex; gap: 12px;">
+        <div class="header-btn-group">
             <button onclick="document.getElementById('close-live-voice')?.click()" class="voice-action-btn ios-btn" title="Go Back">
                 <i class="fas fa-arrow-left"></i>
             </button>
@@ -543,7 +543,7 @@
 
         <button id="toggle-voice-chat-btn" class="voice-action-btn ios-btn" title="Toggle Chat">
             <i class="fas fa-comment-slash"></i>
-            <span style="display: none;">Hide Chat</span> 
+            <span class="visually-hidden-label">Hide Chat</span> 
         </button>
 
     </div>
@@ -682,7 +682,7 @@
         
         <div class="text-chat-header">
         
-        <div style="display: flex; gap: 12px;">
+        <div class="header-btn-group">
             <button onclick="window.closeChatRoomFullscreen()" class="voice-action-btn ios-btn" title="Go Back">
                 <i class="fas fa-arrow-left"></i>
             </button>

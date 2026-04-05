@@ -26,6 +26,29 @@
 
     /* 🚀 FIXED: PURE WHITE BORDER FOR DARK MODE */
     --border-solid: #ffffff; 
+
+    /* visual consistency scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --text-caption: 13px;
+    --text-body: 14px;
+    --text-body-lg: 15px;
+    --line-tight: 1.35;
+    --line-normal: 1.5;
+    --motion-fast: 0.2s;
+    --motion-base: 0.3s;
+    --motion-slow: 0.4s;
+    --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --status-success: #4ade80;
+    --status-warning: #facc15;
+    --status-info: #3b82f6;
 }
 
 body.light-mode {
@@ -830,6 +853,99 @@ html, body {
     overflow: hidden; 
 }
 
+.visually-hidden-control {
+    display: none;
+}
+
+.visually-hidden-label {
+    display: none;
+}
+
+.header-btn-group {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.auth-options-wrap {
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.auth-checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.checkbox-no-margin {
+    margin: 0;
+}
+
+.auth-input-standard {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-5);
+}
+
+.auth-link-inline {
+    margin-left: 5px;
+}
+
+.auth-status {
+    font-size: var(--text-body);
+    line-height: var(--line-normal);
+    font-weight: 500;
+}
+
+.auth-status-compact {
+    margin-bottom: var(--space-3);
+}
+
+.auth-status-verified {
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.auth-status-success {
+    color: var(--status-success);
+}
+
+.auth-status-warning {
+    color: var(--status-warning);
+}
+
+.auth-status-info {
+    color: var(--status-info);
+}
+
+.auth-status-email-msg {
+    font-size: var(--text-caption);
+    margin-bottom: var(--space-5);
+}
+
+.onboard-icon-dob {
+    color: #60a5fa;
+}
+
+.onboard-icon-gender {
+    color: #c084fc;
+}
+
+.gender-btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: var(--space-2);
+}
+
+.gender-btn-base {
+    flex: 1;
+    padding: var(--space-3);
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 #fullscreen-chat-room,
 #live-voice-overlay,
 #sidebar-settings-modal,
@@ -973,7 +1089,7 @@ html, body {
 /* 🎧 LIVE CHAT BUTTON */
 .live-chat-btn { 
     background-color: var(--dropdown-bg); 
-    color: var(--ext-primary); 
+    color: var(--text-primary); 
     box-shadow: var(--shadow); 
     
     /* 🚀 डार्क मोड में वाइट, लाइट मोड में ब्लैक बॉर्डर */
@@ -3313,7 +3429,7 @@ html body #onboarding-view .onboard-fade-in-up {
 html body #onboarding-view .onboard-terms-box,
 html body #onboarding-view .gender-btn,
 html body #onboarding-view .onboard-accept-btn {
-    transition: transform 0.22s ease, background-color 0.22s ease, border-color 0.22s ease, opacity 0.22s ease;
+    transition: transform 0.22s var(--ease-standard), background-color 0.22s var(--ease-standard), border-color 0.22s var(--ease-standard), opacity 0.22s var(--ease-standard);
 }
 
 html body #onboarding-view .onboard-terms-box:active,
@@ -3331,6 +3447,98 @@ html body #onboarding-view .onboard-accept-btn:active {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* =========================================================
+   🎯 VISUAL CONSISTENCY AUDIT PASS
+   spacing + typography + contrast + interaction states
+========================================================= */
+
+/* baseline typography alignment */
+html body #auth-container .auth-subtitle,
+.cookie-desc,
+.trash-desc,
+.chat-bubble,
+#live-voice-overlay .chat-msg-text {
+    font-size: var(--text-body);
+    line-height: var(--line-normal);
+}
+
+html body #auth-container .auth-link,
+.dropdown-link,
+.history-btn,
+.cookie-btn {
+    font-size: var(--text-body);
+}
+
+/* spacing alignment */
+html body #auth-container .auth-input-group {
+    margin-bottom: var(--space-6);
+}
+
+.floating-action-group {
+    gap: var(--space-4);
+}
+
+.cookie-btn-group,
+.history-list-container {
+    gap: var(--space-2);
+}
+
+.text-chat-log,
+.live-voice-chat-log {
+    padding-bottom: var(--space-5);
+}
+
+/* contrast consistency for soft surfaces */
+.dropdown-link i,
+.mode-btn,
+.mode-btn i,
+.cookie-close-btn {
+    color: var(--text-secondary);
+}
+
+.dropdown-link:hover i,
+.mode-btn:hover,
+.mode-btn:hover i,
+.cookie-close-btn:hover {
+    color: var(--text-primary);
+}
+
+/* unified interaction states */
+:where(.menu-btn, .floating-btn, .dropdown-link, .mode-btn, .auth-btn-primary, .auth-btn-social, .cookie-btn, .voice-action-btn, .nav-action-btn, .nav-main-btn, .input-icon-btn, .input-send-btn, .input-stop-btn, .gender-btn, .attachment-btn) {
+    transition: transform var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), opacity var(--motion-fast) var(--ease-standard);
+}
+
+:where(.menu-btn, .floating-btn, .dropdown-link, .mode-btn, .auth-btn-primary, .auth-btn-social, .cookie-btn, .voice-action-btn, .nav-action-btn, .nav-main-btn, .input-icon-btn, .input-send-btn, .input-stop-btn, .gender-btn, .attachment-btn):active {
+    transform: scale(0.98);
+}
+
+:where(.menu-btn, .floating-btn, .dropdown-link, .mode-btn, .auth-btn-primary, .auth-btn-social, .cookie-btn, .voice-action-btn, .nav-action-btn, .nav-main-btn, .input-icon-btn, .input-send-btn, .input-stop-btn, .gender-btn, .attachment-btn):focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+:where(button, .auth-input, textarea, .select-selected):disabled,
+:where(button, .auth-input, textarea, .select-selected)[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* onboarding controls row consistency */
+.gender-btn-row {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+@media screen and (max-width: 480px) {
+    .gender-btn-row {
+        flex-direction: column;
+        gap: var(--space-2);
     }
 }
 
