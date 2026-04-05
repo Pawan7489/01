@@ -214,51 +214,6 @@ window.openLiveChat = (event) => {
    🚀 FIX: NEW CHAT ROOM OPEN & CLOSE LOGIC
    ========================================== */
 
-/* ==========================================
-   🚀 FIX: NEW CHAT ROOM OPEN LOGIC
-   ========================================== */
-/* ==========================================
-   🚀 FIX: NEW CHAT ROOM OPEN LOGIC
-   ========================================== */
-window.openNewChatRoom = function(event) {
-    if(event) event.preventDefault(); 
-    
-    // 1. हमेशा नई ID बनाओ
-    window.isFirstMessage = true;
-    window.currentSessionId = 'chat_' + Date.now();
-    window.currentChatType = 'text';
-    
-    if(navigator.vibrate) navigator.vibrate(15);
-    
-    // 2. साइडबार बंद करो
-    const sidebar = document.getElementById('sidebar-menu');
-    if (sidebar) { sidebar.classList.remove('active'); }
-
-    // 3. 🚀 पुरानी चैट को स्क्रीन से पूरी तरह साफ़ (Clear) करो
-    const chatBox = document.getElementById('chat-box');
-    if(chatBox) {
-        chatBox.querySelectorAll('.chat-message-row').forEach(m => m.remove());
-        const welcomeBanner = document.getElementById('welcome-banner');
-        if (welcomeBanner) welcomeBanner.style.display = 'flex'; // Welcome वापस लाओ
-    }
-
-    // 4. इनपुट बॉक्स खाली करो
-    const chatInput = document.getElementById('chat-user-input');
-    if(chatInput) { chatInput.value = ''; window.autoResizeInput(chatInput); }
-    document.getElementById("chat-send-btn")?.classList.add("hidden");
-    document.getElementById("chat-mic-btn")?.classList.remove("hidden");
-
-    // 5. चैट रूम ओपन करो
-    const chatOverlay = document.getElementById('fullscreen-chat-room');
-    if(chatOverlay) {
-        chatOverlay.classList.remove('hidden');
-        chatOverlay.style.display = 'flex'; 
-    }
-};
-
-
-
-
 // चैट रूम बंद (Close) करने का फंक्शन (Back Button के लिए)
 window.closeChatRoomFullscreen = function(event) {
     if(event) event.preventDefault();
