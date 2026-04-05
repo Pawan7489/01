@@ -32,6 +32,8 @@ _MEMORY_STORE = {}
 
 DB_PATH = os.environ.get("A1_DB_PATH", os.path.join(os.path.dirname(__file__), "a1_auth.db"))
 REDIS_URL = os.environ.get("REDIS_URL", "").strip()
+REDIS_SOCKET_TIMEOUT_SECONDS = float(os.environ.get("REDIS_SOCKET_TIMEOUT_SECONDS", "3"))
+REDIS_CONNECT_TIMEOUT_SECONDS = float(os.environ.get("REDIS_CONNECT_TIMEOUT_SECONDS", "3"))
 _REDIS_CLIENT = None
 _REDIS_ENABLED = False
 
@@ -134,6 +136,8 @@ def _get_user_by_email(email: str):
 
 
 def _create_user(mobile: str | None, email: str | None, password_hash: str) -> bool:
+    if not mobile and not email:
+        return False
     conn = _db_conn()
     try:
         conn.execute(
@@ -169,7 +173,12 @@ def _init_redis():
         _REDIS_ENABLED = False
         return
     try:
-        client = redis.from_url(REDIS_URL, decode_responses=True, socket_timeout=1, socket_connect_timeout=1)
+        client = redis.from_url(
+            REDIS_URL,
+            decode_responses=True,
+            socket_timeout=REDIS_SOCKET_TIMEOUT_SECONDS,
+            socket_connect_timeout=REDIS_CONNECT_TIMEOUT_SECONDS,
+        )
         client.ping()
         _REDIS_CLIENT = client
         _REDIS_ENABLED = True
