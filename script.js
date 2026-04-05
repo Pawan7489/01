@@ -818,6 +818,13 @@ function escapeSafeHTML(str) {
 
 window.__humanTypingWriteLock = false;
 window.__humanTypingObserverReady = false;
+window.__humanTypingSpeedProfiles = {
+    auth: { baseDelay: 10, maxDelay: 22, maxChars: 340 },
+    welcome: { baseDelay: 18, maxDelay: 38, maxChars: 460 },
+    profile: { baseDelay: 28, maxDelay: 56, maxChars: 520 },
+    history: { baseDelay: 14, maxDelay: 28, maxChars: 160 },
+    default: { baseDelay: 18, maxDelay: 42, maxChars: 420 }
+};
 
 window.humanTypeHTML = async function(element, html, options = {}) {
     if (!element || element.dataset.humanTypingRunning === 'true') return;
@@ -880,23 +887,26 @@ window.humanTypeHTML = async function(element, html, options = {}) {
 
 window.initGlobalHumanTyping = function(options = {}) {
     const root = options.scope || document;
-    const selectors = [
-        '.auth-title',
-        '.auth-subtitle',
-        '.trash-title',
-        '.trash-desc',
-        '.welcome-heading',
-        '#welcome-banner h2',
-        '#welcome-banner p',
-        '#future-note-text',
-        '.sidebar-history h5',
-        '.history-type-badge-label'
+    const selectorProfiles = [
+        { selector: '.auth-title', profile: 'auth' },
+        { selector: '.auth-subtitle', profile: 'auth' },
+        { selector: '.trash-title', profile: 'welcome' },
+        { selector: '.trash-desc', profile: 'welcome' },
+        { selector: '.welcome-heading', profile: 'welcome' },
+        { selector: '#welcome-banner h2', profile: 'welcome' },
+        { selector: '#welcome-banner p', profile: 'welcome' },
+        { selector: '#future-note-text', profile: 'welcome' },
+        { selector: '.sidebar-history h5', profile: 'history' },
+        { selector: '.history-type-badge-label', profile: 'history' },
+        { selector: '#profile-dropdown .menu-list-btn', profile: 'profile' },
+        { selector: '#profile-dropdown .profile-user-name', profile: 'profile' }
     ];
 
-    selectors.forEach((selector) => {
+    selectorProfiles.forEach(({ selector, profile }) => {
+        const speedConfig = window.__humanTypingSpeedProfiles[profile] || window.__humanTypingSpeedProfiles.default;
         root.querySelectorAll(selector).forEach((el) => {
             if (!el.dataset.humanTypingSource) el.dataset.humanTypingSource = el.innerHTML;
-            window.humanTypeHTML(el, el.dataset.humanTypingSource);
+            window.humanTypeHTML(el, el.dataset.humanTypingSource, speedConfig);
         });
     });
 };
