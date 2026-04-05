@@ -3177,6 +3177,11 @@ window.openNewChatRoom = function(event) {
     // 4. Welcome बैनर को वापस लाएं
     const welcomeBanner = document.getElementById('welcome-banner');
     if(welcomeBanner) welcomeBanner.style.display = 'flex';
+    const futureNote = document.getElementById('future-note-text');
+    if (futureNote) {
+        const userName = (localStorage.getItem('a1_user_name') || 'Commander').trim() || 'Commander';
+        futureNote.textContent = `${userName}, aap yahan apna next idea/comment likh sakte ho — A1 usse Gemini-style structured response mein convert karega.`;
+    }
 
     // 5. इनपुट बॉक्स और बटन्स को डिफ़ॉल्ट (खाली) करें
     const chatInput = document.getElementById('chat-user-input');
