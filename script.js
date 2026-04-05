@@ -2463,6 +2463,7 @@ document.addEventListener('click', (e) => {
                 // 🔓 SHOW CHAT (चैट दिखाएँ और होलोग्राम को ऊपर भेजें)
                 chatLog.classList.remove('hidden');
                 chatLog.style.display = 'flex'; // 🚀 JS Force Show
+                if (middleContainer) middleContainer.classList.remove('chat-hidden-mode');
                 
                 if(middleContainer) middleContainer.style.justifyContent = 'flex-start';
                 if(holoWrapper) holoWrapper.style.transform = 'scale(1)';
@@ -2473,6 +2474,7 @@ document.addEventListener('click', (e) => {
                 // 🔒 HIDE CHAT (चैट पूरा ग़ायब करें और होलोग्राम को सेंटर में लाएं)
                 chatLog.classList.add('hidden');
                 chatLog.style.display = 'none'; // 🚀 JS Force Hide
+                if (middleContainer) middleContainer.classList.add('chat-hidden-mode');
                 
                 if(middleContainer) middleContainer.style.justifyContent = 'center';
                 if(holoWrapper) holoWrapper.style.transform = 'scale(1.3)';
@@ -2745,6 +2747,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 🚀 MASTER FIX: रूम खुलते ही चैट बॉक्स को जड़ से ग़ायब कर दो
                 logBox.classList.add("hidden");
                 logBox.style.display = "none"; // JS Force Hide
+                if (middleContainer) middleContainer.classList.add('chat-hidden-mode');
                 
                 // 🚀 होलोग्राम को सेंटर में लाओ
                 if (middleContainer) {
@@ -2793,6 +2796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('live-voice-type-input')?.classList.add('hidden');
         document.getElementById('attachment-menu')?.classList.add('hidden');
+        document.getElementById('voice-middle-container')?.classList.remove('chat-hidden-mode');
         document.getElementById("live-voice-overlay")?.classList.add("hidden");
     });
 });

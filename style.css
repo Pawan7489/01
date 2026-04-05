@@ -688,7 +688,7 @@ html, body {
     gap: 8px;
 }
 
-#sidebar-menu .sidebar-history h5 {+0
+#sidebar-menu .sidebar-history h5 {
     color: var(--text-secondary); 
     font-size: 11px;
     font-weight: 700;
@@ -3267,6 +3267,71 @@ html body #live-voice-overlay .voice-bottom-nav {
     flex-shrink: 0;
     position: relative;
     z-index: 999999;
+}
+
+/* =========================================================
+   ✨ UX POLISH PASS (buttons + onboarding + transitions)
+========================================================= */
+
+/* Consistent button micro-interactions */
+.ios-btn,
+button,
+[role="button"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.ios-btn:active,
+button:active,
+[role="button"]:active {
+    transform: scale(0.98);
+}
+
+.ios-btn:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+/* Smooth open/close feel for chat/voice containers */
+html body #fullscreen-chat-room,
+html body #live-voice-overlay {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    transform: translateY(0);
+}
+
+html body #fullscreen-chat-room.hidden,
+html body #live-voice-overlay.hidden {
+    transform: translateY(8px);
+}
+
+/* Onboarding reveal polish */
+html body #onboarding-view .onboard-fade-in-up {
+    will-change: opacity, transform;
+}
+
+html body #onboarding-view .onboard-terms-box,
+html body #onboarding-view .gender-btn,
+html body #onboarding-view .onboard-accept-btn {
+    transition: transform 0.22s ease, background-color 0.22s ease, border-color 0.22s ease, opacity 0.22s ease;
+}
+
+html body #onboarding-view .onboard-terms-box:active,
+html body #onboarding-view .gender-btn:active,
+html body #onboarding-view .onboard-accept-btn:active {
+    transform: scale(0.99);
+}
+
+/* Respect reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 /* =========================================================
