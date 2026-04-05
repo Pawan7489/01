@@ -2798,6 +2798,99 @@ html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-
     }
 }
 
+/* ---------------------------------------------------------
+   11. AUTH SPACING NORMALIZER (Pixel-Consistent Layout)
+--------------------------------------------------------- */
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-title {
+    margin: 0 0 10px 0;
+    line-height: 1.2;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-subtitle {
+    margin: 0 0 24px 0;
+    line-height: 1.45;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-tab-group {
+    margin-bottom: 22px;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-input-group {
+    margin-bottom: 20px;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-btn-primary {
+    margin-bottom: 18px;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-options-row {
+    margin-bottom: 20px;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-divider {
+    margin: 6px 0 18px 0;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-btn-social {
+    margin-bottom: 14px;
+}
+
+html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-footer {
+    margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-subtitle {
+        margin-bottom: 22px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-tab-group {
+        margin-bottom: 20px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-input-group {
+        margin-bottom: 18px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-btn-primary {
+        margin-bottom: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-title {
+        margin-bottom: 8px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-subtitle {
+        margin-bottom: 18px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-tab-group {
+        margin-bottom: 16px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-input-group {
+        margin-bottom: 14px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-options-row {
+        margin-bottom: 14px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-btn-primary {
+        margin-bottom: 14px;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-divider {
+        margin: 4px 0 14px 0;
+    }
+
+    html body #auth-container :is(#login-view, #signup-view, #forgot-view, #twostep-view) .auth-btn-social {
+        margin-bottom: 10px;
+    }
+}
+
 
 
 
