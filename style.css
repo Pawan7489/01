@@ -4177,8 +4177,119 @@ html body #fullscreen-chat-room .menu-divider { height: 1.5px; background: var(-
     html body #fullscreen-chat-room .input-send-btn, 
     html body #fullscreen-chat-room .input-stop-btn { width: 36px; height: 36px; font-size: 14px; }
     
-    html body #fullscreen-chat-room .action-icon-btn { width: 28px; height: 28px; font-size: 11px; }
-    html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visible; pointer-events: auto; } 
+html body #fullscreen-chat-room .action-icon-btn { width: 28px; height: 28px; font-size: 11px; }
+html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visible; pointer-events: auto; } 
+}
+
+/* ==========================================
+   💻 Chat Code Block UI (Theme + Responsive)
+========================================== */
+.premium-code-box {
+    width: 100%;
+    margin: 10px 0;
+    border: 1px solid var(--border-solid);
+    border-radius: 12px;
+    background: var(--card-bg);
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.premium-code-box .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-solid);
+    background: var(--btn-bg);
+}
+
+.premium-code-box .code-lang {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.premium-code-box .code-copy-btn {
+    border: 1px solid var(--border-solid);
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.premium-code-box .code-copy-btn:hover {
+    background: var(--btn-hover);
+}
+
+.premium-code-box .code-body {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.premium-code-box .code-body.many-lines {
+    max-height: 32em;
+    overflow-y: auto;
+}
+
+.premium-code-box pre {
+    margin: 0;
+    padding: 12px;
+    line-height: 1.6;
+    font-size: 13px;
+    white-space: pre;
+    min-width: max-content;
+}
+
+.premium-code-box code {
+    font-family: 'Fira Code', 'Consolas', 'Menlo', 'Monaco', monospace;
+    color: var(--text-primary);
+}
+
+.chat-bubble .normal-text-span {
+    display: inline;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.chat-bubble .tok-comment { color: #6b7280; }
+.chat-bubble .tok-string { color: #16a34a; }
+.chat-bubble .tok-keyword { color: #2563eb; font-weight: 600; }
+.chat-bubble .tok-number { color: #d97706; }
+.chat-bubble .tok-bool { color: #9333ea; font-weight: 600; }
+
+[data-theme="dark"] .chat-bubble .tok-comment { color: #9ca3af; }
+[data-theme="dark"] .chat-bubble .tok-string { color: #4ade80; }
+[data-theme="dark"] .chat-bubble .tok-keyword { color: #60a5fa; }
+[data-theme="dark"] .chat-bubble .tok-number { color: #fbbf24; }
+[data-theme="dark"] .chat-bubble .tok-bool { color: #c084fc; }
+
+@media (max-width: 768px) {
+    .premium-code-box .code-header {
+        padding: 7px 8px;
+    }
+    .premium-code-box .code-copy-btn {
+        font-size: 11px;
+        padding: 4px 7px;
+    }
+    .premium-code-box pre {
+        font-size: 12px;
+        padding: 10px;
+    }
+    .premium-code-box .code-body.many-lines {
+        max-height: 28em;
+    }
 }
 
 

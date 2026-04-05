@@ -874,7 +874,7 @@ window.loadSpecificChat = function(id) {
                     const safeText = encodeURIComponent(msg.text);
                     
                     if(msg.sender === 'user') {
-                        div.innerHTML = `<div class="bubble-container" style="display: flex; flex-direction: column; align-items: flex-end;"><div class="chat-bubble user-bubble">${msg.text.replace(/\n/g, '<br>')}</div><div class="user-action-bar"><button class="action-icon-btn" onclick="window.handleSafeAction('copy', this)" data-text="${safeText}"><i class="fas fa-copy"></i></button></div></div>`;
+                        div.innerHTML = `<div class="bubble-container" style="display: flex; flex-direction: column; align-items: flex-end;"><div class="chat-bubble user-bubble">${window.formatUserMessage(msg.text)}</div><div class="user-action-bar"><button class="action-icon-btn" onclick="window.handleSafeAction('copy', this)" data-text="${safeText}"><i class="fas fa-copy"></i></button></div></div>`;
                     } else {
                         // 🚀 पुरानी हिस्ट्री में भी रुका हुआ होलोग्राम ऊपर दिखेगा और 3-Dots नीचे!
                         div.innerHTML = `
@@ -893,7 +893,7 @@ window.loadSpecificChat = function(id) {
                                             <i class="fas fa-volume-up"></i>
                                         </button>
                                     </div>
-                                    <div class="chat-msg-text">${msg.text.replace(/\n/g, '<br>')}</div>
+                                    <div class="chat-msg-text">${window.formatChatText(msg.text)}</div>
                                 </div>
                                 <div class="chat-action-bar" style="margin-left: 10px; margin-top: 5px; display: flex; gap: 10px;">
                                     <button class="action-icon-btn" onclick="window.handleSafeAction('copy', this)" data-text="${safeText}"><i class="fas fa-copy"></i></button>
@@ -2285,6 +2285,10 @@ window.escapeHtml = function(text) {
 
 window.formatUserMessage = function(text) {
     const safeSource = String(text ?? '');
+    const hasCodeBlock = /```[\s\S]*?```/.test(safeSource);
+    if (hasCodeBlock) {
+        return `<div class="user-msg-content">${window.formatChatText(safeSource)}</div>`;
+    }
     const escaped = window.escapeHtml(safeSource);
     let formattedText = escaped.replace(/\n/g, '<br>');
     
@@ -2308,6 +2312,8 @@ window.formatUserMessage = function(text) {
 // 🚀 LONG MESSAGE FORMATTER (shared for voice/user bubbles)
 window.formatLongMessage = function(text) {
     const source = String(text ?? '');
+    const hasCodeBlock = /```[\s\S]*?```/.test(source);
+    if (hasCodeBlock) return window.formatChatText(source);
     const escaped = window.escapeHtml(source);
     const safe = escaped.replace(/\n/g, '<br>');
     const isLong = source.split('\n').length > 4 || source.length > 220;
@@ -2883,7 +2889,7 @@ window.formatChatText = function(rawText) {
     if (!rawText) return "";
 
     // 1. Text ko safe banana (XSS prevention)
-    let text = rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    let text = window.escapeHtml(rawText);
 
     // 2. Text ko ` ``` ` ke hisaab se tukdo mein todna
     let parts = text.split(/(```[\s\S]*?```)/g);
@@ -2892,7 +2898,7 @@ window.formatChatText = function(rawText) {
     parts.forEach(part => {
         if (part.startsWith('```') && part.endsWith('```')) {
             // 💻 YE CODE BLOCK HAI
-            let match = part.match(/```(\w*)\n?([\s\S]*?)```/);
+            let match = part.match(/```([\w#+.\-]*)\n?([\s\S]*?)```/);
             if (match) {
                 let lang = match[1] ? match[1].toUpperCase() : 'CODE';
                 let codeContent = match[2];
@@ -3426,11 +3432,12 @@ window.sendChatMessage = function() {
         let i = 0;
         function typeWriter() {
             if (i < rawResponse.length && window.isGenerating) {
-                textElement.innerHTML += rawResponse.charAt(i);
+                textElement.textContent += rawResponse.charAt(i);
                 i++;
                 chatBox.scrollTo({ top: chatBox.scrollHeight });
                 setTimeout(typeWriter, 30);
             } else {
+                if (textElement) textElement.innerHTML = window.formatChatText(rawResponse);
                 // 🛑 STOP SPINNING: होलोग्राम घूमेगा नहीं, पर वहीँ ऊपर ही खड़ा रहेगा!
                 document.getElementById(`holo-${msgId}`)?.classList.remove('is-typing');
                 document.getElementById(`holo-${msgId}`)?.classList.add('stopped');
