@@ -1241,6 +1241,8 @@ window.resetForms = function() {
     try {
         window.__a1ForgotResetMobile = null;
         window.__a1ForgotResetToken = null;
+        window.__a1SignupMobileVerifiedToken = null;
+        window.__a1SignupEmailVerifiedToken = null;
 
         // Clear all inputs
         document.querySelectorAll('.auth-input, .auth-otp-input').forEach(i => i.value = '');
@@ -1289,115 +1291,248 @@ window.resetForms = function() {
    🚀 4. LOGIN LOGIC (Direct to Dashboard)
 ========================================================= */
 window.sendLoginOTP = function() {
-    try {
-        const mobile = document.getElementById('login-mobile-input').value;
-        if (mobile.length !== 10) return window.showA1Modal('alert', 'Error', 'Enter a valid 10-digit mobile number.'); 
+    const mobile = (document.getElementById('login-mobile-input')?.value || '').trim();
+    if (!/^\d{10}$/.test(mobile)) return window.showA1Modal('alert', 'Error', 'Enter a valid 10-digit mobile number.');
+
+    const sendBtn = document.getElementById('login-send-otp-btn');
+    if (sendBtn) sendBtn.disabled = true;
+
+    fetch('/api/login/mobile/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Unable to send OTP.');
+
         window.safeVibrate();
-        
-        window.initializeAllPinBoxes(); 
-        
-        const sendBtn = document.getElementById('login-send-otp-btn');
+        window.initializeAllPinBoxes();
         if(sendBtn) sendBtn.classList.add('hidden');
-        
         const otpSec = document.getElementById('login-otp-section');
         if(otpSec) {
             otpSec.classList.remove('hidden');
             setTimeout(() => document.querySelector('#login-otp-boxes input')?.focus(), 300);
         }
-        if(window.showA1Modal) window.showA1Modal('alert', 'OTP Sent', '6-digit OTP has been sent to your mobile number.');
-    } catch (error) {}
+        window.showA1Modal?.('alert', 'OTP Sent', data.message || 'If credentials are valid, OTP has been sent.');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Error', err.message || 'Failed to send OTP.');
+    })
+    .finally(() => {
+        if (sendBtn) sendBtn.disabled = false;
+    });
 };
 
 window.verifyLoginOTP = function() {
-    window.safeVibrate();
-    localStorage.removeItem('a1_pending_onboarding');
-    window.grantAccess(true);
+    const mobile = (document.getElementById('login-mobile-input')?.value || '').trim();
+    const otp = Array.from(document.querySelectorAll('#login-otp-boxes input'))
+        .map((el) => (el.value || '').trim())
+        .join('');
+    if (!/^\d{10}$/.test(mobile)) return window.showA1Modal?.('alert', 'Error', 'Enter a valid 10-digit mobile number.');
+    if (!/^\d{6}$/.test(otp)) return window.showA1Modal?.('alert', 'Invalid OTP', 'Please enter a valid 6-digit OTP.');
+
+    fetch('/api/login/mobile/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, otp })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Login failed.');
+        window.safeVibrate();
+        localStorage.removeItem('a1_pending_onboarding');
+        window.grantAccess(true);
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Login Failed', err.message || 'Invalid credentials.');
+    });
 };
 
 window.processMobilePassLogin = function() {
+    const mobile = (document.getElementById('login-mobile-input')?.value || '').trim();
     const pass = document.getElementById('login-mobile-password').value;
-    if (pass.length < 8) return window.showA1Modal('alert', 'Login Failed', 'Password must be at least 8 characters.'); 
-    window.safeVibrate();
-    localStorage.removeItem('a1_pending_onboarding');
-    window.grantAccess(true);
+    if (!/^\d{10}$/.test(mobile) || pass.length < 8) return window.showA1Modal('alert', 'Login Failed', 'Invalid credentials.');
+
+    fetch('/api/login/mobile/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, password: pass })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Login failed.');
+        window.safeVibrate();
+        localStorage.removeItem('a1_pending_onboarding');
+        window.grantAccess(true);
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Login Failed', err.message || 'Invalid credentials.');
+    });
 };
 
 window.processEmailLogin = function() {
-    const email = document.getElementById('login-email-input').value;
+    const email = (document.getElementById('login-email-input')?.value || '').trim().toLowerCase();
     const pass = document.getElementById('login-password-input').value;
-    if (!email.includes('@') || pass.length < 8) return window.showA1Modal('alert', 'Login Failed', 'Invalid email or password.'); 
-    window.safeVibrate();
-    localStorage.removeItem('a1_pending_onboarding');
-    window.grantAccess(true);
+    if (!email.includes('@') || pass.length < 8) return window.showA1Modal('alert', 'Login Failed', 'Invalid email or password.');
+
+    fetch('/api/login/email/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Login failed.');
+        window.safeVibrate();
+        localStorage.removeItem('a1_pending_onboarding');
+        window.grantAccess(true);
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Login Failed', err.message || 'Invalid credentials.');
+    });
 };
 
 /* =========================================================
    🚀 5. SIGNUP LOGIC (Routes to Onboarding)
 ========================================================= */
 window.sendSignupOTP = function() {
-    try {
-        const mobile = document.getElementById('signup-mobile-input').value;
-        if (mobile.length !== 10) return window.showA1Modal('alert', 'Invalid Input', 'Enter valid 10-digit mobile number.'); 
+    const mobile = (document.getElementById('signup-mobile-input')?.value || '').trim();
+    if (!/^\d{10}$/.test(mobile)) return window.showA1Modal('alert', 'Invalid Input', 'Enter valid 10-digit mobile number.');
+
+    const sendBtn = document.getElementById('signup-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+
+    fetch('/api/signup/mobile/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Unable to send OTP.');
+
         window.safeVibrate();
-        
-        window.initializeAllPinBoxes(); 
-        
+        window.initializeAllPinBoxes();
         document.getElementById('signup-send-btn')?.classList.add('hidden');
         document.getElementById('signup-otp-section')?.classList.remove('hidden');
-        
         setTimeout(() => document.querySelector('#signup-otp-boxes input')?.focus(), 300);
-        if(window.showA1Modal) window.showA1Modal('alert', 'OTP Sent', '6-digit OTP has been sent.');
-    } catch (error) {}
+        window.showA1Modal?.('alert', 'OTP Sent', data.message || 'OTP has been sent.');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Error', err.message || 'Failed to send OTP.');
+    })
+    .finally(() => {
+        if (sendBtn) sendBtn.disabled = false;
+    });
 };
 
 window.verifySignupOTP = function() {
-    window.safeVibrate();
-    document.getElementById('signup-otp-section')?.classList.add('hidden');
-    document.getElementById('signup-mobile-pass-section')?.classList.remove('hidden');
+    const mobile = (document.getElementById('signup-mobile-input')?.value || '').trim();
+    const otp = Array.from(document.querySelectorAll('#signup-otp-boxes input'))
+        .map((el) => (el.value || '').trim())
+        .join('');
+    if (!/^\d{10}$/.test(mobile)) return window.showA1Modal?.('alert', 'Invalid Input', 'Enter valid 10-digit mobile number.');
+    if (!/^\d{6}$/.test(otp)) return window.showA1Modal?.('alert', 'Invalid OTP', 'Please enter valid 6-digit OTP.');
+
+    fetch('/api/signup/mobile/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, otp })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success' || !data.signupToken) throw new Error(data.message || 'OTP verification failed.');
+        window.__a1SignupMobileVerifiedToken = data.signupToken;
+        window.safeVibrate();
+        document.getElementById('signup-otp-section')?.classList.add('hidden');
+        document.getElementById('signup-mobile-pass-section')?.classList.remove('hidden');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Verification Failed', err.message || 'Invalid or expired OTP.');
+    });
 };
 
 window.sendEmailVerification = function() {
-    try {
-        const email = document.getElementById('signup-email-input').value;
-        if (!email.includes('@') || !email.includes('.')) return window.showA1Modal('alert', 'Invalid Email', 'Please enter a valid email address.');
+    const email = (document.getElementById('signup-email-input')?.value || '').trim().toLowerCase();
+    if (!email.includes('@') || !email.includes('.')) return window.showA1Modal('alert', 'Invalid Email', 'Please enter a valid email address.');
+
+    const sendBtn = document.getElementById('signup-send-email-btn');
+    const msgEl = document.getElementById('email-verify-msg');
+    if(sendBtn) { sendBtn.classList.add('hidden'); sendBtn.disabled = true; }
+    if(msgEl) msgEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying email...';
+
+    fetch('/api/signup/email/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success' || !data.signupToken) throw new Error(data.message || 'Email verification failed.');
+        window.__a1SignupEmailVerifiedToken = data.signupToken;
         window.safeVibrate();
-
-        const sendBtn = document.getElementById('signup-send-email-btn');
-        if(sendBtn) sendBtn.classList.add('hidden');
-
-        const msgEl = document.getElementById('email-verify-msg');
+        if(msgEl) msgEl.classList.add('hidden');
+        const passSec = document.getElementById('signup-email-pass-section');
+        if(passSec) passSec.classList.remove('hidden');
+        window.showA1Modal?.('alert', 'Email Verified', data.message || 'Email has been verified successfully! Create your password.');
+    })
+    .catch((err) => {
+        if(sendBtn) sendBtn.classList.remove('hidden');
         if(msgEl) {
-            msgEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending verification link...';
+            msgEl.classList.remove('hidden');
+            msgEl.innerHTML = '<i class="fas fa-envelope"></i> A verification link will be sent to this email.';
         }
-
-        setTimeout(() => {
-            if(msgEl) msgEl.classList.add('hidden'); 
-            const passSec = document.getElementById('signup-email-pass-section');
-            if(passSec) passSec.classList.remove('hidden');
-
-            if(window.showA1Modal) window.showA1Modal('alert', 'Email Verified', 'Email has been verified successfully! Create your password.');
-        }, 1500);
-    } catch (error) {}
+        window.showA1Modal?.('alert', 'Error', err.message || 'Email verification failed.');
+    })
+    .finally(() => {
+        if(sendBtn) sendBtn.disabled = false;
+    });
 };
 
 window.completeSignup = function(type) {
     try {
         let pass, conf;
+        let payload = {};
         if (type === 'mobile') {
             pass = document.getElementById('signup-pass-mobile').value; 
             conf = document.getElementById('signup-conf-pass-mobile').value;
+            const mobile = (document.getElementById('signup-mobile-input')?.value || '').trim();
+            const signupToken = window.__a1SignupMobileVerifiedToken;
+            if (!/^\d{10}$/.test(mobile) || !signupToken) {
+                return window.showA1Modal?.('alert', 'Session Expired', 'Please verify OTP again.');
+            }
+            payload = { url: '/api/signup/mobile/complete', body: { mobile, password: pass, signupToken } };
         } else {
             pass = document.getElementById('signup-pass-email').value; 
             conf = document.getElementById('signup-conf-pass-email').value;
+            const email = (document.getElementById('signup-email-input')?.value || '').trim().toLowerCase();
+            const signupToken = window.__a1SignupEmailVerifiedToken;
+            if (!email.includes('@') || !signupToken) {
+                return window.showA1Modal?.('alert', 'Session Expired', 'Please verify email again.');
+            }
+            payload = { url: '/api/signup/email/complete', body: { email, password: pass, signupToken } };
         }
         if (!window.validatePassword(pass, conf)) return;
-        
-        window.safeVibrate("light");
-        
-        // 🚀 Set Onboarding Flag
-        localStorage.setItem('a1_pending_onboarding', 'true'); 
-        window.grantAccess(true); 
-        
+
+        fetch(payload.url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload.body)
+        })
+        .then(async (res) => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || data.status !== 'success') throw new Error(data.message || 'Signup failed.');
+
+            window.safeVibrate("light");
+            window.__a1SignupMobileVerifiedToken = null;
+            window.__a1SignupEmailVerifiedToken = null;
+            localStorage.setItem('a1_pending_onboarding', 'true');
+            window.grantAccess(true);
+        })
+        .catch((err) => {
+            window.showA1Modal?.('alert', 'Signup Failed', err.message || 'Could not create account.');
+        });
     } catch (error) { console.error(error); }
 };
 
