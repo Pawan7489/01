@@ -334,7 +334,6 @@ window.toggleVoiceAttachMenu = (event) => {
     if (!attachMenu) return;
     if (bottomNav) bottomNav.style.overflow = 'visible';
     attachMenu.classList.toggle('hidden');
-    attachMenu.style.display = attachMenu.classList.contains('hidden') ? 'none' : 'flex';
 };
 
 
@@ -1111,6 +1110,8 @@ window.setupPinBoxes = function(containerId, inputType) {
 
         const inputs = container.querySelectorAll('input');
         inputs.forEach((input, index) => {
+            if (input.dataset.pinBound === '1') return;
+            input.dataset.pinBound = '1';
             input.addEventListener('input', (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, ''); 
                 if (e.target.value !== '' && index < inputs.length - 1) {
@@ -1162,9 +1163,33 @@ window.switchView = function(viewName) {
             if (el) el.classList.add('hidden'); 
         });
         const targetView = document.getElementById(viewName) || document.getElementById('login-view');
-        if (targetView && targetView.classList) targetView.classList.remove('hidden');
+        if (!targetView || !targetView.classList) return;
+        targetView.classList.remove('hidden');
         window.resetForms();
     } catch(e) {}
+};
+
+window.setVoiceChatVisibility = function(showChat) {
+    const chatLog = document.getElementById('live-voice-chat-log');
+    const middleContainer = document.getElementById('voice-middle-container');
+    const toggleBtn = document.getElementById('toggle-voice-chat-btn');
+    if (!chatLog || !middleContainer) return;
+
+    chatLog.classList.toggle('hidden', !showChat);
+    middleContainer.classList.toggle('chat-hidden-mode', !showChat);
+
+    if (toggleBtn) {
+        const icon = toggleBtn.querySelector('i');
+        const text = toggleBtn.querySelector('span');
+        if (icon) icon.className = showChat ? "fas fa-comment-slash" : "fas fa-comment";
+        if (text) text.innerText = showChat ? "Hide Chat" : "Show Chat";
+    }
+};
+
+window.setAttachmentMenuOpen = function(isOpen) {
+    const attachMenu = document.getElementById('attachment-menu');
+    if (!attachMenu) return;
+    attachMenu.classList.toggle('hidden', !isOpen);
 };
 
 window.toggleLoginType = function() {
@@ -2309,6 +2334,21 @@ window.formatUserMessage = function(text) {
     return `<div class="user-msg-content">${formattedText}</div>`;
 };
 
+// 🚀 LONG MESSAGE FORMATTER (shared for voice/user bubbles)
+window.formatLongMessage = function(text) {
+    const safe = String(text ?? '').replace(/\n/g, '<br>');
+    const isLong = safe.split('<br>').length > 4 || safe.length > 220;
+    if (!isLong) return safe;
+    return `
+        <div class="long-msg-wrapper">
+            <div class="long-msg-content line-clamp-3">${safe}</div>
+            <button onclick="window.toggleMsgExpand(this)" class="read-more-btn">
+                <i class="fas fa-chevron-down"></i> Read More
+            </button>
+        </div>
+    `;
+};
+
 // 🚀 SHOW MORE / LESS ICON ROTATION LOGIC
 window.toggleUserMsg = function(btn) {
     if(typeof triggerVibration === 'function') triggerVibration("light");
@@ -2450,37 +2490,15 @@ document.addEventListener('click', (e) => {
     if(toggleBtn) {
         if(navigator.vibrate) navigator.vibrate(20);
         const chatLog = document.getElementById('live-voice-chat-log');
-        const middleContainer = document.getElementById('voice-middle-container');
-        const holoWrapper = document.getElementById('voice-hologram-wrapper');
-        const icon = toggleBtn.querySelector('i');
-        const text = toggleBtn.querySelector('span');
         
         if(chatLog) {
             // चेक करें कि क्या डब्बा छिपा हुआ है
-            const isHidden = chatLog.classList.contains('hidden') || chatLog.style.display === 'none';
+            const isHidden = chatLog.classList.contains('hidden');
 
             if(isHidden) {
-                // 🔓 SHOW CHAT (चैट दिखाएँ और होलोग्राम को ऊपर भेजें)
-                chatLog.classList.remove('hidden');
-                chatLog.style.display = 'flex'; // 🚀 JS Force Show
-                if (middleContainer) middleContainer.classList.remove('chat-hidden-mode');
-                
-                if(middleContainer) middleContainer.style.justifyContent = 'flex-start';
-                if(holoWrapper) holoWrapper.style.transform = 'scale(1)';
-                
-                if(icon) icon.className = "fas fa-comment-slash";
-                if(text) text.innerText = "Hide Chat";
+                window.setVoiceChatVisibility(true);
             } else {
-                // 🔒 HIDE CHAT (चैट पूरा ग़ायब करें और होलोग्राम को सेंटर में लाएं)
-                chatLog.classList.add('hidden');
-                chatLog.style.display = 'none'; // 🚀 JS Force Hide
-                if (middleContainer) middleContainer.classList.add('chat-hidden-mode');
-                
-                if(middleContainer) middleContainer.style.justifyContent = 'center';
-                if(holoWrapper) holoWrapper.style.transform = 'scale(1.3)';
-                
-                if(icon) icon.className = "fas fa-comment";
-                if(text) text.innerText = "Show Chat";
+                window.setVoiceChatVisibility(false);
             }
         }
     }
@@ -2504,21 +2522,9 @@ document.addEventListener('click', (e) => {
             if(bottomNav) bottomNav.style.overflow = 'visible';
 
             if (attachMenu.classList.contains('hidden')) {
-                // मेनू खोलें (Inline Styles सबसे ताकतवर और साफ़ होते हैं)
-                attachMenu.classList.remove('hidden');
-                attachMenu.style.display = 'flex';
-                attachMenu.style.flexDirection = 'column';
-                attachMenu.style.position = 'absolute';
-                attachMenu.style.bottom = 'calc(100% + 15px)';
-                attachMenu.style.left = '15px';
-                attachMenu.style.zIndex = '9999999';
-                attachMenu.style.opacity = '1';
-                attachMenu.style.visibility = 'visible';
-                attachMenu.style.pointerEvents = 'auto';
+                window.setAttachmentMenuOpen(true);
             } else {
-                // मेनू बंद करें
-                attachMenu.classList.add('hidden');
-                attachMenu.style.display = 'none';
+                window.setAttachmentMenuOpen(false);
             }
         }
         return; // 🚀 कोड को यहीं रोक देगा ताकि मेनू तुरंत बंद न हो जाए
@@ -2527,8 +2533,7 @@ document.addEventListener('click', (e) => {
     // 5. 🚀 AUTO-CLOSE: अगर मेनू खुला है और बाहर कहीं क्लिक हुआ है, तो बंद कर दो
     if (attachMenu && !attachMenu.classList.contains('hidden')) {
         if (!e.target.closest('#attachment-menu')) {
-            attachMenu.classList.add('hidden');
-            attachMenu.style.display = 'none'; // स्क्रीन से पूरी तरह गायब
+            window.setAttachmentMenuOpen(false);
         }
     }
 
@@ -2539,7 +2544,7 @@ document.addEventListener('click', (e) => {
         const inputContainer = document.getElementById('live-voice-type-input');
         if(inputContainer) {
             inputContainer.classList.toggle('hidden');
-            document.getElementById('attachment-menu')?.classList.add('hidden'); 
+            window.setAttachmentMenuOpen(false);
             if(!inputContainer.classList.contains('hidden')) {
                 setTimeout(() => document.getElementById('chat-textarea')?.focus(), 100);
             }
@@ -2739,29 +2744,9 @@ document.addEventListener('DOMContentLoaded', () => {
             window.currentChatId = window.currentSessionId; 
             
             const logBox = document.getElementById("live-voice-chat-log");
-            const toggleBtn = document.getElementById("toggle-voice-chat-btn");
-            const middleContainer = document.getElementById("voice-middle-container");
-            const holoWrapper = document.getElementById('voice-hologram-wrapper');
 
             if(logBox) {
-                // 🚀 MASTER FIX: रूम खुलते ही चैट बॉक्स को जड़ से ग़ायब कर दो
-                logBox.classList.add("hidden");
-                logBox.style.display = "none"; // JS Force Hide
-                if (middleContainer) middleContainer.classList.add('chat-hidden-mode');
-                
-                // 🚀 होलोग्राम को सेंटर में लाओ
-                if (middleContainer) {
-                    middleContainer.style.justifyContent = "center";
-                    if(holoWrapper) holoWrapper.style.transform = "scale(1.3)";
-                }
-                
-                // 🚀 ऊपर वाले बटन को 'Show Chat' पर सेट करो
-                if (toggleBtn) {
-                    const icon = toggleBtn.querySelector('i');
-                    const text = toggleBtn.querySelector('span');
-                    if(icon) icon.className = "fas fa-comment";
-                    if(text) text.innerText = "Show Chat";
-                }
+                window.setVoiceChatVisibility(false);
 
                 logBox.innerHTML = `
                     <div class="secure-voice-badge">
@@ -2795,8 +2780,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.toggleHologramTalking(false);
         
         document.getElementById('live-voice-type-input')?.classList.add('hidden');
-        document.getElementById('attachment-menu')?.classList.add('hidden');
-        document.getElementById('voice-middle-container')?.classList.remove('chat-hidden-mode');
+        window.setAttachmentMenuOpen(false);
+        window.setVoiceChatVisibility(true);
         document.getElementById("live-voice-overlay")?.classList.add("hidden");
     });
 });

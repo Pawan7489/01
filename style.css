@@ -3641,17 +3641,12 @@ html body #live-voice-overlay #voice-middle-container.chat-hidden-mode .voice-ho
 html body #live-voice-overlay #voice-middle-container:not(.chat-hidden-mode) .voice-hologram-wrapper {
     transform: scale(1);
     transition: transform 0.5s ease-out;
+    margin-bottom: 30px;
 }
 
 /* =========================================================
    🚀 1. CLEAN FIX: HOLOGRAM & CHAT BOX OVERLAP BUG
 ========================================================= */
-html body #live-voice-overlay #voice-middle-container:not(.chat-hidden-mode) .voice-hologram-wrapper {
-    margin-bottom: 50px; 
-    transform: scale(0.85); 
-    transition: all 0.4s ease-out;
-}
-
 html body #live-voice-overlay #live-voice-chat-log:not(.hidden) {
     max-height: 40vh; 
     margin-top: auto; 
