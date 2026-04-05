@@ -816,6 +816,110 @@ function escapeSafeHTML(str) {
     }[tag]));
 }
 
+window.__humanTypingWriteLock = false;
+window.__humanTypingObserverReady = false;
+
+window.humanTypeHTML = async function(element, html, options = {}) {
+    if (!element || element.dataset.humanTypingRunning === 'true') return;
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const baseDelay = typeof options.baseDelay === 'number' ? options.baseDelay : 18;
+    const maxDelay = typeof options.maxDelay === 'number' ? options.maxDelay : 42;
+    const force = !!options.force;
+    const maxChars = typeof options.maxChars === 'number' ? options.maxChars : 420;
+
+    const isHidden = element.classList.contains('hidden') || element.closest('.hidden');
+    if (isHidden && !force) return;
+
+    if (!element.dataset.humanTypingSource || force) element.dataset.humanTypingSource = html;
+    const sourceHTML = element.dataset.humanTypingSource || html || '';
+    if (!sourceHTML) return;
+    if (element.dataset.humanTypedDone === 'true' && !force) return;
+
+    if (reducedMotion || sourceHTML.length > maxChars) {
+        window.__humanTypingWriteLock = true;
+        element.innerHTML = sourceHTML;
+        window.__humanTypingWriteLock = false;
+        element.dataset.humanTypedDone = 'true';
+        return;
+    }
+
+    element.dataset.humanTypingRunning = 'true';
+    let output = '';
+    let i = 0;
+
+    while (i < sourceHTML.length) {
+        if (sourceHTML[i] === '<') {
+            let tag = '';
+            while (i < sourceHTML.length && sourceHTML[i] !== '>') {
+                tag += sourceHTML[i];
+                i++;
+            }
+            tag += '>';
+            i++;
+            output += tag;
+        } else {
+            output += sourceHTML[i];
+            i++;
+            let delay = Math.floor(Math.random() * (maxDelay - baseDelay + 1)) + baseDelay;
+            const prev = sourceHTML[i - 1];
+            if (prev === '.' || prev === ',' || prev === '!' || prev === '?') delay += 120;
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        window.__humanTypingWriteLock = true;
+        element.innerHTML = `${output}<span class="human-typing-cursor">|</span>`;
+        window.__humanTypingWriteLock = false;
+    }
+
+    window.__humanTypingWriteLock = true;
+    element.innerHTML = output;
+    window.__humanTypingWriteLock = false;
+    element.dataset.humanTypingRunning = 'false';
+    element.dataset.humanTypedDone = 'true';
+};
+
+window.initGlobalHumanTyping = function(options = {}) {
+    const root = options.scope || document;
+    const selectors = [
+        '.auth-title',
+        '.auth-subtitle',
+        '.trash-title',
+        '.trash-desc',
+        '.welcome-heading',
+        '#welcome-banner h2',
+        '#welcome-banner p',
+        '#future-note-text',
+        '.sidebar-history h5',
+        '.history-type-badge-label'
+    ];
+
+    selectors.forEach((selector) => {
+        root.querySelectorAll(selector).forEach((el) => {
+            if (!el.dataset.humanTypingSource) el.dataset.humanTypingSource = el.innerHTML;
+            window.humanTypeHTML(el, el.dataset.humanTypingSource);
+        });
+    });
+};
+
+window.setupGlobalHumanTypingObserver = function() {
+    if (window.__humanTypingObserverReady) return;
+    window.__humanTypingObserverReady = true;
+
+    let timer = null;
+    const observer = new MutationObserver(() => {
+        if (window.__humanTypingWriteLock) return;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => window.initGlobalHumanTyping(), 180);
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
 // =========================================================
 // 🚀 4. RENDER SIDEBAR HISTORY (100% Matching Design)
 // =========================================================
@@ -838,6 +942,9 @@ window.renderHistoryList = function() {
             const titleColor = chat.isPinned ? '#facc15' : 'var(--text-primary, #ffffff)';
             const safeTitle = escapeSafeHTML(chat.title);
             const pinIconHtml = chat.isPinned ? `<i class="fas fa-thumbtack" style="color: #facc15; margin-right: 8px; font-size: 13px; transform: rotate(45deg);"></i>` : '';
+            const typeBadgeClass = chat.type === 'voice' ? 'badge-voice' : 'badge-text';
+            const typeIcon = chat.type === 'voice' ? 'fa-microphone-lines' : 'fa-comment-dots';
+            const typeLabel = chat.type === 'voice' ? 'Voice' : 'Text';
 
             html += `
                 <div class="history-item-wrapper clean-wrapper" style="display:flex; flex-direction: column; align-items: flex-start; position: relative; margin-bottom: 8px; background: ${isActive}; border: 1px solid var(--border, rgba(128,128,128,0.2)); border-radius: 12px; transition: 0.3s;" id="wrapper-${chat.id}">
@@ -851,8 +958,12 @@ window.renderHistoryList = function() {
                         ontouchend="window.cancelHistoryPress()"
                         ontouchmove="window.cancelHistoryPress()">
                         
-                        <span style="flex:1; display:flex; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 15px; font-weight: 500;">
+                        <span class="history-title-text" style="flex:1; display:flex; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 15px; font-weight: 500;">
                             ${pinIconHtml} ${safeTitle}
+                        </span>
+                        <span class="history-type-badge ${typeBadgeClass}">
+                            <i class="fas ${typeIcon}"></i>
+                            <span class="history-type-badge-label">${typeLabel}</span>
                         </span>
                     </button>
                     
@@ -883,6 +994,7 @@ window.renderHistoryList = function() {
             `;
         });
         list.innerHTML = html;
+        window.initGlobalHumanTyping({ scope: list });
     });
 };
 
@@ -1182,6 +1294,11 @@ window.hideTrashModal = function() {
 
 document.addEventListener("DOMContentLoaded", () => {
     window.renderHistoryList();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    window.initGlobalHumanTyping();
+    window.setupGlobalHumanTypingObserver();
 });
 
 

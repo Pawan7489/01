@@ -1785,6 +1785,51 @@ html body #live-voice-overlay.hidden {
     box-shadow: 0 0 15px var(--glow, rgba(0, 0, 0, 0.1));
 }
 
+.history-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    margin-left: 10px;
+    white-space: nowrap;
+    animation: historyBadgeFloatIn 0.32s var(--ease-standard) both;
+}
+
+.history-type-badge i { font-size: 10px; }
+.history-type-badge.badge-text {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.14);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+.history-type-badge.badge-voice {
+    color: #c084fc;
+    background: rgba(192, 132, 252, 0.14);
+    border-color: rgba(192, 132, 252, 0.35);
+}
+
+@keyframes historyBadgeFloatIn {
+    from { opacity: 0; transform: translateY(4px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.human-typing-cursor {
+    display: inline-block;
+    margin-left: 2px;
+    color: #f97316;
+    font-weight: 700;
+    animation: humanTypingBlink 0.9s step-end infinite;
+}
+
+@keyframes humanTypingBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
 .history-btn {
     flex: 1; 
     display: flex;
