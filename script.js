@@ -746,9 +746,17 @@ window.__roomDeepLinkOpened = null;
 
 window.createRoomId = function(type = 'chat') {
     const prefix = type === 'voice' ? 'voice' : 'chat';
-    const token = (window.crypto && typeof window.crypto.randomUUID === 'function')
-        ? window.crypto.randomUUID().replace(/-/g, '').slice(0, 12)
-        : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    const hasWebCrypto = !!(window.crypto && typeof window.crypto.getRandomValues === 'function');
+    let token = '';
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        token = window.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+    } else if (hasWebCrypto) {
+        const bytes = new Uint8Array(8);
+        window.crypto.getRandomValues(bytes);
+        token = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, 12);
+    } else {
+        token = `${Date.now().toString(36)}${performance.now().toString(36).replace('.', '').slice(-6)}`.slice(0, 12);
+    }
     return `${prefix}_${token}`;
 };
 
