@@ -2916,7 +2916,7 @@ window.formatChatText = function(rawText) {
                             <i class="far fa-copy"></i> <span>Copy</span>
                         </button>
                     </div>
-                    <div class="code-body custom-scrollbar">
+                    <div class="code-body custom-scrollbar${codeContent.split('\n').length > 20 ? ' many-lines' : ''}">
                         <pre><code>${coloredCode}</code></pre>
                     </div>
                 </div>`;
@@ -3430,14 +3430,16 @@ window.sendChatMessage = function() {
         // ⌨️ HUMAN TYPING EFFECT
         const textElement = document.getElementById(`text-${msgId}`);
         let i = 0;
+        let typedRaw = "";
         function typeWriter() {
             if (i < rawResponse.length && window.isGenerating) {
-                textElement.textContent += rawResponse.charAt(i);
+                typedRaw += rawResponse.charAt(i);
+                textElement.textContent = typedRaw;
                 i++;
                 chatBox.scrollTo({ top: chatBox.scrollHeight });
                 setTimeout(typeWriter, 30);
             } else {
-                if (textElement) textElement.innerHTML = window.formatChatText(rawResponse);
+                if (textElement) textElement.innerHTML = window.formatChatText(typedRaw || rawResponse);
                 // 🛑 STOP SPINNING: होलोग्राम घूमेगा नहीं, पर वहीँ ऊपर ही खड़ा रहेगा!
                 document.getElementById(`holo-${msgId}`)?.classList.remove('is-typing');
                 document.getElementById(`holo-${msgId}`)?.classList.add('stopped');
