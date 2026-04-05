@@ -825,9 +825,19 @@ html, body {
     margin: 0 auto;
     
     /* 🌟 FIX: Header ke theek niche laane ke liye 130px se ghata kar 85px kar diya */
-    padding-top: 70 px; 
+    padding-top: 70px; 
     box-sizing: border-box;
     overflow: hidden; 
+}
+
+#fullscreen-chat-room,
+#live-voice-overlay,
+#sidebar-settings-modal,
+#cookie-consent-overlay,
+#trash-modal,
+#profile-dropdown,
+#chat-context-menu {
+    position: fixed;
 }
 
 /* Hologram (Recreated accurate design) */

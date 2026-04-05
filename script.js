@@ -232,13 +232,14 @@ window.openNewChatRoom = function(event) {
     
     // 2. साइडबार बंद करो
     const sidebar = document.getElementById('sidebar-menu');
-    if (sidebar) { sidebar.classList.remove('active'); sidebar.classList.add('-translate-x-full'); }
+    if (sidebar) { sidebar.classList.remove('active'); }
 
     // 3. 🚀 पुरानी चैट को स्क्रीन से पूरी तरह साफ़ (Clear) करो
     const chatBox = document.getElementById('chat-box');
     if(chatBox) {
         chatBox.querySelectorAll('.chat-message-row').forEach(m => m.remove());
-        document.getElementById('welcome-banner').style.display = 'flex'; // Welcome वापस लाओ
+        const welcomeBanner = document.getElementById('welcome-banner');
+        if (welcomeBanner) welcomeBanner.style.display = 'flex'; // Welcome वापस लाओ
     }
 
     // 4. इनपुट बॉक्स खाली करो
@@ -418,10 +419,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. HTML Buttons को कनेक्ट करना
     const liveChatBtn = document.getElementById('live-voice-chatroom');
-    if (liveChatBtn) liveChatBtn.addEventListener('click', window.openLiveChat);
+    if (liveChatBtn && !liveChatBtn.dataset.boundMainInit) {
+        liveChatBtn.dataset.boundMainInit = '1';
+        liveChatBtn.addEventListener('click', window.openLiveChat);
+    }
 
     const newChatBtn = document.getElementById('New-Chatroom');
-    if (newChatBtn) newChatBtn.addEventListener('click', window.openNewChatRoom);
+    if (newChatBtn && !newChatBtn.dataset.boundMainInit) {
+        newChatBtn.dataset.boundMainInit = '1';
+        newChatBtn.addEventListener('click', window.openNewChatRoom);
+    }
 
     
 });
@@ -497,7 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeVoiceRoomBtn = document.getElementById('close-live-voice');
 
     // बटन क्लिक करने पर रूम ओपन (Show) करना
-    if (liveChatBtn && liveVoiceOverlay) {
+    if (liveChatBtn && liveVoiceOverlay && !liveChatBtn.dataset.boundLegacyVoice) {
+        liveChatBtn.dataset.boundLegacyVoice = '1';
         liveChatBtn.addEventListener('click', (e) => {
             e.preventDefault(); // पेज रीफ्रेश होने से रोके
             liveVoiceOverlay.classList.remove('hidden');
@@ -2714,6 +2722,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 🚀 FIX: हर बटन पर क्लिक इवेंट लगाना ज़रूरी है (यही आपसे मिस हुआ था)
     liveChatBtns.forEach(btn => {
+        if (!btn || btn.dataset.boundLiveVoiceInit) return;
+        btn.dataset.boundLiveVoiceInit = '1';
         btn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopImmediatePropagation(); // एक क्लिक पर दो बार मैसेज आने से रोकेगा
@@ -3061,7 +3071,7 @@ window.openNewChatRoom = function(event) {
 
     // 2. साइडबार बंद करें
     const sidebar = document.getElementById('sidebar-menu');
-    if(sidebar) { sidebar.classList.remove('active'); sidebar.classList.add('-translate-x-full'); }
+    if(sidebar) { sidebar.classList.remove('active'); }
 
     // 3. 🚀 पुरानी चैट को स्क्रीन से पूरी तरह साफ़ (Clear) करें
     const chatBox = document.getElementById('chat-box');
@@ -3367,7 +3377,8 @@ window.sendChatMessage = function() {
 
     window.saveMessageToSession(safeSessionId, 'user', text);
     if(typeof triggerVibration === 'function') triggerVibration();
-    document.getElementById("welcome-banner").style.display = "none";
+    const welcomeBanner = document.getElementById("welcome-banner");
+    if (welcomeBanner) welcomeBanner.style.display = "none";
     
     chatInput.value = ""; window.autoResizeInput(chatInput); window.isGenerating = true;
     document.getElementById("chat-stop-btn")?.classList.remove("hidden"); 
