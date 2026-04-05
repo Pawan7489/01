@@ -1441,7 +1441,6 @@ window.simulateGoogleAuth = function(actionText) {
 
 
 
-
 /* 🛡️ WEB 4.0 SECURITY: Encrypted Onboarding Pipeline | 🧬 AUTO-HEAL: Active */
 /* =========================================================
    A1 AI - Quantum JavaScript Logic Engine (ONBOARDING 100% FIXED)
@@ -1520,7 +1519,11 @@ window.startAIOnboarding = async function() {
                 
                 textDisplay.innerHTML = typedText + '<span style="color: #f97316; font-weight: bold; animation: blink 1s step-end infinite;">|</span>';
                 
-                if (typingArea) {
+                // 🚀 BUG FIX: Chhote dabbe (typingArea) ki jagah poori screen (onboarding-view) ko scroll hone do!
+                const onboardViewScroll = document.getElementById('onboarding-view');
+                if (onboardViewScroll) {
+                    onboardViewScroll.scrollTop = onboardViewScroll.scrollHeight;
+                } else if (typingArea) {
                     typingArea.scrollTop = typingArea.scrollHeight;
                 }
             }
@@ -1531,18 +1534,26 @@ window.startAIOnboarding = async function() {
             typingArea.style.transition = 'all 0.5s ease-in-out';
             typingArea.style.fontSize = '15px'; 
             typingArea.style.lineHeight = '1.8';
-            typingArea.style.maxHeight = '400px'; 
-            typingArea.style.overflowY = 'auto'; 
-            typingArea.style.padding = '20px'; 
+            
+            // 🚀 MASTER BUG FIX: Yahan dabba (Box) ban raha tha. Maine isko natural screen format me set kar diya hai!
+            typingArea.style.maxHeight = 'none'; // Pehle '400px' tha, ab 'none' hai taaki lamba ho sake
+            typingArea.style.overflowY = 'visible'; // Pehle 'auto' tha, isliye andar ka scroll atak raha tha
+            typingArea.style.padding = '0px'; // Pehle '20px' tha
             typingArea.style.boxSizing = 'border-box';
-            typingArea.style.background = 'var(--btn-bg, rgba(255,255,255,0.03))'; 
-            typingArea.style.border = '1px solid var(--border, rgba(255,255,255,0.1))';
-            typingArea.style.borderRadius = '12px';
+            typingArea.style.background = 'transparent'; // Pehle color tha, ab transparent hai
+            typingArea.style.border = 'none'; // Pehle border thi, ab hata di gayi hai
+            typingArea.style.borderRadius = '0px'; 
             typingArea.style.marginBottom = '20px';
             typingArea.classList.add('quantum-scrollbar'); 
 
             setTimeout(() => {
-                typingArea.scrollTo({ top: 0, behavior: 'smooth' });
+                // 🚀 FIX: Scroll wapas set karne ke liye poori screen target ki gayi hai
+                const onboardViewMain = document.getElementById('onboarding-view');
+                if(onboardViewMain) {
+                    onboardViewMain.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    typingArea.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             }, 500);
         }
         
@@ -1550,7 +1561,7 @@ window.startAIOnboarding = async function() {
         if (nameContainer) {
             setTimeout(() => {
                 nameContainer.classList.remove('hidden');
-                nameContainer.classList.add('onboard-fade-in-up'); // 🚀 Smart Flow Animation
+                nameContainer.classList.add('onboard-fade-in-up'); 
                 nameContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 if(typeof triggerVibration === 'function') triggerVibration("light");
                 setTimeout(() => document.getElementById('profile-name')?.focus(), 500);
@@ -1590,7 +1601,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const genderBox = document.getElementById('gender-container');
             if(genderBox && genderBox.classList.contains('hidden')) {
                 genderBox.classList.remove('hidden');
-                genderBox.classList.add('onboard-fade-in-up'); // 🚀 Smart Flow Animation
+                genderBox.classList.add('onboard-fade-in-up'); 
                 genderBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 if(typeof triggerVibration === 'function') triggerVibration("light");
             }
@@ -1639,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dob = document.getElementById('dob-container');
             if(dob && dob.classList.contains('hidden')) {
                 dob.classList.remove('hidden');
-                dob.classList.add('onboard-fade-in-up'); // 🚀 Smart Flow Animation
+                dob.classList.add('onboard-fade-in-up'); 
                 dob.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
                 if(typeof triggerVibration === 'function') triggerVibration("light");
             }
@@ -1658,7 +1669,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const termsBox = document.getElementById('terms-container');
             if(termsBox && termsBox.classList.contains('hidden')) {
                 termsBox.classList.remove('hidden');
-                termsBox.classList.add('onboard-fade-in-up'); // 🚀 Smart Flow Animation
+                termsBox.classList.add('onboard-fade-in-up'); 
                 termsBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 if(typeof triggerVibration === 'function') triggerVibration("light");
             }
@@ -1689,15 +1700,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 🚀 FIX 1: ACCEPT BUTTON CLICK LISTENER (Universal ID Support)
+    // 🚀 FIX 1: ACCEPT BUTTON CLICK LISTENER 
     // ==========================================
-    // Ye code aapke button ko kisi bhi ID ya Class se dhoondh lega
     const finalAcceptBtn = document.getElementById('accept-btn') || document.getElementById('onboard-accept-btn') || document.querySelector('.onboard-accept-btn');
     
     if (finalAcceptBtn) {
         finalAcceptBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // Page refresh hone se rokega
-            console.log("Accept Button Clicked! Going to Home Screen..."); // Console me check karne ke liye
+            e.preventDefault(); 
+            console.log("Accept Button Clicked! Going to Home Screen..."); 
             
             if (typeof window.finishOnboarding === 'function') {
                 window.finishOnboarding(); 
@@ -1708,8 +1718,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 🚀 FINAL SUBMIT BUTTON LOGIC (Home Screen lane ke liye)
-// 🚀 FINAL SUBMIT BUTTON LOGIC (Home Screen lane ke liye)
+// 🚀 FINAL SUBMIT BUTTON LOGIC
 window.finishOnboarding = function() {
     try {
         if(typeof triggerVibration === 'function') triggerVibration("medium");
@@ -1728,23 +1737,20 @@ window.finishOnboarding = function() {
         const dash = document.getElementById('app-home-screen-wrapper'); 
         const floatingBtns = document.querySelector('.floating-action-group');
         
-        // 1. Hide Onboarding (Clean way)
         if (onboardBox) {
             onboardBox.classList.add('hidden');
             onboardBox.style.display = 'none'; 
         }
         
-        // 2. SHOW HOME SCREEN (Clean way)
         if (dash) {
             dash.classList.remove('hidden');
             dash.style.display = 'flex'; 
             dash.style.opacity = '1';
             dash.style.visibility = 'visible';
             dash.style.pointerEvents = 'auto';
-            dash.style.zIndex = '1000'; // Normal high z-index
+            dash.style.zIndex = '1000';
         }
         
-        // 3. Show Floating Buttons
         if (floatingBtns) {
             floatingBtns.classList.remove('hidden');
             floatingBtns.style.display = 'flex';
@@ -1754,7 +1760,6 @@ window.finishOnboarding = function() {
         if(typeof grantAccess === 'function') grantAccess(true); 
     } catch(e) { console.error("Submit Error:", e); }
 };
-
 
 
 
