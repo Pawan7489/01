@@ -227,15 +227,19 @@ window.closeCustomModal = () => {
 // ==========================================
 // 🚀 FIXED: LIVE VOICE CHAT OPENER (HAR BAAR NEW ROOM)
 // ==========================================
-window.openLiveChat = (event) => {
+window.openLiveChat = (eventOrOptions) => {
+    const event = eventOrOptions && typeof eventOrOptions.preventDefault === 'function' ? eventOrOptions : null;
+    const options = event ? {} : (eventOrOptions || {});
     if (event) event.preventDefault();
     if (navigator.vibrate) navigator.vibrate([15, 30, 15]);
     
     // 🚀 1. नया सेशन और नई ID जनरेट करना
     window.isFirstMessage = true;
-    window.currentSessionId = 'voice_' + Date.now();
+    const incomingRoomId = typeof options.roomId === 'string' && options.roomId.trim() ? options.roomId.trim() : '';
+    window.currentSessionId = incomingRoomId || window.createRoomId('voice');
     window.currentChatType = 'voice'; 
     window.currentChatId = window.currentSessionId; 
+    window.syncRoomUrl('voice', window.currentSessionId);
 
     // अगर पुरानी वॉइस चल रही हो तो उसे रोकना
     if(typeof window.stopAITalking === 'function') window.stopAITalking();
@@ -737,6 +741,65 @@ try {
 window.currentSessionId = null;
 window.isFirstMessage = true; 
 window.currentChatType = 'text'; 
+window.__roomLinkHandled = false;
+window.__roomDeepLinkOpened = null;
+
+window.createRoomId = function(type = 'chat') {
+    const prefix = type === 'voice' ? 'voice' : 'chat';
+    const token = (window.crypto && typeof window.crypto.randomUUID === 'function')
+        ? window.crypto.randomUUID().replace(/-/g, '').slice(0, 12)
+        : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    return `${prefix}_${token}`;
+};
+
+window.buildRoomShareUrl = function(roomType = window.currentChatType || 'text', roomId = window.currentSessionId) {
+    const url = new URL(window.location.href);
+    if (roomId) {
+        const safeType = roomType === 'voice' ? 'voice' : 'text';
+        url.searchParams.set('roomId', roomId);
+        url.searchParams.set('roomType', safeType);
+    }
+    return url.toString();
+};
+
+window.syncRoomUrl = function(roomType, roomId) {
+    if (!roomId || !window.history || typeof window.history.replaceState !== 'function') return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('roomId', roomId);
+    url.searchParams.set('roomType', roomType === 'voice' ? 'voice' : 'text');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+};
+
+window.getRoomLinkDataFromUrl = function() {
+    const url = new URL(window.location.href);
+    const roomId = (url.searchParams.get('roomId') || '').trim();
+    const roomTypeRaw = (url.searchParams.get('roomType') || '').trim().toLowerCase();
+    if (!roomId) return null;
+    const roomType = roomTypeRaw === 'voice' ? 'voice' : 'text';
+    return { roomId, roomType };
+};
+
+window.consumePendingRoomLink = function() {
+    try {
+        const raw = sessionStorage.getItem('a1_pending_room_link');
+        if (!raw) return null;
+        sessionStorage.removeItem('a1_pending_room_link');
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.roomId) return null;
+        return { roomId: String(parsed.roomId), roomType: parsed.roomType === 'voice' ? 'voice' : 'text' };
+    } catch (_) {
+        sessionStorage.removeItem('a1_pending_room_link');
+        return null;
+    }
+};
+
+window.openRoomFromDeepLink = function(linkData) {
+    if (!linkData || !linkData.roomId) return;
+    if (window.__roomDeepLinkOpened === linkData.roomId) return;
+    window.__roomDeepLinkOpened = linkData.roomId;
+    if (linkData.roomType === 'voice') window.openLiveChat({ roomId: linkData.roomId, fromDeepLink: true });
+    else window.openNewChatRoom({ roomId: linkData.roomId, fromDeepLink: true });
+};
 
 function escapeSafeHTML(str) {
     if (!str) return "";
@@ -1773,6 +1836,13 @@ window.grantAccess = function(rememberMe) {
             let storedName = localStorage.getItem('a1_user_name') || "Commander";
             const dashNameEl = document.getElementById('User-name');
             if (dashNameEl) dashNameEl.innerText = storedName;
+
+            const pendingLink = window.consumePendingRoomLink();
+            if (pendingLink) {
+                setTimeout(() => {
+                    window.openRoomFromDeepLink(pendingLink);
+                }, 0);
+            }
         }
     } catch (error) { console.error("Access Error:", error); }
 };
@@ -2848,9 +2918,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             isLiveVoiceMode = true;
             window.isFirstMessage = true;
-            window.currentSessionId = 'voice_' + Date.now();
+            window.currentSessionId = window.createRoomId('voice');
             window.currentChatType = 'voice';
             window.currentChatId = window.currentSessionId; 
+            window.syncRoomUrl('voice', window.currentSessionId);
             
             const logBox = document.getElementById("live-voice-chat-log");
 
@@ -2917,11 +2988,22 @@ document.addEventListener('click', async (e) => {
         // हल्का सा वाइब्रेशन (Haptic Feedback) मोबाइल यूज़र्स के लिए
         if (navigator.vibrate) navigator.vibrate(20); 
 
+        const isVoiceShare = shareBtn.id === 'voice-share-btn';
+        const roomType = isVoiceShare ? 'voice' : 'text';
+        if (!window.currentSessionId) {
+            window.currentSessionId = window.createRoomId(roomType === 'voice' ? 'voice' : 'chat');
+            window.currentChatType = roomType;
+            window.currentChatId = window.currentSessionId;
+            window.syncRoomUrl(roomType, window.currentSessionId);
+        }
+
         // शेयर करने वाला डेटा
         const shareData = {
             title: 'A1 AI Assistant',
-            text: 'Hey! Check out this amazing A1 AI Assistant. It is super smart and fast!',
-            url: window.location.href // यह आपकी वेबसाइट का असली लिंक ऑटोमैटिक ले लेगा
+            text: roomType === 'voice'
+                ? 'Join my A1 Live Voice Room 🎙️'
+                : 'Open my A1 New Chat Room 💬',
+            url: window.buildRoomShareUrl(roomType, window.currentSessionId)
         };
 
         try {
@@ -3308,13 +3390,18 @@ document.addEventListener('click', (event) => {
 // =========================================================
 // 🚀 MASTER FIX: हर बार 100% नया और फ्रेश चैट रूम खुलेगा
 // =========================================================
-window.openNewChatRoom = function(event) {
+window.openNewChatRoom = function(eventOrOptions) {
+    const event = eventOrOptions && typeof eventOrOptions.preventDefault === 'function' ? eventOrOptions : null;
+    const options = event ? {} : (eventOrOptions || {});
     if(event) { event.preventDefault(); event.stopPropagation(); }
 
     // 1. हमेशा नई ID और फर्स्ट मैसेज सेट करो
     window.isFirstMessage = true;
-    window.currentSessionId = 'chat_' + Date.now();
+    const incomingRoomId = typeof options.roomId === 'string' && options.roomId.trim() ? options.roomId.trim() : '';
+    window.currentSessionId = incomingRoomId || window.createRoomId('chat');
     window.currentChatType = 'text';
+    window.currentChatId = window.currentSessionId;
+    window.syncRoomUrl('text', window.currentSessionId);
 
     if(typeof window.stopChatGeneration === 'function') window.stopChatGeneration();
     if(typeof triggerVibration === 'function') triggerVibration("medium");
@@ -3359,6 +3446,21 @@ window.openNewChatRoom = function(event) {
         chatOverlay.style.display = 'flex';
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.__roomLinkHandled) return;
+    window.__roomLinkHandled = true;
+
+    const linkData = window.getRoomLinkDataFromUrl();
+    if (!linkData) return;
+
+    const isLoggedIn = localStorage.getItem('a1_ai_logged_in') === 'true';
+    if (isLoggedIn) {
+        window.openRoomFromDeepLink(linkData);
+    } else {
+        sessionStorage.setItem('a1_pending_room_link', JSON.stringify(linkData));
+    }
+});
 
 
 
