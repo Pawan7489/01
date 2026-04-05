@@ -47,6 +47,55 @@ window.prompt = function(message, defaultValue) {
 // सिस्टम थीम को रियल-टाइम ट्रैक करने के लिए मॉडर्न API
 const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const stylePackStorageKey = 'a1_style_pack';
+const stylePackTokenMap = {
+    default: {
+        radiusMd: '14px',
+        radiusLg: '20px',
+        elevation: '0 15px 35px rgba(0, 0, 0, 0.22)',
+        glassBlur: '15px',
+        uiAccent: '#9ca3af'
+    },
+    oneui: {
+        radiusMd: '18px',
+        radiusLg: '24px',
+        elevation: '0 12px 30px rgba(0, 0, 0, 0.24)',
+        glassBlur: '18px',
+        uiAccent: '#60a5fa'
+    },
+    ios: {
+        radiusMd: '16px',
+        radiusLg: '22px',
+        elevation: '0 10px 28px rgba(0, 0, 0, 0.18)',
+        glassBlur: '22px',
+        uiAccent: '#a78bfa'
+    },
+    hyperos: {
+        radiusMd: '20px',
+        radiusLg: '28px',
+        elevation: '0 16px 40px rgba(0, 0, 0, 0.26)',
+        glassBlur: '20px',
+        uiAccent: '#22d3ee'
+    }
+};
+
+window.applyStylePack = (packName) => {
+    const key = stylePackTokenMap[packName] ? packName : 'default';
+    const tokens = stylePackTokenMap[key];
+
+    document.body.classList.remove('style-pack-default', 'style-pack-oneui', 'style-pack-ios', 'style-pack-hyperos');
+    document.body.classList.add(`style-pack-${key}`);
+
+    document.documentElement.style.setProperty('--pack-radius-md', tokens.radiusMd);
+    document.documentElement.style.setProperty('--pack-radius-lg', tokens.radiusLg);
+    document.documentElement.style.setProperty('--pack-elevation', tokens.elevation);
+    document.documentElement.style.setProperty('--pack-glass-blur', tokens.glassBlur);
+    document.documentElement.style.setProperty('--pack-ui-accent', tokens.uiAccent);
+
+    localStorage.setItem(stylePackStorageKey, key);
+    const styleSelect = document.getElementById('style-pack-select');
+    if (styleSelect && styleSelect.value !== key) styleSelect.value = key;
+};
 
 window.updateDeviceThemeEngine = () => {
     const w = window.innerWidth || document.documentElement.clientWidth || 0;
@@ -385,8 +434,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. सही थीम लोड करना
     const savedTheme = localStorage.getItem('a1_os_theme') || 'system';
     window.changeAppTheme(savedTheme);
+    const savedStylePack = localStorage.getItem(stylePackStorageKey) || 'default';
+    window.applyStylePack(savedStylePack);
     window.updateDeviceThemeEngine();
     window.addEventListener('resize', window.updateDeviceThemeEngine, { passive: true });
+
+    const stylePackSelect = document.getElementById('style-pack-select');
+    if (stylePackSelect && !stylePackSelect.dataset.boundStylePack) {
+        stylePackSelect.dataset.boundStylePack = '1';
+        stylePackSelect.value = savedStylePack;
+        stylePackSelect.addEventListener('change', (event) => {
+            window.applyStylePack(event.target.value);
+            if (navigator.vibrate) navigator.vibrate(15);
+        });
+    }
 
     // 2. राईट-क्लिक मेनू सेट करना
     const dashboard = document.getElementById('main-dashboard');

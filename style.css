@@ -49,6 +49,11 @@
     --status-success: #4ade80;
     --status-warning: #facc15;
     --status-info: #3b82f6;
+    --pack-radius-md: 14px;
+    --pack-radius-lg: 20px;
+    --pack-elevation: 0 15px 35px rgba(0, 0, 0, 0.22);
+    --pack-glass-blur: 15px;
+    --pack-ui-accent: #9ca3af;
 }
 
 body.light-mode {
@@ -124,8 +129,8 @@ html, body {
     align-items: center;
     padding: 16px 30px;
     background: linear-gradient(to bottom, var(--header-bg) 60%, transparent 100%);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(var(--pack-glass-blur));
+    -webkit-backdrop-filter: blur(var(--pack-glass-blur));
     transition: background 0.4s ease;
 }
 
@@ -145,7 +150,7 @@ html, body {
     
     width: 45px;
     height: 45px;
-    border-radius: 14px;
+    border-radius: var(--pack-radius-md);
     cursor: pointer;
     font-size: 18px;
     display: flex;
@@ -246,6 +251,25 @@ html, body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
 }
 .theme-active-btn i { color: var(--active-btn-text); }
+.style-pack-group { margin-top: 12px; }
+.style-pack-select {
+    width: 100%;
+    border: 1px solid var(--border-solid);
+    border-radius: var(--pack-radius-md);
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
+}
+.style-pack-select:focus-visible {
+    border-color: var(--pack-ui-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pack-ui-accent) 30%, transparent);
+}
+.style-pack-select option {
+    background: var(--bg-main);
+    color: var(--text-primary);
+}
              
 
 
@@ -4188,10 +4212,10 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     width: 100%;
     margin: 10px 0;
     border: 1px solid var(--border-solid);
-    border-radius: 12px;
+    border-radius: var(--pack-radius-md);
     background: linear-gradient(165deg, color-mix(in srgb, var(--btn-bg) 82%, transparent), transparent 65%), var(--bg-main);
     overflow: hidden;
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--bg-main) 70%, transparent);
+    box-shadow: var(--pack-elevation);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
@@ -4383,6 +4407,16 @@ body.theme-light .premium-code-box {
 
 body.theme-dark .premium-code-box {
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.28);
+}
+
+body.style-pack-oneui {
+    --pack-ui-accent: #60a5fa;
+}
+body.style-pack-ios {
+    --pack-ui-accent: #a78bfa;
+}
+body.style-pack-hyperos {
+    --pack-ui-accent: #22d3ee;
 }
 
 @keyframes codeHeaderSweep {
