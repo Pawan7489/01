@@ -3147,6 +3147,65 @@ const Web4_Quantum_UI_Core = (function() {
 })();
 
 window.futureSuggestionTimer = null;
+window.futurePreviewStyle = 'gemini';
+window.futureStyleConfig = {
+    gemini: {
+        labelPrefix: 'Thinking',
+        noteTemplate: (userName) => `${userName}, aap yahan apna next idea/comment likh sakte ho — A1 usse Gemini-style structured response mein convert karega.`,
+        suggestions: [
+            { label: 'Daily Plan', text: 'Mere liye ek productive daily plan banao' },
+            { label: 'English Boost', text: 'Meri English improve karne ka 7 din ka roadmap do' },
+            { label: 'Motivation', text: 'Aaj ke liye short motivation line likho' }
+        ]
+    },
+    chatgpt: {
+        labelPrefix: 'Drafting',
+        noteTemplate: (userName) => `${userName}, prompt dalo aur ChatGPT-style clear, step-by-step answer preview yahan milega.`,
+        suggestions: [
+            { label: 'Summarize', text: 'Is topic ko simple bullet points mein summarize karo' },
+            { label: 'Rewrite', text: 'Mera text professional tone mein rewrite karo' },
+            { label: 'Checklist', text: 'Mere task ke liye actionable checklist banao' }
+        ]
+    },
+    claude: {
+        labelPrefix: 'Reasoning',
+        noteTemplate: (userName) => `${userName}, Claude-style thoughtful aur context-aware response preview yahan show hoga.`,
+        suggestions: [
+            { label: 'Deep Explain', text: 'Is concept ko depth mein explain karo with examples' },
+            { label: 'Compare', text: 'Do options compare karo with pros and cons' },
+            { label: 'Refine', text: 'Mere draft ko concise aur impactful banao' }
+        ]
+    },
+    groq: {
+        labelPrefix: 'Fast mode',
+        noteTemplate: (userName) => `${userName}, Groq-style ultra-fast crisp response suggestions yahan rotate honge.`,
+        suggestions: [
+            { label: 'Quick Answer', text: 'Iska fastest short answer do' },
+            { label: 'Code Fix', text: 'Is bug ka quick fix suggest karo' },
+            { label: 'Instant Plan', text: 'Mujhe 3-step instant plan do' }
+        ]
+    }
+};
+
+window.renderFutureSuggestions = function (styleKey) {
+    const row = document.getElementById('future-suggestion-row');
+    const note = document.getElementById('future-preview-note');
+    const chips = document.querySelectorAll('#future-style-switcher .future-style-chip');
+    if (!row || !note) return;
+
+    const safeStyle = window.futureStyleConfig[styleKey] ? styleKey : 'gemini';
+    window.futurePreviewStyle = safeStyle;
+
+    note.classList.remove('style-gemini', 'style-chatgpt', 'style-claude', 'style-groq');
+    note.classList.add(`style-${safeStyle}`);
+    chips.forEach((chip) => chip.classList.toggle('is-active', chip.dataset.style === safeStyle));
+
+    const suggestionHtml = window.futureStyleConfig[safeStyle].suggestions
+        .map((item) => `<button type="button" class="future-suggestion-chip" data-suggestion="${item.text.replace(/"/g, '&quot;')}">${item.label}</button>`)
+        .join('');
+    row.innerHTML = suggestionHtml;
+};
+
 window.stopFuturePreviewRotation = function () {
     if (window.futureSuggestionTimer) {
         clearInterval(window.futureSuggestionTimer);
@@ -3156,6 +3215,7 @@ window.stopFuturePreviewRotation = function () {
 
 window.startFuturePreviewRotation = function () {
     window.stopFuturePreviewRotation();
+    window.renderFutureSuggestions(window.futurePreviewStyle || 'gemini');
     const chips = Array.from(document.querySelectorAll('#future-suggestion-row .future-suggestion-chip'));
     const typingLabel = document.getElementById('future-typing-label');
     if (!chips.length) return;
@@ -3164,7 +3224,9 @@ window.startFuturePreviewRotation = function () {
     const applyActive = () => {
         chips.forEach((chip, index) => chip.classList.toggle('is-rotating', index === activeIndex));
         const phrase = chips[activeIndex]?.dataset?.suggestion || chips[activeIndex]?.textContent || 'Thinking next idea...';
-        if (typingLabel) typingLabel.textContent = `Thinking: ${phrase}`;
+        const styleKey = window.futurePreviewStyle || 'gemini';
+        const prefix = window.futureStyleConfig[styleKey]?.labelPrefix || 'Thinking';
+        if (typingLabel) typingLabel.textContent = `${prefix}: ${phrase}`;
     };
     applyActive();
 
@@ -3176,6 +3238,12 @@ window.startFuturePreviewRotation = function () {
 };
 
 document.addEventListener('click', (event) => {
+    const styleChip = event.target.closest('#future-style-switcher .future-style-chip');
+    if (styleChip) {
+        window.renderFutureSuggestions(styleChip.dataset.style || 'gemini');
+        window.startFuturePreviewRotation();
+        return;
+    }
     const chip = event.target.closest('#future-suggestion-row .future-suggestion-chip');
     if (!chip) return;
     const chatInput = document.getElementById('chat-user-input');
@@ -3219,7 +3287,11 @@ window.openNewChatRoom = function(event) {
     const futureNote = document.getElementById('future-note-text');
     if (futureNote) {
         const userName = (localStorage.getItem('a1_user_name') || 'Commander').trim() || 'Commander';
-        futureNote.textContent = `${userName}, aap yahan apna next idea/comment likh sakte ho — A1 usse Gemini-style structured response mein convert karega.`;
+        const styleKey = window.futurePreviewStyle || 'gemini';
+        const template = window.futureStyleConfig[styleKey]?.noteTemplate;
+        futureNote.textContent = typeof template === 'function'
+            ? template(userName)
+            : `${userName}, aap yahan apna next idea/comment likh sakte ho.`;
     }
     window.startFuturePreviewRotation();
 
