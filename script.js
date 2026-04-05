@@ -3146,6 +3146,45 @@ const Web4_Quantum_UI_Core = (function() {
     return { executeWithAutoHeal };
 })();
 
+window.futureSuggestionTimer = null;
+window.stopFuturePreviewRotation = function () {
+    if (window.futureSuggestionTimer) {
+        clearInterval(window.futureSuggestionTimer);
+        window.futureSuggestionTimer = null;
+    }
+};
+
+window.startFuturePreviewRotation = function () {
+    window.stopFuturePreviewRotation();
+    const chips = Array.from(document.querySelectorAll('#future-suggestion-row .future-suggestion-chip'));
+    const typingLabel = document.getElementById('future-typing-label');
+    if (!chips.length) return;
+
+    let activeIndex = 0;
+    const applyActive = () => {
+        chips.forEach((chip, index) => chip.classList.toggle('is-rotating', index === activeIndex));
+        const phrase = chips[activeIndex]?.dataset?.suggestion || chips[activeIndex]?.textContent || 'Thinking next idea...';
+        if (typingLabel) typingLabel.textContent = `Thinking: ${phrase}`;
+    };
+    applyActive();
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.futureSuggestionTimer = setInterval(() => {
+        activeIndex = (activeIndex + 1) % chips.length;
+        applyActive();
+    }, 1700);
+};
+
+document.addEventListener('click', (event) => {
+    const chip = event.target.closest('#future-suggestion-row .future-suggestion-chip');
+    if (!chip) return;
+    const chatInput = document.getElementById('chat-user-input');
+    if (!chatInput) return;
+    chatInput.value = chip.dataset.suggestion || chip.textContent || '';
+    if (typeof window.autoResizeInput === 'function') window.autoResizeInput(chatInput);
+    chatInput.focus();
+});
+
 
 
 
@@ -3182,6 +3221,7 @@ window.openNewChatRoom = function(event) {
         const userName = (localStorage.getItem('a1_user_name') || 'Commander').trim() || 'Commander';
         futureNote.textContent = `${userName}, aap yahan apna next idea/comment likh sakte ho — A1 usse Gemini-style structured response mein convert karega.`;
     }
+    window.startFuturePreviewRotation();
 
     // 5. इनपुट बॉक्स और बटन्स को डिफ़ॉल्ट (खाली) करें
     const chatInput = document.getElementById('chat-user-input');
@@ -3479,6 +3519,7 @@ window.sendChatMessage = function() {
     if(typeof triggerVibration === 'function') triggerVibration();
     const welcomeBanner = document.getElementById("welcome-banner");
     if (welcomeBanner) welcomeBanner.style.display = "none";
+    window.stopFuturePreviewRotation();
     
     chatInput.value = ""; window.autoResizeInput(chatInput); window.isGenerating = true;
     document.getElementById("chat-stop-btn")?.classList.remove("hidden"); 
