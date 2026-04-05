@@ -1239,6 +1239,9 @@ window.validatePassword = function(pass, confPass) {
 
 window.resetForms = function() {
     try {
+        window.__a1ForgotResetMobile = null;
+        window.__a1ForgotResetToken = null;
+
         // Clear all inputs
         document.querySelectorAll('.auth-input, .auth-otp-input').forEach(i => i.value = '');
         document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
@@ -1255,6 +1258,12 @@ window.resetForms = function() {
         showEl('signup-send-btn'); 
         hideEl('signup-otp-section'); 
         hideEl('signup-mobile-pass-section');
+
+        showEl('forgot-send-otp-btn');
+        hideEl('forgot-otp-section');
+        hideEl('forgot-pass-section');
+        const forgotBtn = document.getElementById('forgot-send-otp-btn');
+        if (forgotBtn) forgotBtn.disabled = false;
         
         showEl('signup-email-step-1');
         showEl('signup-send-email-btn');
@@ -1394,29 +1403,105 @@ window.completeSignup = function(type) {
 
 window.sendForgotOTP = function() {
     const mobile = (document.getElementById('forgot-mobile-input')?.value || '').trim();
-    if (mobile.length !== 10) {
+    if (!/^\d{10}$/.test(mobile)) {
         return window.showA1Modal?.('alert', 'Invalid Input', 'Please enter a valid 10-digit mobile number.');
     }
-    // UI-only simulation flow: backend OTP API is not wired yet.
-    window.initializeAllPinBoxes();
-    document.getElementById('forgot-send-otp-btn')?.classList.add('hidden');
-    document.getElementById('forgot-otp-section')?.classList.remove('hidden');
-    setTimeout(() => document.querySelector('#forgot-otp-boxes input')?.focus(), 200);
-    window.showA1Modal?.('alert', 'OTP Sent', 'Password reset OTP has been sent.');
+
+    const sendBtn = document.getElementById('forgot-send-otp-btn');
+    if (sendBtn) sendBtn.disabled = true;
+
+    fetch('/api/forgot/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') {
+            throw new Error(data.message || 'Unable to send OTP.');
+        }
+
+        window.initializeAllPinBoxes();
+        document.getElementById('forgot-send-otp-btn')?.classList.add('hidden');
+        document.getElementById('forgot-otp-section')?.classList.remove('hidden');
+        setTimeout(() => document.querySelector('#forgot-otp-boxes input')?.focus(), 200);
+        window.showA1Modal?.('alert', 'OTP Sent', data.message || 'If an account exists, OTP has been sent.');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Error', err.message || 'Failed to send OTP. Please try again.');
+    })
+    .finally(() => {
+        if (sendBtn) sendBtn.disabled = false;
+    });
 };
 
 window.verifyForgotOTP = function() {
-    document.getElementById('forgot-otp-section')?.classList.add('hidden');
-    document.getElementById('forgot-pass-section')?.classList.remove('hidden');
-    window.safeVibrate();
+    const mobile = (document.getElementById('forgot-mobile-input')?.value || '').trim();
+    const otp = Array.from(document.querySelectorAll('#forgot-otp-boxes input'))
+        .map((el) => (el.value || '').trim())
+        .join('');
+
+    if (!/^\d{10}$/.test(mobile)) {
+        return window.showA1Modal?.('alert', 'Invalid Input', 'Please enter a valid 10-digit mobile number.');
+    }
+    if (!/^\d{6}$/.test(otp)) {
+        return window.showA1Modal?.('alert', 'Invalid OTP', 'Please enter a valid 6-digit OTP.');
+    }
+
+    fetch('/api/forgot/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, otp })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success' || !data.resetToken) {
+            throw new Error(data.message || 'OTP verification failed.');
+        }
+
+        window.__a1ForgotResetMobile = mobile;
+        window.__a1ForgotResetToken = data.resetToken;
+
+        document.getElementById('forgot-otp-section')?.classList.add('hidden');
+        document.getElementById('forgot-pass-section')?.classList.remove('hidden');
+        window.safeVibrate();
+        window.showA1Modal?.('alert', 'Verified', 'OTP verified. Set your new password.');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Verification Failed', err.message || 'Invalid or expired OTP.');
+    });
 };
 
 window.resetForgotPassword = function() {
     const pass = document.getElementById('forgot-pass')?.value || '';
     const conf = document.getElementById('forgot-conf-pass')?.value || '';
     if (!window.validatePassword(pass, conf)) return;
-    window.showA1Modal?.('alert', 'Success', 'Password reset successful. Please login.');
-    window.switchView('login-view');
+
+    const mobile = window.__a1ForgotResetMobile;
+    const resetToken = window.__a1ForgotResetToken;
+    if (!mobile || !resetToken) {
+        return window.showA1Modal?.('alert', 'Session Expired', 'Please verify OTP again.');
+    }
+
+    fetch('/api/forgot/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, resetToken, newPassword: pass })
+    })
+    .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'success') {
+            throw new Error(data.message || 'Password reset failed.');
+        }
+
+        window.__a1ForgotResetMobile = null;
+        window.__a1ForgotResetToken = null;
+        window.showA1Modal?.('alert', 'Success', 'Password reset successful. Please login.');
+        window.switchView('login-view');
+    })
+    .catch((err) => {
+        window.showA1Modal?.('alert', 'Error', err.message || 'Password reset failed.');
+    });
 };
 
 /* =========================================================
