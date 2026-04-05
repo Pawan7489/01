@@ -4231,6 +4231,51 @@ html body #fullscreen-chat-room .user-action-bar { opacity: 1; visibility: visib
     background: var(--btn-hover);
 }
 
+.premium-code-box {
+    --lang-accent: #6b7280;
+    --lang-accent-soft: rgba(107, 114, 128, 0.12);
+}
+
+.premium-code-box .code-header {
+    border-left: 3px solid var(--lang-accent);
+    background: linear-gradient(180deg, var(--lang-accent-soft), var(--btn-bg));
+}
+
+.premium-code-box .code-lang {
+    color: var(--lang-accent);
+}
+
+.premium-code-box .code-copy-btn {
+    border-color: var(--lang-accent);
+    color: var(--lang-accent);
+}
+
+.premium-code-box .code-copy-btn:hover {
+    background: var(--lang-accent-soft);
+}
+
+.premium-code-box.lang-javascript { --lang-accent: #f59e0b; --lang-accent-soft: rgba(245, 158, 11, 0.16); }
+.premium-code-box.lang-typescript { --lang-accent: #2563eb; --lang-accent-soft: rgba(37, 99, 235, 0.16); }
+.premium-code-box.lang-python { --lang-accent: #10b981; --lang-accent-soft: rgba(16, 185, 129, 0.16); }
+.premium-code-box.lang-java { --lang-accent: #ea580c; --lang-accent-soft: rgba(234, 88, 12, 0.16); }
+.premium-code-box.lang-c { --lang-accent: #0891b2; --lang-accent-soft: rgba(8, 145, 178, 0.16); }
+.premium-code-box.lang-cpp { --lang-accent: #3b82f6; --lang-accent-soft: rgba(59, 130, 246, 0.16); }
+.premium-code-box.lang-csharp { --lang-accent: #8b5cf6; --lang-accent-soft: rgba(139, 92, 246, 0.16); }
+.premium-code-box.lang-php { --lang-accent: #6366f1; --lang-accent-soft: rgba(99, 102, 241, 0.16); }
+.premium-code-box.lang-go { --lang-accent: #06b6d4; --lang-accent-soft: rgba(6, 182, 212, 0.16); }
+.premium-code-box.lang-rust { --lang-accent: #b45309; --lang-accent-soft: rgba(180, 83, 9, 0.16); }
+.premium-code-box.lang-ruby { --lang-accent: #dc2626; --lang-accent-soft: rgba(220, 38, 38, 0.16); }
+.premium-code-box.lang-swift { --lang-accent: #f97316; --lang-accent-soft: rgba(249, 115, 22, 0.16); }
+.premium-code-box.lang-kotlin { --lang-accent: #a855f7; --lang-accent-soft: rgba(168, 85, 247, 0.16); }
+.premium-code-box.lang-sql { --lang-accent: #0ea5e9; --lang-accent-soft: rgba(14, 165, 233, 0.16); }
+.premium-code-box.lang-shell { --lang-accent: #22c55e; --lang-accent-soft: rgba(34, 197, 94, 0.16); }
+.premium-code-box.lang-html { --lang-accent: #f97316; --lang-accent-soft: rgba(249, 115, 22, 0.16); }
+.premium-code-box.lang-css { --lang-accent: #0ea5e9; --lang-accent-soft: rgba(14, 165, 233, 0.16); }
+.premium-code-box.lang-json { --lang-accent: #eab308; --lang-accent-soft: rgba(234, 179, 8, 0.16); }
+.premium-code-box.lang-yaml { --lang-accent: #14b8a6; --lang-accent-soft: rgba(20, 184, 166, 0.16); }
+.premium-code-box.lang-xml { --lang-accent: #ec4899; --lang-accent-soft: rgba(236, 72, 153, 0.16); }
+.premium-code-box.lang-markdown { --lang-accent: #64748b; --lang-accent-soft: rgba(100, 116, 139, 0.16); }
+
 .premium-code-box .code-body {
     overflow-x: auto;
     overflow-y: hidden;

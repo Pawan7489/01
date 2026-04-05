@@ -2885,8 +2885,51 @@ window.copyCodeBlock = async function(btn, encodedCode) {
 };
 
 // 🚀 MASTER FORMATTER (Text + Code Box Maker)
+window.getCodeLanguageMeta = function(langRaw) {
+    const key = String(langRaw || '').trim().toLowerCase();
+    const map = {
+        js: { label: 'JavaScript', theme: 'javascript' },
+        javascript: { label: 'JavaScript', theme: 'javascript' },
+        jsx: { label: 'JavaScript (JSX)', theme: 'javascript' },
+        ts: { label: 'TypeScript', theme: 'typescript' },
+        tsx: { label: 'TypeScript (TSX)', theme: 'typescript' },
+        py: { label: 'Python', theme: 'python' },
+        python: { label: 'Python', theme: 'python' },
+        java: { label: 'Java', theme: 'java' },
+        c: { label: 'C', theme: 'c' },
+        'c++': { label: 'C++', theme: 'cpp' },
+        cpp: { label: 'C++', theme: 'cpp' },
+        'c#': { label: 'C#', theme: 'csharp' },
+        cs: { label: 'C#', theme: 'csharp' },
+        php: { label: 'PHP', theme: 'php' },
+        go: { label: 'Go', theme: 'go' },
+        golang: { label: 'Go', theme: 'go' },
+        rs: { label: 'Rust', theme: 'rust' },
+        rust: { label: 'Rust', theme: 'rust' },
+        rb: { label: 'Ruby', theme: 'ruby' },
+        ruby: { label: 'Ruby', theme: 'ruby' },
+        swift: { label: 'Swift', theme: 'swift' },
+        kt: { label: 'Kotlin', theme: 'kotlin' },
+        kotlin: { label: 'Kotlin', theme: 'kotlin' },
+        sql: { label: 'SQL', theme: 'sql' },
+        sh: { label: 'Shell', theme: 'shell' },
+        bash: { label: 'Shell', theme: 'shell' },
+        zsh: { label: 'Shell', theme: 'shell' },
+        html: { label: 'HTML', theme: 'html' },
+        css: { label: 'CSS', theme: 'css' },
+        json: { label: 'JSON', theme: 'json' },
+        yaml: { label: 'YAML', theme: 'yaml' },
+        yml: { label: 'YAML', theme: 'yaml' },
+        xml: { label: 'XML', theme: 'xml' },
+        md: { label: 'Markdown', theme: 'markdown' },
+        markdown: { label: 'Markdown', theme: 'markdown' }
+    };
+    return map[key] || { label: key ? key.toUpperCase() : 'CODE', theme: 'default' };
+};
+
 window.formatChatText = function(rawText) {
     if (!rawText) return "";
+    const CODE_SCROLL_THRESHOLD = 20;
 
     // 1. Text ko safe banana (XSS prevention)
     let text = window.escapeHtml(rawText);
@@ -2898,9 +2941,11 @@ window.formatChatText = function(rawText) {
     parts.forEach(part => {
         if (part.startsWith('```') && part.endsWith('```')) {
             // 💻 YE CODE BLOCK HAI
+            // Intentionally supports aliases like c++, c#, tsx, etc.
             let match = part.match(/```([\w#+.\-]*)\n?([\s\S]*?)```/);
             if (match) {
-                let lang = match[1] ? match[1].toUpperCase() : 'CODE';
+                const languageMeta = window.getCodeLanguageMeta(match[1]);
+                let lang = languageMeta.label;
                 let codeContent = match[2];
                 let rawCodeToCopy = codeContent.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
                 
@@ -2909,14 +2954,14 @@ window.formatChatText = function(rawText) {
 
                 // Premium Code Box HTML
                 finalHtml += `
-                <div class="premium-code-box">
+                <div class="premium-code-box lang-${languageMeta.theme}">
                     <div class="code-header">
                         <span class="code-lang">${lang}</span>
                         <button class="code-copy-btn" onclick="window.copyCodeBlock(this, '${encodeURIComponent(rawCodeToCopy)}')">
                             <i class="far fa-copy"></i> <span>Copy</span>
                         </button>
                     </div>
-                    <div class="code-body custom-scrollbar${codeContent.split('\n').length > 20 ? ' many-lines' : ''}">
+                    <div class="code-body custom-scrollbar${codeContent.split('\n').length > CODE_SCROLL_THRESHOLD ? ' many-lines' : ''}">
                         <pre><code>${coloredCode}</code></pre>
                     </div>
                 </div>`;
