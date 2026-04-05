@@ -308,6 +308,34 @@ window.showSidebarSettings = () => {
     }
 };
 
+window.hideSidebarSettings = () => {
+    const modal = document.getElementById('sidebar-settings-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = '';
+    }
+};
+
+window.closeWebsitePreview = () => {
+    const previewModal = document.getElementById('website-preview-modal');
+    const iframe = document.getElementById('live-preview-iframe');
+    if (previewModal) previewModal.classList.add('hidden');
+    if (iframe) iframe.src = 'about:blank';
+};
+
+window.toggleVoiceAttachMenu = (event) => {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    const attachMenu = document.getElementById('attachment-menu');
+    const bottomNav = document.querySelector('.voice-bottom-nav');
+    if (!attachMenu) return;
+    if (bottomNav) bottomNav.style.overflow = 'visible';
+    attachMenu.classList.toggle('hidden');
+    attachMenu.style.display = attachMenu.classList.contains('hidden') ? 'none' : 'flex';
+};
+
 
 
 
@@ -1125,7 +1153,7 @@ window.switchView = function(viewName) {
             const el = document.getElementById(v);
             if (el) el.classList.add('hidden'); 
         });
-        const targetView = document.getElementById(viewName);
+        const targetView = document.getElementById(viewName) || document.getElementById('login-view');
         if (targetView) targetView.classList.remove('hidden');
         window.resetForms();
     } catch(e) {}
@@ -1362,6 +1390,32 @@ window.completeSignup = function(type) {
         window.grantAccess(true); 
         
     } catch (error) { console.error(error); }
+};
+
+window.sendForgotOTP = function() {
+    const mobile = (document.getElementById('forgot-mobile-input')?.value || '').trim();
+    if (mobile.length !== 10) {
+        return window.showA1Modal?.('alert', 'Invalid Input', 'Enter valid 10-digit mobile number.');
+    }
+    window.initializeAllPinBoxes();
+    document.getElementById('forgot-send-otp-btn')?.classList.add('hidden');
+    document.getElementById('forgot-otp-section')?.classList.remove('hidden');
+    setTimeout(() => document.querySelector('#forgot-otp-boxes input')?.focus(), 200);
+    window.showA1Modal?.('alert', 'OTP Sent', 'Password reset OTP has been sent.');
+};
+
+window.verifyForgotOTP = function() {
+    document.getElementById('forgot-otp-section')?.classList.add('hidden');
+    document.getElementById('forgot-pass-section')?.classList.remove('hidden');
+    window.safeVibrate();
+};
+
+window.resetForgotPassword = function() {
+    const pass = document.getElementById('forgot-pass')?.value || '';
+    const conf = document.getElementById('forgot-conf-pass')?.value || '';
+    if (!window.validatePassword(pass, conf)) return;
+    window.showA1Modal?.('alert', 'Success', 'Password reset successful. Please login.');
+    window.switchView('login-view');
 };
 
 /* =========================================================
