@@ -20,12 +20,14 @@ app = Flask(__name__)
 MOBILE_RE = re.compile(r"^\d{10}$")
 OTP_RE = re.compile(r"^\d{6}$")
 PASSWORD_RE = re.compile(r"^.{8,20}$")
+SUPPORT_TOKEN_RE = re.compile(r"^SUP-[A-F0-9]{8}-[A-F0-9]{6}$")
 
 OTP_TTL_SECONDS = 5 * 60
 RESET_TOKEN_TTL_SECONDS = 10 * 60
 OTP_RESEND_COOLDOWN_SECONDS = 30
 MAX_OTP_ATTEMPTS = 5
 AUTH_TOKEN_TTL_SECONDS = 10 * 60
+SUPPORT_TOKEN_GENERATION_ATTEMPTS = 5
 
 _LOCK = Lock()
 _MEMORY_STORE = {}
@@ -108,6 +110,25 @@ def _init_db():
         )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_users_mobile ON users(mobile)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS support_tickets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT UNIQUE NOT NULL,
+                user_ref TEXT NOT NULL,
+                name TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                short_issue TEXT NOT NULL,
+                details TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'open',
+                admin_reply TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_support_user_ref ON support_tickets(user_ref)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_support_token ON support_tickets(token)")
         conn.commit()
     finally:
         conn.close()
@@ -158,6 +179,66 @@ def _update_user_password_by_mobile(mobile: str, password_hash: str) -> bool:
         cur = conn.execute("UPDATE users SET password_hash = ? WHERE mobile = ?", (password_hash, mobile))
         conn.commit()
         return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+def _is_valid_support_token(token: str) -> bool:
+    return bool(SUPPORT_TOKEN_RE.fullmatch(token or ""))
+
+
+def _is_valid_support_text(value: str, min_len: int = 1, max_len: int = 2000) -> bool:
+    v = (value or "").strip()
+    return min_len <= len(v) <= max_len
+
+
+def _is_valid_contact(value: str) -> bool:
+    v = (value or "").strip()
+    return _is_valid_mobile(v) or _is_valid_email(v.lower())
+
+
+def _new_support_token() -> str:
+    return f"SUP-{secrets.token_hex(4).upper()}-{secrets.token_hex(3).upper()}"
+
+
+def _normalize_support_ticket(row):
+    if not row:
+        return None
+    data = dict(row)
+    data["admin_reply"] = data.get("admin_reply") or ""
+    return data
+
+
+def _list_support_tickets(user_ref: str):
+    conn = _db_conn()
+    try:
+        rows = conn.execute(
+            """
+            SELECT token, user_ref, name, contact, short_issue, details, status, admin_reply, created_at, updated_at
+            FROM support_tickets
+            WHERE user_ref = ?
+            ORDER BY updated_at DESC, created_at DESC
+            """,
+            (user_ref,),
+        ).fetchall()
+        return [_normalize_support_ticket(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def _get_support_ticket(token: str):
+    conn = _db_conn()
+    try:
+        row = conn.execute(
+            """
+            SELECT token, user_ref, name, contact, short_issue, details, status, admin_reply, created_at, updated_at
+            FROM support_tickets
+            WHERE token = ?
+            LIMIT 1
+            """,
+            (token,),
+        ).fetchone()
+        return _normalize_support_ticket(row)
     finally:
         conn.close()
 
@@ -591,6 +672,195 @@ def login_email_password():
         if not user or not _verify_password(password, user.get("password_hash", "")):
             return jsonify({"status": "error", "message": "Invalid credentials."}), 400
     return jsonify({"status": "success", "message": "Login successful."})
+
+
+@app.route('/api/support/tickets', methods=['GET'])
+def support_list_tickets():
+    user_ref = (request.args.get("userRef") or "").strip()
+    if not _is_valid_support_text(user_ref, 3, 120):
+        return jsonify({"status": "error", "message": "Invalid user reference."}), 400
+    with _LOCK:
+        items = _list_support_tickets(user_ref)
+    return jsonify({"status": "success", "tickets": items})
+
+
+@app.route('/api/support/tickets/<token>', methods=['GET'])
+def support_get_ticket(token):
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+    with _LOCK:
+        ticket = _get_support_ticket(token)
+    if not ticket:
+        return jsonify({"status": "error", "message": "Ticket not found."}), 404
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/support/tickets', methods=['POST'])
+def support_create_ticket():
+    data = request.get_json(silent=True) or {}
+    user_ref = (data.get("userRef") or "").strip()
+    name = (data.get("name") or "").strip()
+    contact = (data.get("contact") or "").strip()
+    short_issue = (data.get("shortIssue") or "").strip()
+    details = (data.get("details") or "").strip()
+
+    if not _is_valid_support_text(user_ref, 3, 120):
+        return jsonify({"status": "error", "message": "Invalid user reference."}), 400
+    if not _is_valid_support_text(name, 2, 120):
+        return jsonify({"status": "error", "message": "Please enter valid name."}), 400
+    if not _is_valid_contact(contact):
+        return jsonify({"status": "error", "message": "Please enter valid mobile or email."}), 400
+    if not _is_valid_support_text(short_issue, 3, 180):
+        return jsonify({"status": "error", "message": "Please enter short issue."}), 400
+    if not _is_valid_support_text(details, 10, 4000):
+        return jsonify({"status": "error", "message": "Please enter full issue details."}), 400
+
+    now = _now()
+    with _LOCK:
+        conn = _db_conn()
+        try:
+            token = ""
+            # Retry a few times to handle rare token collisions on unique index.
+            for _ in range(SUPPORT_TOKEN_GENERATION_ATTEMPTS):
+                candidate = _new_support_token()
+                try:
+                    conn.execute(
+                        """
+                        INSERT INTO support_tickets
+                        (token, user_ref, name, contact, short_issue, details, status, admin_reply, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, 'open', '', ?, ?)
+                        """,
+                        (candidate, user_ref, name, contact, short_issue, details, now, now),
+                    )
+                    conn.commit()
+                    token = candidate
+                    break
+                except sqlite3.IntegrityError:
+                    continue
+            if not token:
+                return jsonify({"status": "error", "message": "Could not generate support token."}), 500
+            ticket = _get_support_ticket(token)
+        finally:
+            conn.close()
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/support/tickets/<token>', methods=['PUT'])
+def support_update_ticket(token):
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    contact = (data.get("contact") or "").strip()
+    short_issue = (data.get("shortIssue") or "").strip()
+    details = (data.get("details") or "").strip()
+    user_ref = (data.get("userRef") or "").strip()
+
+    if name and not _is_valid_support_text(name, 2, 120):
+        return jsonify({"status": "error", "message": "Invalid name."}), 400
+    if contact and not _is_valid_contact(contact):
+        return jsonify({"status": "error", "message": "Invalid contact."}), 400
+    if short_issue and not _is_valid_support_text(short_issue, 3, 180):
+        return jsonify({"status": "error", "message": "Invalid short issue."}), 400
+    if details and not _is_valid_support_text(details, 10, 4000):
+        return jsonify({"status": "error", "message": "Invalid details."}), 400
+
+    with _LOCK:
+        existing = _get_support_ticket(token)
+        if not existing:
+            return jsonify({"status": "error", "message": "Ticket not found."}), 404
+        if user_ref and existing.get("user_ref") != user_ref:
+            return jsonify({"status": "error", "message": "Unauthorized update."}), 403
+        if existing.get("status") == "closed":
+            return jsonify({"status": "error", "message": "Ticket is closed. Reopen or create new token."}), 400
+
+        now = _now()
+        conn = _db_conn()
+        try:
+            conn.execute(
+                """
+                UPDATE support_tickets
+                SET name = COALESCE(NULLIF(?, ''), name),
+                    contact = COALESCE(NULLIF(?, ''), contact),
+                    short_issue = COALESCE(NULLIF(?, ''), short_issue),
+                    details = COALESCE(NULLIF(?, ''), details),
+                    updated_at = ?
+                WHERE token = ?
+                """,
+                (name, contact, short_issue, details, now, token),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        ticket = _get_support_ticket(token)
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/support/tickets/<token>/status', methods=['PUT'])
+def support_update_status(token):
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+
+    data = request.get_json(silent=True) or {}
+    status = (data.get("status") or "").strip().lower()
+    allowed = {"open", "closed"}
+    if status not in allowed:
+        return jsonify({"status": "error", "message": "Invalid status."}), 400
+
+    user_ref = (data.get("userRef") or "").strip()
+    actor = (data.get("actor") or "user").strip().lower()
+
+    with _LOCK:
+        existing = _get_support_ticket(token)
+        if not existing:
+            return jsonify({"status": "error", "message": "Ticket not found."}), 404
+        if actor != "admin":
+            if not _is_valid_support_text(user_ref, 3, 120) or existing.get("user_ref") != user_ref:
+                return jsonify({"status": "error", "message": "Unauthorized status update."}), 403
+            if existing.get("status") == "closed" and status == "closed":
+                return jsonify({"status": "error", "message": "Ticket already closed."}), 400
+        conn = _db_conn()
+        try:
+            conn.execute(
+                "UPDATE support_tickets SET status = ?, updated_at = ? WHERE token = ?",
+                (status, _now(), token),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        ticket = _get_support_ticket(token)
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/support/tickets/<token>/reply', methods=['PUT'])
+def support_reply_ticket(token):
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+    data = request.get_json(silent=True) or {}
+    reply = (data.get("reply") or "").strip()
+    if not _is_valid_support_text(reply, 1, 4000):
+        return jsonify({"status": "error", "message": "Invalid reply."}), 400
+
+    with _LOCK:
+        existing = _get_support_ticket(token)
+        if not existing:
+            return jsonify({"status": "error", "message": "Ticket not found."}), 404
+        conn = _db_conn()
+        try:
+            conn.execute(
+                "UPDATE support_tickets SET admin_reply = ?, updated_at = ? WHERE token = ?",
+                (reply, _now(), token),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        ticket = _get_support_ticket(token)
+    return jsonify({"status": "success", "ticket": ticket})
 
 
 # Render सर्वर के लिए पोर्ट कॉन्फ़िगरेशन

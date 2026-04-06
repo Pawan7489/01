@@ -345,6 +345,279 @@ window.showSettings = () => {
 
 window.showSupport = () => { window.showCustomModal("Support", "सपोर्ट टीम से संपर्क किया जा रहा है..."); };
 
+window.a1SupportState = {
+    userRef: '',
+    tickets: [],
+    activeToken: '',
+    mode: 'list'
+};
+
+window.getSupportUserRef = function() {
+    const name = (localStorage.getItem('a1_user_name') || 'Commander').trim() || 'Commander';
+    const mobile = (document.getElementById('login-mobile-input')?.value || '').trim();
+    const email = (document.getElementById('login-email-input')?.value || '').trim().toLowerCase();
+    const contactRef = mobile || email || name.toLowerCase().replace(/\s+/g, '_');
+    return `usr_${contactRef.slice(0, 96)}`;
+};
+
+window.supportApi = async function(path, options = {}) {
+    const res = await fetch(path, {
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.status === 'error') throw new Error(data.message || 'Support request failed');
+    return data;
+};
+
+window.persistSupportTokenIds = function() {
+    try {
+        const ids = (window.a1SupportState.tickets || []).map(t => t.token).filter(Boolean);
+        localStorage.setItem('a1_support_ticket_ids', JSON.stringify(ids));
+    } catch (_) {}
+};
+
+window.renderSupportTokenList = function() {
+    const list = document.getElementById('support-token-list');
+    if (!list) return;
+    const tickets = window.a1SupportState.tickets || [];
+    if (!tickets.length) {
+        list.innerHTML = '<div class="support-empty-state">Abhi koi token nahi bana hai.</div>';
+        return;
+    }
+    list.innerHTML = tickets.map((t) => `
+        <button class="support-token-item ${window.a1SupportState.activeToken === t.token ? 'active' : ''}" onclick="window.openSupportTicket('${t.token}')">
+            <div class="support-token-id">${t.token}</div>
+            <div class="support-token-subject">${window.escapeHtml(t.short_issue || 'No subject')}</div>
+            <div class="support-token-meta">
+                <span>${window.escapeHtml((t.status || 'open').toUpperCase())}</span>
+                <span>${new Date((t.updated_at || 0) * 1000).toLocaleDateString()}</span>
+            </div>
+        </button>
+    `).join('');
+};
+
+window.renderSupportCreateForm = function(prefill = {}) {
+    const panel = document.getElementById('support-right-panel');
+    if (!panel) return;
+    const defaultName = (localStorage.getItem('a1_user_name') || '').trim();
+    panel.innerHTML = `
+        <div class="support-token-header">
+            <strong>Create New Token</strong>
+        </div>
+        <form id="support-create-form" class="support-form-grid">
+            <div>
+                <label class="support-field-label">Your Name</label>
+                <input class="support-input" name="name" value="${window.escapeHtml(prefill.name || defaultName)}" required minlength="2" maxlength="120">
+            </div>
+            <div>
+                <label class="support-field-label">Mobile or Email</label>
+                <input class="support-input" name="contact" value="${window.escapeHtml(prefill.contact || '')}" required>
+            </div>
+            <div>
+                <label class="support-field-label">Short Error / Issue</label>
+                <input class="support-input" name="shortIssue" value="${window.escapeHtml(prefill.shortIssue || '')}" required minlength="3" maxlength="180">
+            </div>
+            <div>
+                <label class="support-field-label">Full Details</label>
+                <textarea class="support-textarea" name="details" required minlength="10" maxlength="4000">${window.escapeHtml(prefill.details || '')}</textarea>
+            </div>
+            <div class="support-actions-row">
+                <button type="button" class="support-btn" onclick="window.closeSupportCenter()">Cancel</button>
+                <button type="submit" class="support-btn primary">Submit</button>
+            </div>
+        </form>
+    `;
+
+    const form = document.getElementById('support-create-form');
+    if (form) {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            try {
+                const fd = new FormData(form);
+                const payload = {
+                    userRef: window.a1SupportState.userRef,
+                    name: (fd.get('name') || '').toString().trim(),
+                    contact: (fd.get('contact') || '').toString().trim(),
+                    shortIssue: (fd.get('shortIssue') || '').toString().trim(),
+                    details: (fd.get('details') || '').toString().trim()
+                };
+                const res = await window.supportApi('/api/support/tickets', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                window.showA1Modal('alert', 'Token Created', `Support token created: ${res.ticket.token}`);
+                await window.loadSupportTickets();
+                window.openSupportTicket(res.ticket.token);
+            } catch (err) {
+                window.showA1Modal('alert', 'Support Error', err.message || 'Could not create token');
+            }
+        });
+    }
+};
+
+window.renderSupportTicketDetails = function(ticket, isEdit = false) {
+    const panel = document.getElementById('support-right-panel');
+    if (!panel || !ticket) return;
+    const isClosed = (ticket.status || 'open') === 'closed';
+    const badgeClass = isClosed ? 'closed' : 'open';
+    const formInner = isEdit ? `
+        <form id="support-edit-form" class="support-form-grid">
+            <div>
+                <label class="support-field-label">Your Name</label>
+                <input class="support-input" name="name" value="${window.escapeHtml(ticket.name || '')}" required>
+            </div>
+            <div>
+                <label class="support-field-label">Mobile or Email</label>
+                <input class="support-input" name="contact" value="${window.escapeHtml(ticket.contact || '')}" required>
+            </div>
+            <div>
+                <label class="support-field-label">Short Error / Issue</label>
+                <input class="support-input" name="shortIssue" value="${window.escapeHtml(ticket.short_issue || '')}" required>
+            </div>
+            <div>
+                <label class="support-field-label">Full Details</label>
+                <textarea class="support-textarea" name="details" required>${window.escapeHtml(ticket.details || '')}</textarea>
+            </div>
+            <div class="support-actions-row">
+                <button type="button" class="support-btn" onclick="window.openSupportTicket('${ticket.token}')">Cancel</button>
+                <button type="submit" class="support-btn primary">Resubmit</button>
+            </div>
+        </form>
+    ` : `
+        <div class="support-form-grid">
+            <div><span class="support-field-label">Name</span><div>${window.escapeHtml(ticket.name || '')}</div></div>
+            <div><span class="support-field-label">Contact</span><div>${window.escapeHtml(ticket.contact || '')}</div></div>
+            <div><span class="support-field-label">Short Issue</span><div>${window.escapeHtml(ticket.short_issue || '')}</div></div>
+            <div><span class="support-field-label">Details</span><div style="white-space: pre-wrap;">${window.escapeHtml(ticket.details || '')}</div></div>
+        </div>
+    `;
+    panel.innerHTML = `
+        <div class="support-token-header">
+            <div>
+                <strong>${window.escapeHtml(ticket.token)}</strong>
+                <div class="support-field-label" style="margin-top: 3px;">Created: ${new Date((ticket.created_at || 0) * 1000).toLocaleString()}</div>
+            </div>
+            <span class="support-token-badge ${badgeClass}">${window.escapeHtml((ticket.status || 'open').toUpperCase())}</span>
+        </div>
+        ${formInner}
+        ${ticket.admin_reply ? `<div class="support-admin-reply"><strong>Admin Reply:</strong><br>${window.escapeHtml(ticket.admin_reply)}</div>` : ''}
+        ${!isEdit ? `<div class="support-actions-row">
+            <button class="support-btn" onclick="window.openSupportTicket('${ticket.token}', true)">Edit</button>
+            ${isClosed
+                ? `<button class="support-btn primary" onclick="window.reopenSupportTicket('${ticket.token}')">Reopen</button>
+                   <button class="support-btn" onclick="window.renderSupportCreateForm()">Create New Token</button>`
+                : `<button class="support-btn" onclick="window.closeSupportTicket('${ticket.token}')">Close Token</button>`
+            }
+        </div>` : ''}
+    `;
+
+    if (isEdit) {
+        const form = document.getElementById('support-edit-form');
+        if (form) {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                try {
+                    const fd = new FormData(form);
+                    const payload = {
+                        userRef: window.a1SupportState.userRef,
+                        name: (fd.get('name') || '').toString().trim(),
+                        contact: (fd.get('contact') || '').toString().trim(),
+                        shortIssue: (fd.get('shortIssue') || '').toString().trim(),
+                        details: (fd.get('details') || '').toString().trim()
+                    };
+                    await window.supportApi(`/api/support/tickets/${encodeURIComponent(ticket.token)}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(payload)
+                    });
+                    window.showA1Modal('alert', 'Updated', 'Token updated successfully.');
+                    await window.loadSupportTickets();
+                    window.openSupportTicket(ticket.token);
+                } catch (err) {
+                    window.showA1Modal('alert', 'Update Error', err.message || 'Could not update token');
+                }
+            });
+        }
+    }
+};
+
+window.loadSupportTickets = async function() {
+    const res = await window.supportApi(`/api/support/tickets?userRef=${encodeURIComponent(window.a1SupportState.userRef)}`);
+    window.a1SupportState.tickets = Array.isArray(res.tickets) ? res.tickets : [];
+    window.persistSupportTokenIds();
+    window.renderSupportTokenList();
+};
+
+window.openSupportTicket = async function(token, editMode = false) {
+    try {
+        const res = await window.supportApi(`/api/support/tickets/${encodeURIComponent(token)}`);
+        window.a1SupportState.activeToken = token;
+        window.renderSupportTokenList();
+        window.renderSupportTicketDetails(res.ticket, !!editMode);
+    } catch (err) {
+        window.showA1Modal('alert', 'Support Error', err.message || 'Could not load token.');
+    }
+};
+
+window.closeSupportTicket = async function(token) {
+    try {
+        await window.supportApi(`/api/support/tickets/${encodeURIComponent(token)}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ userRef: window.a1SupportState.userRef, status: 'closed' })
+        });
+        await window.loadSupportTickets();
+        await window.openSupportTicket(token);
+    } catch (err) {
+        window.showA1Modal('alert', 'Support Error', err.message || 'Could not close token.');
+    }
+};
+
+window.reopenSupportTicket = async function(token) {
+    try {
+        await window.supportApi(`/api/support/tickets/${encodeURIComponent(token)}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ userRef: window.a1SupportState.userRef, status: 'open' })
+        });
+        await window.loadSupportTickets();
+        await window.openSupportTicket(token);
+    } catch (err) {
+        window.showA1Modal('alert', 'Support Error', err.message || 'Could not reopen token.');
+    }
+};
+
+window.openSupportCenter = async function(prefill = null) {
+    const modal = document.getElementById('support-center-modal');
+    if (!modal) return;
+    const sidebar = document.getElementById('sidebar-menu');
+    if (sidebar) sidebar.classList.remove('active');
+    window.a1SupportState.userRef = window.getSupportUserRef();
+    modal.classList.remove('hidden');
+    const createBtn = document.getElementById('support-create-token-btn');
+    if (createBtn && !createBtn.dataset.boundSupportCreate) {
+        createBtn.dataset.boundSupportCreate = '1';
+        createBtn.addEventListener('click', () => window.renderSupportCreateForm());
+    }
+    try {
+        await window.loadSupportTickets();
+        if (prefill) {
+            window.renderSupportCreateForm(prefill);
+        } else if (window.a1SupportState.tickets.length) {
+            const first = window.a1SupportState.tickets[0];
+            await window.openSupportTicket(first.token);
+        } else {
+            window.renderSupportCreateForm();
+        }
+    } catch (err) {
+        window.showA1Modal('alert', 'Support Error', err.message || 'Could not open support center');
+        window.renderSupportCreateForm(prefill || {});
+    }
+};
+
+window.closeSupportCenter = function() {
+    const modal = document.getElementById('support-center-modal');
+    if (modal) modal.classList.add('hidden');
+};
+
 // Purana code: if (sidebar) sidebar.style.left = '-350px'; 
 // Naya code:
 window.showSidebarSettings = () => { 
@@ -1282,7 +1555,12 @@ window.actionDelete = function(id, event) {
 
 window.actionHelp = function(id, event) {
     if(event) { event.preventDefault(); event.stopPropagation(); }
-    window.showA1Modal('alert', 'Help Center', '🛠️ Support features will be connected to admin panel soon!'); 
+    const chat = window.chatSessions.find(c => String(c.id).trim() === String(id).trim());
+    const shortIssue = chat?.title ? `History issue: ${chat.title}` : 'History issue';
+    window.openSupportCenter({
+        shortIssue,
+        details: chat ? `Token created from history: ${chat.title}\nType: ${chat.type || 'text'}\nSession ID: ${chat.id}` : ''
+    });
 };
 
 // 🚀 FIX: Restore Old Chat with Hologram & Feedback UI
@@ -2788,7 +3066,10 @@ window.editMsgText = (text) => {
 
 window.helpMsgSystem = () => {
     if(navigator.vibrate) navigator.vibrate([20, 50]);
-    alert("A1 Support: Apki madad ke liye request bhej di gayi hai.");
+    window.openSupportCenter({
+        shortIssue: 'Live voice chat support request',
+        details: 'Issue created from live voice chat help menu.'
+    });
     document.querySelectorAll('.smart-msg-menu').forEach(menu => menu.classList.add('hidden'));
 };
 
@@ -3763,6 +4044,12 @@ document.addEventListener('click', (event) => {
     if (!event.target.closest('#history-floating-popup') && !event.target.closest('.history-btn-clean')) {
         window.hideHistoryPopup();
     }
+});
+
+document.addEventListener('click', (event) => {
+    const supportModal = document.getElementById('support-center-modal');
+    if (!supportModal || supportModal.classList.contains('hidden')) return;
+    if (event.target === supportModal) window.closeSupportCenter();
 });
 
 

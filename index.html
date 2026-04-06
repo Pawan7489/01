@@ -180,7 +180,7 @@
                <i class="fas fa-trash-restore"></i> Recover Deleted
             </button>
 
-            <button class="menu-list-btn"><i class="fas fa-headset"></i> Support</button>
+            <button class="menu-list-btn" onclick="window.openSupportCenter()"><i class="fas fa-headset"></i> Support</button>
             <button onclick="window.showSidebarSettings()" class="menu-list-btn"><i class="fas fa-cog"></i> App Settings</button>
         </div>
     </aside>
@@ -250,6 +250,24 @@
 
 
 
+
+<div id="support-center-modal" class="support-modal-overlay hidden">
+    <div class="support-modal-content">
+        <button onclick="window.closeSupportCenter()" class="support-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2 class="support-title"><i class="fas fa-headset"></i> Help & Support</h2>
+        <div class="support-layout">
+            <div class="support-left-panel">
+                <button id="support-create-token-btn" class="primary-btn full-width"><i class="fas fa-plus"></i> Create New Token</button>
+                <div id="support-token-list" class="support-token-list custom-scrollbar"></div>
+            </div>
+            <div id="support-right-panel" class="support-right-panel">
+                <div class="support-empty-state">Create new token ya token select karke details dekhiye.</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="auth-container" class="hidden auth-container-glass fade-in pace-aware" data-web4-vault="encrypted" data-auto-heal="true">
     
