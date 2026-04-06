@@ -3050,11 +3050,37 @@ window.startScreenShare = () => {
 };
 
 window.handleFileUpload = (event, type) => {
-    if(event.target.files.length > 0) {
-        document.getElementById('attachment-menu')?.classList.add('hidden');
-        const fileName = event.target.files[0].name;
-        window.processLiveVoiceQuery(`[${type} Attached: ${fileName}]`);
-    }
+    // Legacy entrypoint retained for compatibility; active binding is in DOMContentLoaded.
+    if(event.target.files.length > 0) document.getElementById('attachment-menu')?.classList.add('hidden');
+};
+
+window.MAX_FILE_CONTENT_CHARS = 120000;
+window.readFileAsPreviewText = function(file, maxChars = window.MAX_FILE_CONTENT_CHARS || 120000) {
+    return new Promise((resolve) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onerror = () => resolve(`[Unreadable file: ${file.name}]`);
+        reader.onload = () => {
+            const result = typeof reader.result === 'string' ? reader.result : '';
+            const trimmed = result.length > maxChars ? result.slice(0, maxChars) + '\n...[truncated]...' : result;
+            resolve(trimmed || `[Empty file: ${file.name}]`);
+        };
+        try {
+            reader.readAsText(file);
+        } catch (_) {
+            resolve(`[Cannot parse file as text: ${file.name}]`);
+        }
+    });
+};
+
+window.buildFilesMessageBlock = async function(files, header = 'Attached Files') {
+    const list = Array.from(files || []);
+    if (!list.length) return '';
+    const blocks = await Promise.all(list.map(async (file) => {
+        const content = await window.readFileAsPreviewText(file);
+        return `\n\n[FILE: ${file.name}]\n${content}\n[/FILE]`;
+    }));
+    return `[📎 ${header}]${blocks.join('')}`;
 };
 
 // ==========================================
@@ -4293,20 +4319,40 @@ window.triggerUniversalUpload = function() {
 document.addEventListener("DOMContentLoaded", () => {
     const fileInput = document.getElementById('universal-file-upload');
     if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', async function(e) {
             const files = e.target.files;
             if(files.length > 0) {
-                // सभी फाइल्स के नाम निकाल कर एक लिस्ट बनाना
-                let fileNames = Array.from(files).map(f => f.name).join(', ');
                 const chatInput = document.getElementById('chat-user-input');
+                if(!chatInput) return;
                 
-                // इनपुट बॉक्स में फाइल का नाम जोड़ देना
-                chatInput.value += (chatInput.value ? '\n' : '') + `[📎 Attached Files: ${fileNames}] `;
+                const filesBlock = await window.buildFilesMessageBlock(files, 'Attached Files');
+                chatInput.value += (chatInput.value ? '\n\n' : '') + filesBlock;
                 window.autoResizeInput(chatInput);
                 chatInput.focus();
             }
+            e.target.value = '';
         });
     }
+
+    const liveVoiceFileConfig = [
+        { id: 'file-photo', type: 'Photo' },
+        { id: 'file-video', type: 'Video' },
+        { id: 'file-music', type: 'Music' },
+        { id: 'file-doc', type: 'Document' }
+    ];
+    liveVoiceFileConfig.forEach(({ id, type }) => {
+        const input = document.getElementById(id);
+        if (!input || input.dataset.boundFileContent === '1') return;
+        input.dataset.boundFileContent = '1';
+        input.addEventListener('change', async (event) => {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            document.getElementById('attachment-menu')?.classList.add('hidden');
+            const filesBlock = await window.buildFilesMessageBlock(files, `${type} Files`);
+            window.processLiveVoiceQuery(filesBlock);
+            event.target.value = '';
+        });
+    });
 });
 
 
