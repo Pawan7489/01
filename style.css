@@ -2087,6 +2087,11 @@ html body #live-voice-overlay.hidden {
     flex: 1;
 }
 
+.support-layout > .support-left-panel,
+.support-layout > .support-right-panel {
+    min-height: 320px;
+}
+
 .support-left-panel {
     border: 1px solid var(--border, rgba(255,255,255,0.12));
     border-radius: 14px;
@@ -2388,6 +2393,12 @@ body.theme-dark .support-token-badge.closed {
 }
 
 @media (max-width: 900px) {
+    .support-layout {
+        grid-template-columns: minmax(260px, 38%) 1fr;
+    }
+}
+
+@media (max-width: 640px) {
     .support-layout {
         grid-template-columns: 1fr;
     }

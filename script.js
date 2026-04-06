@@ -370,6 +370,42 @@ window.supportApi = async function(path, options = {}) {
     return data;
 };
 
+window.normalizeSupportContact = function(rawContact) {
+    const contact = String(rawContact || '').trim();
+    if (!contact) return '';
+    if (contact.includes('@')) return contact.toLowerCase();
+    return contact.replace(/\D/g, '');
+};
+
+window.prepareSupportPayload = function(rawPayload = {}) {
+    const normalized = {
+        userRef: String(rawPayload.userRef || window.getSupportUserRef() || '').trim(),
+        name: String(rawPayload.name || '').trim().replace(/\s+/g, ' '),
+        contact: window.normalizeSupportContact(rawPayload.contact),
+        shortIssue: String(rawPayload.shortIssue || '').trim(),
+        details: String(rawPayload.details || '').trim()
+    };
+
+    if (!normalized.userRef || normalized.userRef.length < 3 || normalized.userRef.length > 120) {
+        throw new Error('Invalid user reference. Please reopen Support and try again.');
+    }
+    if (normalized.name.length < 2 || normalized.name.length > 120) {
+        throw new Error('Please enter valid name (2-120 characters).');
+    }
+    const contactOk = /^\d{10}$/.test(normalized.contact) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized.contact);
+    if (!contactOk) {
+        throw new Error('Please enter valid 10-digit mobile or email.');
+    }
+    if (normalized.shortIssue.length < 3 || normalized.shortIssue.length > 180) {
+        throw new Error('Please enter short issue (3-180 characters).');
+    }
+    if (normalized.details.length < 10 || normalized.details.length > 4000) {
+        throw new Error('Please enter full details (10-4000 characters).');
+    }
+
+    return normalized;
+};
+
 window.persistSupportTokenIds = function() {
     try {
         const ids = (window.a1SupportState.tickets || []).map(t => t.token).filter(Boolean);
@@ -435,13 +471,13 @@ window.renderSupportCreateForm = function(prefill = {}) {
             event.preventDefault();
             try {
                 const fd = new FormData(form);
-                const payload = {
+                const payload = window.prepareSupportPayload({
                     userRef: window.a1SupportState.userRef,
                     name: (fd.get('name') || '').toString().trim(),
                     contact: (fd.get('contact') || '').toString().trim(),
                     shortIssue: (fd.get('shortIssue') || '').toString().trim(),
                     details: (fd.get('details') || '').toString().trim()
-                };
+                });
                 const res = await window.supportApi('/api/support/tickets', {
                     method: 'POST',
                     body: JSON.stringify(payload)
@@ -519,13 +555,13 @@ window.renderSupportTicketDetails = function(ticket, isEdit = false) {
                 event.preventDefault();
                 try {
                     const fd = new FormData(form);
-                    const payload = {
+                    const payload = window.prepareSupportPayload({
                         userRef: window.a1SupportState.userRef,
                         name: (fd.get('name') || '').toString().trim(),
                         contact: (fd.get('contact') || '').toString().trim(),
                         shortIssue: (fd.get('shortIssue') || '').toString().trim(),
                         details: (fd.get('details') || '').toString().trim()
-                    };
+                    });
                     await window.supportApi(`/api/support/tickets/${encodeURIComponent(ticket.token)}`, {
                         method: 'PUT',
                         body: JSON.stringify(payload)
