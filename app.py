@@ -21,10 +21,10 @@ MOBILE_RE = re.compile(r"^\d{10}$")
 OTP_RE = re.compile(r"^\d{6}$")
 PASSWORD_RE = re.compile(r"^.{8,20}$")
 SUPPORT_TOKEN_RE = re.compile(r"^SUP-[A-F0-9]{8}-[A-F0-9]{6}$")
-ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "admin-secret-change-me")
-if ADMIN_SECRET == "admin-secret-change-me":
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "pawan")
+if ADMIN_SECRET == "pawan":
     import warnings
-    warnings.warn("ADMIN_SECRET is set to the default value. Set the ADMIN_SECRET environment variable before deploying to production.", RuntimeWarning, stacklevel=2)
+    warnings.warn("ADMIN_SECRET is using default value 'pawan'. Set ADMIN_SECRET environment variable before deploying to production.", RuntimeWarning, stacklevel=2)
 
 OTP_TTL_SECONDS = 5 * 60
 RESET_TOKEN_TTL_SECONDS = 10 * 60
