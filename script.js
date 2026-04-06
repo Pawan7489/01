@@ -48,6 +48,14 @@ window.prompt = function(message, defaultValue) {
 const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const stylePackStorageKey = 'a1_style_pack';
+const typingSpeedStorageKey = 'a1_typing_speed_mode';
+const typingSpeedMultipliers = {
+    normal: 0.75,
+    smooth: 1,
+    ultra: 1.3
+};
+
+window.__humanTypingSpeedMode = 'smooth';
 const stylePackTokenMap = {
     default: {
         radiusMd: '14px',
@@ -125,6 +133,21 @@ window.changeAppTheme = (mode) => {
     if (activeBtn) activeBtn.classList.add('theme-active-btn');
 
     if (navigator.vibrate) navigator.vibrate(15);
+};
+
+window.applyHumanTypingSpeedMode = (mode, options = {}) => {
+    const force = !!options.force;
+    const validMode = Object.prototype.hasOwnProperty.call(typingSpeedMultipliers, mode) ? mode : 'smooth';
+    window.__humanTypingSpeedMode = validMode;
+    localStorage.setItem(typingSpeedStorageKey, validMode);
+
+    document.querySelectorAll('[data-typing-speed]').forEach((btn) => {
+        btn.classList.toggle('theme-active-btn', btn.dataset.typingSpeed === validMode);
+    });
+
+    if (force && typeof window.initGlobalHumanTyping === 'function') {
+        window.initGlobalHumanTyping({ force: true });
+    }
 };
 
 // सिस्टम सेटिंग बदलने पर ऑटो-अपडेट
@@ -452,6 +475,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (navigator.vibrate) navigator.vibrate(15);
         });
     }
+
+    const savedTypingSpeed = localStorage.getItem(typingSpeedStorageKey) || 'smooth';
+    window.applyHumanTypingSpeedMode(savedTypingSpeed, { force: false });
+    document.querySelectorAll('[data-typing-speed]').forEach((btn) => {
+        if (btn.dataset.boundTypingSpeed === '1') return;
+        btn.dataset.boundTypingSpeed = '1';
+        btn.addEventListener('click', () => {
+            window.applyHumanTypingSpeedMode(btn.dataset.typingSpeed, { force: true });
+            if (navigator.vibrate) navigator.vibrate(12);
+        });
+    });
 
     // 2. राईट-क्लिक मेनू सेट करना
     const dashboard = document.getElementById('main-dashboard');
@@ -951,13 +985,21 @@ window.initGlobalHumanTyping = function(options = {}) {
 
     selectorProfiles.forEach(({ selector, profile }) => {
         const speedConfig = window.__humanTypingSpeedProfiles[profile] || window.__humanTypingSpeedProfiles.default;
+        const speedMode = window.__humanTypingSpeedMode || 'smooth';
+        const speedMultiplier = typingSpeedMultipliers[speedMode] || 1;
+        const tunedSpeed = {
+            ...speedConfig,
+            baseDelay: Math.max(6, Math.round(speedConfig.baseDelay * speedMultiplier)),
+            maxDelay: Math.max(10, Math.round(speedConfig.maxDelay * speedMultiplier)),
+            maxChars: speedConfig.maxChars
+        };
         root.querySelectorAll(selector).forEach((el) => {
             const currentHtml = el.innerHTML;
             if (!el.dataset.humanTypingSource || force || el.dataset.humanTypingSource !== currentHtml) {
                 el.dataset.humanTypingSource = currentHtml;
                 el.dataset.humanTypedDone = 'false';
             }
-            window.humanTypeHTML(el, el.dataset.humanTypingSource, { ...speedConfig, force });
+            window.humanTypeHTML(el, el.dataset.humanTypingSource, { ...tunedSpeed, force });
         });
     });
 };

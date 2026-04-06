@@ -270,6 +270,15 @@ html, body {
     background: var(--bg-main);
     color: var(--text-primary);
 }
+
+#typing-speed-control .mode-btn {
+    padding: 9px 4px;
+    font-size: 11px;
+}
+
+#typing-speed-control .mode-btn i {
+    font-size: 14px;
+}
              
 
 
