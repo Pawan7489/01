@@ -1797,7 +1797,7 @@ html body #live-voice-overlay.hidden {
     letter-spacing: 0.3px;
     margin-left: 10px;
     white-space: nowrap;
-    animation: historyBadgeFloatIn 0.32s var(--ease-standard) both;
+    animation: historyBadgeFloatIn 0.38s var(--ease-standard) both, historyBadgeGlowPulse 2.2s ease-in-out infinite;
 }
 
 .history-type-badge i { font-size: 10px; }
@@ -1815,6 +1815,11 @@ html body #live-voice-overlay.hidden {
 @keyframes historyBadgeFloatIn {
     from { opacity: 0; transform: translateY(4px) scale(0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes historyBadgeGlowPulse {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06); }
 }
 
 .human-typing-cursor {

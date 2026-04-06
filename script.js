@@ -826,6 +826,11 @@ window.__humanTypingSpeedProfiles = {
     default: { baseDelay: 18, maxDelay: 42, maxChars: 420 }
 };
 
+window.resolveTextDirectionByContent = function(text) {
+    const value = String(text || '');
+    return /[\u0590-\u08FF]/.test(value) ? 'rtl' : 'ltr';
+};
+
 window.humanTypeHTML = async function(element, html, options = {}) {
     if (!element || element.dataset.humanTypingRunning === 'true') return;
     const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -838,15 +843,21 @@ window.humanTypeHTML = async function(element, html, options = {}) {
     if (isHidden && !force) return;
 
     if (!element.dataset.humanTypingSource || force) element.dataset.humanTypingSource = html;
+    if (!force && html && element.dataset.humanTypingSource !== html && element.dataset.humanTypingRunning !== 'true') {
+        element.dataset.humanTypingSource = html;
+        element.dataset.humanTypedDone = 'false';
+    }
     const sourceHTML = element.dataset.humanTypingSource || html || '';
     if (!sourceHTML) return;
     if (element.dataset.humanTypedDone === 'true' && !force) return;
+    element.setAttribute('dir', window.resolveTextDirectionByContent(sourceHTML));
 
     if (reducedMotion || sourceHTML.length > maxChars) {
         window.__humanTypingWriteLock = true;
         element.innerHTML = sourceHTML;
         window.__humanTypingWriteLock = false;
         element.dataset.humanTypedDone = 'true';
+        element.dataset.humanTypingRunning = 'false';
         return;
     }
 
@@ -887,17 +898,26 @@ window.humanTypeHTML = async function(element, html, options = {}) {
 
 window.initGlobalHumanTyping = function(options = {}) {
     const root = options.scope || document;
+    const force = !!options.force;
     const selectorProfiles = [
         { selector: '.auth-title', profile: 'auth' },
         { selector: '.auth-subtitle', profile: 'auth' },
+        { selector: '.auth-link', profile: 'auth' },
+        { selector: '.auth-link-inline', profile: 'auth' },
+        { selector: '.auth-btn-primary', profile: 'auth' },
         { selector: '.trash-title', profile: 'welcome' },
         { selector: '.trash-desc', profile: 'welcome' },
         { selector: '.welcome-heading', profile: 'welcome' },
         { selector: '#welcome-banner h2', profile: 'welcome' },
         { selector: '#welcome-banner p', profile: 'welcome' },
         { selector: '#future-note-text', profile: 'welcome' },
+        { selector: '#future-typing-label', profile: 'welcome' },
+        { selector: '#dynamic-thinking-text', profile: 'welcome' },
+        { selector: '#live-voice-status', profile: 'welcome' },
+        { selector: '.secure-voice-badge', profile: 'history' },
         { selector: '.sidebar-history h5', profile: 'history' },
         { selector: '.history-type-badge-label', profile: 'history' },
+        { selector: '#profile-dropdown .dropdown-link', profile: 'profile' },
         { selector: '#profile-dropdown .menu-list-btn', profile: 'profile' },
         { selector: '#profile-dropdown .profile-user-name', profile: 'profile' }
     ];
@@ -905,8 +925,12 @@ window.initGlobalHumanTyping = function(options = {}) {
     selectorProfiles.forEach(({ selector, profile }) => {
         const speedConfig = window.__humanTypingSpeedProfiles[profile] || window.__humanTypingSpeedProfiles.default;
         root.querySelectorAll(selector).forEach((el) => {
-            if (!el.dataset.humanTypingSource) el.dataset.humanTypingSource = el.innerHTML;
-            window.humanTypeHTML(el, el.dataset.humanTypingSource, speedConfig);
+            const currentHtml = el.innerHTML;
+            if (!el.dataset.humanTypingSource || force || el.dataset.humanTypingSource !== currentHtml) {
+                el.dataset.humanTypingSource = currentHtml;
+                el.dataset.humanTypedDone = 'false';
+            }
+            window.humanTypeHTML(el, el.dataset.humanTypingSource, { ...speedConfig, force });
         });
     });
 };
@@ -1004,7 +1028,7 @@ window.renderHistoryList = function() {
             `;
         });
         list.innerHTML = html;
-        window.initGlobalHumanTyping({ scope: list });
+        window.initGlobalHumanTyping({ scope: list, force: true });
     });
 };
 
@@ -1307,7 +1331,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    window.initGlobalHumanTyping();
+    window.initGlobalHumanTyping({ force: true });
     window.setupGlobalHumanTypingObserver();
 });
 
@@ -1422,6 +1446,7 @@ window.switchView = function(viewName) {
         const finalView = isKnownView ? targetView : document.getElementById('login-view');
         if (!finalView || !finalView.classList) return;
         finalView.classList.remove('hidden');
+        setTimeout(() => window.initGlobalHumanTyping({ scope: finalView, force: true }), 60);
         window.resetForms();
     } catch(e) {}
 };
