@@ -495,7 +495,7 @@
 
     try {
       const data = await apiFetch(`/api/admin/support/tickets/${encodeURIComponent(token)}/reply`, {
-        method: 'PUT', body: JSON.stringify({ reply, adminSecret: _secret })
+        method: 'PUT', body: JSON.stringify({ reply })
       });
       const updated = data.ticket;
       // Update local cache
@@ -520,7 +520,7 @@
     if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
     try {
       const data = await apiFetch(`/api/admin/support/tickets/${encodeURIComponent(token)}/status`, {
-        method: 'PUT', body: JSON.stringify({ status: newStatus, actor: 'admin', adminSecret: _secret })
+        method: 'PUT', body: JSON.stringify({ status: newStatus, actor: 'admin' })
       });
       const updated = data.ticket;
       const idx = _tickets.findIndex(t => t.token === token);
