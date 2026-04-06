@@ -2234,6 +2234,101 @@ html body #live-voice-overlay.hidden {
     border-color: rgba(59, 130, 246, 0.9);
 }
 
+/* =========================================================
+   🎯 SUPPORT + PROFILE DROPDOWN COMPATIBILITY FIX
+========================================================= */
+#header .profile-container {
+    position: relative;
+    margin-right: 8px; /* right edge se chipakne se bachao */
+}
+
+#header #profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    left: auto;
+    min-width: 280px;
+    max-width: min(320px, calc(100vw - 24px));
+    z-index: 100050;
+}
+
+/* Purani global fixed positioning override ko neutralize */
+#header .profile-container #profile-dropdown {
+    position: absolute;
+}
+
+.support-modal-content #support-create-token-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.45);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(37, 99, 235, 0.2));
+    color: var(--text-primary, #fff);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.support-modal-content #support-create-token-btn:hover {
+    border-color: rgba(96, 165, 250, 0.9);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.support-modal-content #support-create-token-btn:focus-visible,
+.support-btn:focus-visible,
+.support-close-btn:focus-visible,
+.support-token-item:focus-visible {
+    outline: 2px solid rgba(96, 165, 250, 0.9);
+    outline-offset: 2px;
+}
+
+.support-token-item {
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.support-token-item:hover {
+    border-color: rgba(96, 165, 250, 0.6);
+    background: color-mix(in srgb, var(--btn-bg, rgba(128,128,128,0.08)) 78%, rgba(59,130,246,0.22));
+    transform: translateY(-1px);
+}
+
+.support-close-btn {
+    transition: transform .18s ease, border-color .18s ease, color .18s ease, background-color .18s ease;
+}
+
+.support-close-btn:hover {
+    border-color: rgba(248, 113, 113, 0.7);
+    background: rgba(248, 113, 113, 0.12);
+    color: #fecaca;
+    transform: scale(1.04);
+}
+
+.support-input:focus,
+.support-textarea:focus {
+    border-color: rgba(96, 165, 250, 0.8);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+.support-btn {
+    transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+.support-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(148, 163, 184, 0.55);
+}
+
+.support-btn.primary:hover {
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.34);
+    filter: brightness(1.08);
+}
+
 .support-admin-reply {
     margin-top: 10px;
     border: 1px dashed rgba(74, 222, 128, 0.4);
