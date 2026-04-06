@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = event.target.value.toLowerCase().trim();
             
             // हिस्ट्री के सारे आइटम्स को ढूँढना
-            const historyItems = document.querySelectorAll('#history-list-container .history-item-wrapper, #history-list-container .history-item');
+            const historyItems = document.querySelectorAll('#history-list-container .history-item-wrapper');
             
             // हर एक हिस्ट्री आइटम को चेक करना
             historyItems.forEach(item => {
@@ -1091,6 +1091,8 @@ window.pressTimer = null;
 window.isLongPress = false;
 window.historyPopupTimer = null;
 window.activeHistoryPopupId = null;
+const HISTORY_POPUP_ARROW_MIN_OFFSET = 10;
+const HISTORY_POPUP_ARROW_BOTTOM_MARGIN = 16;
 
 window.ensureHistoryPopup = function() {
     let popup = document.getElementById('history-floating-popup');
@@ -1173,7 +1175,7 @@ window.showHistoryPopup = function(id, triggerEl) {
     if (top + popupRect.height > viewportHeight - 8) top = Math.max(8, viewportHeight - popupRect.height - 8);
 
     const newArrowTop = (triggerRect.top + triggerRect.height / 2) - top - 6;
-    arrowTop = Math.max(10, Math.min(popupRect.height - 16, newArrowTop));
+    arrowTop = Math.max(HISTORY_POPUP_ARROW_MIN_OFFSET, Math.min(popupRect.height - HISTORY_POPUP_ARROW_BOTTOM_MARGIN, newArrowTop));
 
     popup.classList.toggle('arrow-left', placeLeft);
     popup.classList.toggle('arrow-right', !placeLeft);
