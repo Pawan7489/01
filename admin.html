@@ -51,6 +51,11 @@
       transition: border-color .2s;
     }
     .form-group input:focus { border-color: rgba(255,255,255,.45); }
+    .form-helper {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
     .btn-primary {
       width: 100%; padding: 11px; background: var(--active-btn-bg); color: var(--active-btn-text);
       border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
@@ -229,6 +234,7 @@
     <div class="form-group">
       <label>Admin Secret Key</label>
       <input type="password" id="admin-secret-input" placeholder="Enter secret key..." autocomplete="off">
+      <div class="form-helper">Default key: pawan</div>
     </div>
     <button class="btn-primary" id="login-btn" onclick="adminLogin()">
       <i class="fas fa-arrow-right-to-bracket" style="margin-right:6px"></i>Login
