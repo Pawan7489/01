@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import re
 import time
@@ -21,6 +21,7 @@ MOBILE_RE = re.compile(r"^\d{10}$")
 OTP_RE = re.compile(r"^\d{6}$")
 PASSWORD_RE = re.compile(r"^.{8,20}$")
 SUPPORT_TOKEN_RE = re.compile(r"^SUP-[A-F0-9]{8}-[A-F0-9]{6}$")
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "admin-secret-change-me")
 
 OTP_TTL_SECONDS = 5 * 60
 RESET_TOKEN_TTL_SECONDS = 10 * 60
@@ -863,7 +864,124 @@ def support_reply_ticket(token):
     return jsonify({"status": "success", "ticket": ticket})
 
 
-# Render सर्वर के लिए पोर्ट कॉन्फ़िगरेशन
+
+# ─── Admin helper ────────────────────────────────────────────────────────────
+
+def _admin_auth(req) -> bool:
+    """Check X-Admin-Secret header or 'adminSecret' body field."""
+    header_val = (req.headers.get("X-Admin-Secret") or "").strip()
+    if header_val and hmac.compare_digest(header_val, ADMIN_SECRET):
+        return True
+    data = req.get_json(silent=True) or {}
+    body_val = (data.get("adminSecret") or "").strip()
+    return bool(body_val and hmac.compare_digest(body_val, ADMIN_SECRET))
+
+
+def _list_all_support_tickets(status_filter: str = ""):
+    conn = _db_conn()
+    try:
+        if status_filter in ("open", "closed"):
+            rows = conn.execute(
+                "SELECT token, user_ref, name, contact, short_issue, details, status, admin_reply, created_at, updated_at"
+                " FROM support_tickets WHERE status = ? ORDER BY updated_at DESC",
+                (status_filter,),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT token, user_ref, name, contact, short_issue, details, status, admin_reply, created_at, updated_at"
+                " FROM support_tickets ORDER BY updated_at DESC"
+            ).fetchall()
+        return [_normalize_support_ticket(r) for r in rows]
+    finally:
+        conn.close()
+
+
+# ─── Admin API routes ─────────────────────────────────────────────────────────
+
+@app.route('/api/admin/support/tickets', methods=['GET'])
+def admin_list_tickets():
+    if not _admin_auth(request):
+        return jsonify({"status": "error", "message": "Unauthorized."}), 401
+    status_filter = (request.args.get("status") or "").strip().lower()
+    items = _list_all_support_tickets(status_filter)
+    return jsonify({"status": "success", "tickets": items})
+
+
+@app.route('/api/admin/support/tickets/<token>', methods=['GET'])
+def admin_get_ticket(token):
+    if not _admin_auth(request):
+        return jsonify({"status": "error", "message": "Unauthorized."}), 401
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+    ticket = _get_support_ticket(token)
+    if not ticket:
+        return jsonify({"status": "error", "message": "Ticket not found."}), 404
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/admin/support/tickets/<token>/reply', methods=['PUT'])
+def admin_reply_ticket(token):
+    if not _admin_auth(request):
+        return jsonify({"status": "error", "message": "Unauthorized."}), 401
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+    data = request.get_json(silent=True) or {}
+    reply = (data.get("reply") or "").strip()
+    if not _is_valid_support_text(reply, 1, 4000):
+        return jsonify({"status": "error", "message": "Invalid reply."}), 400
+    with _LOCK:
+        existing = _get_support_ticket(token)
+        if not existing:
+            return jsonify({"status": "error", "message": "Ticket not found."}), 404
+        conn = _db_conn()
+        try:
+            conn.execute(
+                "UPDATE support_tickets SET admin_reply = ?, updated_at = ? WHERE token = ?",
+                (reply, _now(), token),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        ticket = _get_support_ticket(token)
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/api/admin/support/tickets/<token>/status', methods=['PUT'])
+def admin_update_ticket_status(token):
+    if not _admin_auth(request):
+        return jsonify({"status": "error", "message": "Unauthorized."}), 401
+    token = (token or "").strip().upper()
+    if not _is_valid_support_token(token):
+        return jsonify({"status": "error", "message": "Invalid token."}), 400
+    data = request.get_json(silent=True) or {}
+    status = (data.get("status") or "").strip().lower()
+    if status not in ("open", "closed"):
+        return jsonify({"status": "error", "message": "Invalid status."}), 400
+    with _LOCK:
+        existing = _get_support_ticket(token)
+        if not existing:
+            return jsonify({"status": "error", "message": "Ticket not found."}), 404
+        conn = _db_conn()
+        try:
+            conn.execute(
+                "UPDATE support_tickets SET status = ?, updated_at = ? WHERE token = ?",
+                (status, _now(), token),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        ticket = _get_support_ticket(token)
+    return jsonify({"status": "success", "ticket": ticket})
+
+
+@app.route('/admin')
+def admin_panel():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'admin.html')
+
+
+
 if __name__ == '__main__':
     # Render अपने आप एक PORT देता है, नहीं तो डिफ़ॉल्ट 5000 इस्तेमाल होगा
     port = int(os.environ.get('PORT', 5000))

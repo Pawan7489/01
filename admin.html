@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <title>A1 – Admin Support Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* ── Theme variables (matching main app) ── */
+    :root {
+      --bg-main: #010101;
+      --panel-bg: rgba(255,255,255,0.04);
+      --panel-border: rgba(255,255,255,0.12);
+      --text-primary: #ffffff;
+      --text-secondary: #aaaaaa;
+      --border: rgba(255,255,255,0.15);
+      --btn-bg: rgba(255,255,255,0.08);
+      --btn-hover: rgba(255,255,255,0.16);
+      --active-btn-bg: #ffffff;
+      --active-btn-text: #000000;
+      --status-success: #4ade80;
+      --status-warning: #facc15;
+      --status-info: #3b82f6;
+      --status-error: #f87171;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg-main); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 14px; }
+
+    /* ── Login screen ── */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+    }
+    .login-card {
+      background: var(--panel-bg); border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg); padding: 40px 36px; width: 100%; max-width: 380px;
+      backdrop-filter: blur(16px);
+    }
+    .login-card h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .login-card p { color: var(--text-secondary); margin-bottom: 28px; font-size: 13px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; letter-spacing: .03em; }
+    .form-group input {
+      width: 100%; padding: 10px 14px; background: var(--btn-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; font-family: inherit; outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: rgba(255,255,255,.45); }
+    .btn-primary {
+      width: 100%; padding: 11px; background: var(--active-btn-bg); color: var(--active-btn-text);
+      border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity .2s; font-family: inherit;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    #login-error { color: var(--status-error); font-size: 12px; margin-top: 10px; min-height: 18px; }
+
+    /* ── Main layout ── */
+    #admin-app { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; border-bottom: 1px solid var(--panel-border);
+      background: rgba(0,0,0,.7); backdrop-filter: blur(12px); flex-shrink: 0;
+    }
+    .admin-header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .admin-header h1 i { color: var(--text-secondary); }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .admin-logout-btn {
+      padding: 7px 16px; background: var(--btn-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit;
+      transition: background .2s;
+    }
+    .admin-logout-btn:hover { background: var(--btn-hover); }
+
+    /* ── Split view ── */
+    .admin-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* Left panel – ticket list */
+    .ticket-list-panel {
+      width: 340px; flex-shrink: 0; border-right: 1px solid var(--panel-border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .panel-toolbar {
+      padding: 14px 16px; border-bottom: 1px solid var(--panel-border); display: flex;
+      align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .filter-btn {
+      padding: 5px 12px; background: var(--btn-bg); border: 1px solid var(--border);
+      border-radius: 20px; color: var(--text-secondary); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all .2s; font-family: inherit;
+    }
+    .filter-btn.active { background: var(--active-btn-bg); color: var(--active-btn-text); border-color: transparent; }
+    .filter-btn:hover:not(.active) { background: var(--btn-hover); color: var(--text-primary); }
+    .refresh-icon-btn {
+      margin-left: auto; width: 32px; height: 32px; background: var(--btn-bg);
+      border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-secondary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px;
+      transition: background .2s, color .2s; flex-shrink: 0;
+    }
+    .refresh-icon-btn:hover { background: var(--btn-hover); color: var(--text-primary); }
+    .ticket-list-scroll { flex: 1; overflow-y: auto; padding: 8px; }
+    .ticket-list-scroll::-webkit-scrollbar { width: 4px; }
+    .ticket-list-scroll::-webkit-scrollbar-track { background: transparent; }
+    .ticket-list-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+
+    .ticket-item {
+      padding: 13px 14px; border-radius: var(--radius-md); border: 1px solid transparent;
+      cursor: pointer; transition: background .2s, border-color .2s; margin-bottom: 6px;
+    }
+    .ticket-item:hover { background: var(--btn-bg); }
+    .ticket-item.selected { background: var(--btn-bg); border-color: rgba(255,255,255,.25); }
+    .ticket-item-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .ticket-token-id { font-size: 11px; font-weight: 600; color: var(--text-secondary); font-family: monospace; letter-spacing: .04em; }
+    .status-badge {
+      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .status-badge.open { background: rgba(74,222,128,.15); color: var(--status-success); border: 1px solid rgba(74,222,128,.3); }
+    .status-badge.closed { background: rgba(170,170,170,.12); color: var(--text-secondary); border: 1px solid rgba(170,170,170,.2); }
+    .ticket-item-subject { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .ticket-item-meta { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+    .ticket-item-meta span { display: flex; align-items: center; gap: 4px; }
+    .has-reply-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-info); display: inline-block; }
+
+    .empty-list { padding: 32px 16px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+    .loading-state { padding: 32px 16px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+    .loading-state i { font-size: 18px; margin-bottom: 8px; display: block; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Right panel – ticket detail */
+    .ticket-detail-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .empty-detail {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-secondary); gap: 12px;
+    }
+    .empty-detail i { font-size: 36px; opacity: .35; }
+    .empty-detail p { font-size: 14px; }
+
+    .detail-content { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .detail-content::-webkit-scrollbar { width: 4px; }
+    .detail-content::-webkit-scrollbar-track { background: transparent; }
+    .detail-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+
+    .detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .detail-title-group { flex: 1; min-width: 0; }
+    .detail-title-group h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; word-break: break-word; }
+    .detail-token-id { font-size: 12px; color: var(--text-secondary); font-family: monospace; letter-spacing: .05em; }
+    .detail-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .status-toggle-btn {
+      padding: 7px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1px solid; transition: all .2s; font-family: inherit;
+    }
+    .status-toggle-btn.open { background: rgba(74,222,128,.12); color: var(--status-success); border-color: rgba(74,222,128,.3); }
+    .status-toggle-btn.open:hover { background: rgba(74,222,128,.22); }
+    .status-toggle-btn.closed { background: rgba(170,170,170,.1); color: var(--text-secondary); border-color: rgba(170,170,170,.25); }
+    .status-toggle-btn.closed:hover { background: rgba(170,170,170,.18); }
+
+    .info-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;
+    }
+    .info-card {
+      background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    .info-card label { display: block; font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 5px; }
+    .info-card .info-value { font-size: 14px; color: var(--text-primary); word-break: break-all; }
+
+    .section-block { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px 18px; }
+    .section-block h3 { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .section-block p { font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+    /* Reply section */
+    .reply-section { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 18px; }
+    .reply-section h3 { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+    .current-reply {
+      background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.22);
+      border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
+      font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+      color: var(--text-primary);
+    }
+    .reply-textarea {
+      width: 100%; min-height: 100px; padding: 12px 14px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px;
+      font-family: inherit; resize: vertical; outline: none; transition: border-color .2s; line-height: 1.6;
+    }
+    .reply-textarea:focus { border-color: rgba(255,255,255,.4); }
+    .reply-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+    .btn-send-reply {
+      padding: 9px 20px; background: var(--active-btn-bg); color: var(--active-btn-text);
+      border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 7px; font-family: inherit;
+      transition: opacity .2s;
+    }
+    .btn-send-reply:hover { opacity: .86; }
+    .btn-send-reply:disabled { opacity: .4; cursor: not-allowed; }
+    .reply-status-msg { font-size: 12px; color: var(--status-success); }
+    .reply-status-msg.error { color: var(--status-error); }
+
+    /* Toast notification */
+    #admin-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(30,30,30,.97); border: 1px solid var(--panel-border); border-radius: var(--radius-md);
+      padding: 12px 20px; font-size: 13px; color: var(--text-primary); opacity: 0;
+      transition: opacity .3s, transform .3s; pointer-events: none; z-index: 9999;
+      backdrop-filter: blur(12px); white-space: nowrap;
+    }
+    #admin-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #admin-toast.success { border-color: rgba(74,222,128,.4); }
+    #admin-toast.error-t { border-color: rgba(248,113,113,.4); }
+
+    /* Scrollbar count badge */
+    .list-count { font-size: 12px; color: var(--text-secondary); padding: 0 16px 10px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1><i class="fas fa-shield-halved" style="color:#aaa;margin-right:8px"></i>Admin Login</h1>
+    <p>A1 Support Panel — Enter admin secret key to continue.</p>
+    <div class="form-group">
+      <label>Admin Secret Key</label>
+      <input type="password" id="admin-secret-input" placeholder="Enter secret key..." autocomplete="off">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="adminLogin()">
+      <i class="fas fa-arrow-right-to-bracket" style="margin-right:6px"></i>Login
+    </button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- Admin App -->
+<div id="admin-app">
+  <header class="admin-header">
+    <h1><i class="fas fa-headset"></i> Help & Support — Admin Panel</h1>
+    <div class="header-actions">
+      <span id="admin-stats" style="font-size:12px;color:var(--text-secondary)"></span>
+      <button class="admin-logout-btn" onclick="adminLogout()">
+        <i class="fas fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+    <!-- Left: Ticket List -->
+    <div class="ticket-list-panel">
+      <div class="panel-toolbar">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" data-filter="open" onclick="setFilter('open',this)">Open</button>
+        <button class="filter-btn" data-filter="closed" onclick="setFilter('closed',this)">Closed</button>
+        <button class="refresh-icon-btn" onclick="loadTickets()" title="Refresh">
+          <i class="fas fa-rotate-right"></i>
+        </button>
+      </div>
+      <div id="list-count" class="list-count"></div>
+      <div class="ticket-list-scroll" id="ticket-list-scroll">
+        <div class="loading-state"><i class="fas fa-circle-notch"></i>Loading tickets…</div>
+      </div>
+    </div>
+
+    <!-- Right: Ticket Detail -->
+    <div class="ticket-detail-panel" id="ticket-detail-panel">
+      <div class="empty-detail" id="detail-empty">
+        <i class="fas fa-ticket"></i>
+        <p>Select a ticket from the list to view details.</p>
+      </div>
+      <div class="detail-content" id="detail-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="admin-toast"></div>
+
+<script>
+  // ── State ───────────────────────────────────────────────────────────────────
+  let _secret = '';
+  let _tickets = [];
+  let _filter = 'all';
+  let _selectedToken = null;
+  let _replyInProgress = false;
+  let _statusInProgress = false;
+
+  // ── Utility ─────────────────────────────────────────────────────────────────
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts * 1000);
+    return d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  }
+  function showToast(msg, type='') {
+    const t = document.getElementById('admin-toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => { t.className = ''; }, 3200);
+  }
+
+  // ── Auth ────────────────────────────────────────────────────────────────────
+  function adminLogin() {
+    const val = document.getElementById('admin-secret-input').value.trim();
+    if (!val) { document.getElementById('login-error').textContent = 'Secret key required.'; return; }
+    _secret = val;
+    document.getElementById('login-btn').disabled = true;
+    document.getElementById('login-error').textContent = '';
+    loadTickets().then(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'flex';
+      document.getElementById('login-btn').disabled = false;
+    }).catch(() => {
+      _secret = '';
+      document.getElementById('login-error').textContent = 'Invalid secret key or server error.';
+      document.getElementById('login-btn').disabled = false;
+    });
+  }
+  function adminLogout() {
+    _secret = ''; _tickets = []; _selectedToken = null; _filter = 'all';
+    document.getElementById('admin-app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-secret-input').value = '';
+    document.getElementById('login-error').textContent = '';
+    renderList();
+    showDetail(null);
+  }
+  document.getElementById('admin-secret-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+
+  // ── API helpers ──────────────────────────────────────────────────────────────
+  async function apiFetch(url, opts={}) {
+    const headers = { 'Content-Type': 'application/json', 'X-Admin-Secret': _secret, ...(opts.headers||{}) };
+    const res = await fetch(url, { ...opts, headers });
+    const json = await res.json();
+    if (!res.ok || json.status === 'error') throw new Error(json.message || 'API error');
+    return json;
+  }
+
+  // ── Load & render ticket list ────────────────────────────────────────────────
+  async function loadTickets() {
+    const url = _filter === 'all' ? '/api/admin/support/tickets' : `/api/admin/support/tickets?status=${_filter}`;
+    const data = await apiFetch(url);
+    _tickets = data.tickets || [];
+    renderList();
+    updateStats();
+    // re-select if still present
+    if (_selectedToken && _tickets.find(t => t.token === _selectedToken)) {
+      showDetail(_tickets.find(t => t.token === _selectedToken));
+    } else if (_selectedToken) {
+      _selectedToken = null;
+      showDetail(null);
+    }
+  }
+
+  function renderList() {
+    const el = document.getElementById('ticket-list-scroll');
+    const countEl = document.getElementById('list-count');
+    if (!_tickets.length) {
+      el.innerHTML = '<div class="empty-list"><i class="fas fa-inbox" style="font-size:22px;margin-bottom:8px;opacity:.4;display:block"></i>No tickets found.</div>';
+      countEl.textContent = '';
+      return;
+    }
+    countEl.textContent = `${_tickets.length} ticket${_tickets.length !== 1 ? 's' : ''}`;
+    el.innerHTML = _tickets.map(t => {
+      const sel = t.token === _selectedToken ? ' selected' : '';
+      const hasReply = t.admin_reply ? '<span class="has-reply-dot" title="Has admin reply"></span>' : '';
+      return `<div class="ticket-item${sel}" onclick="selectTicket('${esc(t.token)}')" data-token="${esc(t.token)}">
+        <div class="ticket-item-row1">
+          <span class="ticket-token-id">${esc(t.token)}</span>
+          <span class="status-badge ${esc(t.status)}">${esc(t.status)}</span>
+        </div>
+        <div class="ticket-item-subject">${esc(t.short_issue)}</div>
+        <div class="ticket-item-meta">
+          <span><i class="fas fa-user" style="font-size:10px"></i>${esc(t.name)}</span>
+          <span><i class="fas fa-clock" style="font-size:10px"></i>${fmtDate(t.created_at)}</span>
+          ${hasReply}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function updateStats() {
+    const open = _tickets.filter(t => t.status === 'open').length;
+    const closed = _tickets.filter(t => t.status === 'closed').length;
+    document.getElementById('admin-stats').textContent = `${open} open · ${closed} closed`;
+  }
+
+  function setFilter(f, btn) {
+    _filter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('ticket-list-scroll').innerHTML = '<div class="loading-state"><i class="fas fa-circle-notch"></i>Loading…</div>';
+    loadTickets().catch(err => showToast('Load error: ' + err.message, 'error-t'));
+  }
+
+  // ── Ticket detail ────────────────────────────────────────────────────────────
+  function selectTicket(token) {
+    const ticket = _tickets.find(t => t.token === token);
+    if (!ticket) return;
+    _selectedToken = token;
+    renderList(); // update selected highlight
+    showDetail(ticket);
+  }
+
+  function showDetail(ticket) {
+    const empty = document.getElementById('detail-empty');
+    const content = document.getElementById('detail-content');
+    if (!ticket) {
+      empty.style.display = 'flex'; content.style.display = 'none'; return;
+    }
+    empty.style.display = 'none'; content.style.display = 'flex';
+
+    const statusClass = ticket.status === 'open' ? 'open' : 'closed';
+    const toggleLabel = ticket.status === 'open' ? '<i class="fas fa-lock"></i> Close Ticket' : '<i class="fas fa-lock-open"></i> Reopen Ticket';
+    const toggleAction = ticket.status === 'open' ? 'closed' : 'open';
+
+    content.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <h2>${esc(ticket.short_issue)}</h2>
+          <div class="detail-token-id"><i class="fas fa-tag" style="margin-right:5px;opacity:.6"></i>${esc(ticket.token)}</div>
+        </div>
+        <div class="detail-actions">
+          <span class="status-badge ${statusClass}" style="font-size:12px;padding:4px 12px">${esc(ticket.status)}</span>
+          <button class="status-toggle-btn ${statusClass}" id="status-toggle-btn" onclick="toggleStatus('${esc(ticket.token)}','${toggleAction}')">
+            ${toggleLabel}
+          </button>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <label><i class="fas fa-user" style="margin-right:4px"></i>Name</label>
+          <div class="info-value">${esc(ticket.name)}</div>
+        </div>
+        <div class="info-card">
+          <label><i class="fas fa-phone" style="margin-right:4px"></i>Contact</label>
+          <div class="info-value">${esc(ticket.contact)}</div>
+        </div>
+        <div class="info-card">
+          <label><i class="fas fa-calendar" style="margin-right:4px"></i>Created</label>
+          <div class="info-value">${fmtDate(ticket.created_at)}</div>
+        </div>
+        <div class="info-card">
+          <label><i class="fas fa-rotate" style="margin-right:4px"></i>Updated</label>
+          <div class="info-value">${fmtDate(ticket.updated_at)}</div>
+        </div>
+        <div class="info-card">
+          <label><i class="fas fa-user-tag" style="margin-right:4px"></i>User Ref</label>
+          <div class="info-value" style="font-size:12px;font-family:monospace">${esc(ticket.user_ref)}</div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h3><i class="fas fa-file-lines" style="margin-right:5px"></i>Issue Details</h3>
+        <p>${esc(ticket.details || '—')}</p>
+      </div>
+
+      <div class="reply-section" id="reply-section">
+        <h3><i class="fas fa-reply" style="margin-right:5px"></i>Admin Reply</h3>
+        ${ticket.admin_reply ? `<div class="current-reply" id="current-reply-box">${esc(ticket.admin_reply)}</div>` : '<p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px">No reply sent yet.</p>'}
+        <textarea class="reply-textarea" id="reply-textarea" placeholder="Type your reply to the user here…">${esc(ticket.admin_reply || '')}</textarea>
+        <div class="reply-actions">
+          <span class="reply-status-msg" id="reply-status-msg"></span>
+          <button class="btn-send-reply" id="send-reply-btn" onclick="sendReply('${esc(ticket.token)}')">
+            <i class="fas fa-paper-plane"></i> Send Reply
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Reply ────────────────────────────────────────────────────────────────────
+  async function sendReply(token) {
+    if (_replyInProgress) return;
+    const textarea = document.getElementById('reply-textarea');
+    const btn = document.getElementById('send-reply-btn');
+    const msg = document.getElementById('reply-status-msg');
+    const reply = (textarea.value || '').trim();
+    if (!reply) { msg.textContent = 'Reply cannot be empty.'; msg.className = 'reply-status-msg error'; return; }
+
+    _replyInProgress = true;
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+    msg.textContent = ''; msg.className = 'reply-status-msg';
+
+    try {
+      const data = await apiFetch(`/api/admin/support/tickets/${encodeURIComponent(token)}/reply`, {
+        method: 'PUT', body: JSON.stringify({ reply, adminSecret: _secret })
+      });
+      const updated = data.ticket;
+      // Update local cache
+      const idx = _tickets.findIndex(t => t.token === token);
+      if (idx !== -1) _tickets[idx] = updated;
+      renderList(); updateStats();
+      showDetail(updated);
+      showToast('Reply sent successfully!', 'success');
+    } catch(err) {
+      msg.textContent = 'Error: ' + err.message; msg.className = 'reply-status-msg error';
+    } finally {
+      _replyInProgress = false;
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reply';
+    }
+  }
+
+  // ── Status toggle ────────────────────────────────────────────────────────────
+  async function toggleStatus(token, newStatus) {
+    if (_statusInProgress) return;
+    _statusInProgress = true;
+    const btn = document.getElementById('status-toggle-btn');
+    if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+    try {
+      const data = await apiFetch(`/api/admin/support/tickets/${encodeURIComponent(token)}/status`, {
+        method: 'PUT', body: JSON.stringify({ status: newStatus, actor: 'admin', adminSecret: _secret })
+      });
+      const updated = data.ticket;
+      const idx = _tickets.findIndex(t => t.token === token);
+      if (idx !== -1) _tickets[idx] = updated;
+      renderList(); updateStats();
+      showDetail(updated);
+      showToast(`Ticket ${newStatus === 'closed' ? 'closed' : 'reopened'}.`, 'success');
+    } catch(err) {
+      showToast('Status update failed: ' + err.message, 'error-t');
+      if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    } finally {
+      _statusInProgress = false;
+    }
+  }
+</script>
+</body>
+</html>
