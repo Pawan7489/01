@@ -3416,7 +3416,7 @@ document.addEventListener('click', (e) => {
     const jumpBtn = e.target.closest('#jump-chat-btn');
     if(jumpBtn) {
         if(navigator.vibrate) navigator.vibrate(30);
-        document.getElementById('close-live-voice')?.click(); 
+        window.openLinkedTextChatFromVoice();
     }
 });
 
@@ -3473,21 +3473,29 @@ window.playAIVoice = (text) => {
 window.processLiveVoiceQuery = (text) => {
     try {
         window.appendLiveVoiceLog(text, "user"); 
+        const safeSessionId = window.currentSessionId || window.createRoomId('voice');
+        window.currentSessionId = safeSessionId;
+        window.currentChatType = 'voice';
+        window.currentChatId = safeSessionId;
+        window.syncRoomUrl('voice', safeSessionId);
         
         // 🚀 FIX: Voice Chat का पहला सवाल हिस्ट्री में सेव करना
         if (window.isFirstMessage && typeof window.chatSessions !== 'undefined') {
             const newEntry = {
-                id: window.currentSessionId || 'voice_' + Date.now(),
+                id: safeSessionId,
                 title: text.length > 30 ? text.substring(0, 30) + "..." : text,
                 type: 'voice',
                 timestamp: Date.now(),
                 isPinned: false,
-                isDeleted: false
+                isDeleted: false,
+                messages: []
             };
             window.chatSessions.unshift(newEntry);
             if(typeof window.saveHistory === 'function') window.saveHistory();
             window.isFirstMessage = false;
         }
+
+        window.saveMessageToSession(safeSessionId, 'user', text);
 
         const status = document.getElementById('live-voice-status');
         if(status) status.innerText = "Processing...";
@@ -3515,9 +3523,35 @@ window.processLiveVoiceQuery = (text) => {
             let aiResponse = `Aapne kaha: "${text}". Main is data ko sync kar raha hoon.`; 
             window.finishThinkingTrace(voiceTraceId, true);
             window.appendLiveVoiceLog(aiResponse, "ai"); 
+            window.saveMessageToSession(safeSessionId, 'ai', aiResponse);
             window.playAIVoice(aiResponse); 
         }, 2000); 
     } catch(e) {}
+};
+
+window.getLinkedTextRoomIdFromVoiceId = function(voiceRoomId) {
+    const base = String(voiceRoomId || '').trim();
+    if (!base) return window.createRoomId('chat');
+    return `txt_${base.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+};
+
+window.openLinkedTextChatFromVoice = function(options = {}) {
+    const voiceInput = document.getElementById('chat-textarea');
+    const draft = String(options.draft ?? voiceInput?.value ?? '').trim();
+    const linkedRoomId = window.getLinkedTextRoomIdFromVoiceId(window.currentSessionId);
+
+    document.getElementById('close-live-voice')?.click();
+    window.openNewChatRoom({ roomId: linkedRoomId });
+
+    if (draft) {
+        const chatInput = document.getElementById('chat-user-input');
+        if (chatInput) {
+            chatInput.value = draft;
+            window.autoResizeInput?.(chatInput);
+            document.getElementById("chat-send-btn")?.classList.remove("hidden");
+            setTimeout(() => chatInput.focus(), 60);
+        }
+    }
 };
 
 
