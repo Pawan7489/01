@@ -2143,6 +2143,80 @@ html body #live-voice-overlay.hidden {
     background: var(--btn-hover, rgba(128, 128, 128, 0.15));
 }
 
+.history-floating-popup {
+    position: fixed;
+    z-index: 100090;
+    width: min(320px, calc(100vw - 20px));
+    background: var(--dropdown-bg, #111827);
+    border: 1.5px solid var(--border-solid, rgba(255,255,255,0.2));
+    border-radius: 14px;
+    box-shadow: 0 20px 38px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    pointer-events: auto;
+}
+
+.history-floating-popup.hidden {
+    display: none;
+}
+
+.history-popup-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+}
+
+.history-popup-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--text-primary, #e5e7eb);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.history-popup-btn i {
+    width: 18px;
+    text-align: center;
+}
+
+.history-popup-btn:hover,
+.history-popup-btn:active {
+    background: var(--btn-hover, rgba(128,128,128,0.2));
+}
+
+.history-popup-btn-danger {
+    color: #f87171;
+}
+
+.history-popup-arrow {
+    position: absolute;
+    width: var(--history-popup-arrow-size, 10px);
+    height: var(--history-popup-arrow-size, 10px);
+    top: var(--history-popup-arrow-top, 50%);
+    background: var(--dropdown-bg, #111827);
+    border-top: 1.5px solid var(--border-solid, rgba(255,255,255,0.2));
+    border-left: 1.5px solid var(--border-solid, rgba(255,255,255,0.2));
+    transform: rotate(-45deg);
+}
+
+.history-floating-popup.arrow-left .history-popup-arrow {
+    left: calc(var(--history-popup-arrow-size, 10px) * -0.5);
+}
+
+.history-floating-popup.arrow-right .history-popup-arrow {
+    right: calc(var(--history-popup-arrow-size, 10px) * -0.5);
+    transform: rotate(135deg);
+}
+
 
 
 

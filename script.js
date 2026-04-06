@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = event.target.value.toLowerCase().trim();
             
             // हिस्ट्री के सारे आइटम्स को ढूँढना
-            const historyItems = document.querySelectorAll('#sidebar-menu .history-item');
+            const historyItems = document.querySelectorAll('#history-list-container .history-item-wrapper, #history-list-container .history-item');
             
             // हर एक हिस्ट्री आइटम को चेक करना
             historyItems.forEach(item => {
@@ -1054,10 +1054,10 @@ window.renderHistoryList = function() {
                     
                     <button class="history-btn-clean" style="width: 100%; display: flex; align-items: center; padding: 14px 16px; background: transparent; border: none; color: ${titleColor}; position: relative; z-index: 10; cursor: pointer; text-align: left;"
                         onclick="window.handleHistoryClick('${chat.id}', event)"
-                        onmousedown="window.startHistoryPress('${chat.id}')" 
+                        onmousedown="window.startHistoryPress('${chat.id}', event)" 
                         onmouseup="window.cancelHistoryPress()" 
                         onmouseleave="window.cancelHistoryPress()" 
-                        ontouchstart="window.startHistoryPress('${chat.id}')" 
+                        ontouchstart="window.startHistoryPress('${chat.id}', event)" 
                         ontouchend="window.cancelHistoryPress()"
                         ontouchmove="window.cancelHistoryPress()">
                         
@@ -1069,30 +1069,6 @@ window.renderHistoryList = function() {
                             <span class="history-type-badge-label">${typeLabel}</span>
                         </span>
                     </button>
-                    
-                    <div id="menu-${chat.id}" class="history-context-menu hidden" style="width: 100%; box-sizing: border-box; background: var(--dropdown-bg, #111827); padding: 8px; border-radius: 0 0 12px 12px; border-top: 1px solid var(--border, rgba(255,255,255,0.1)); pointer-events: auto;">
-                        
-                        <button onclick="window.actionPin('${chat.id}', event)" style="width: 100%; padding: 12px; text-align: left; background: transparent; border: none; color: ${pinColor}; display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
-                            <i class="fas fa-thumbtack" style="width: 20px; text-align:center;"></i> Pin History
-                        </button>
-                        
-                        <button onclick="window.actionRename('${chat.id}', event)" style="width: 100%; padding: 12px; text-align: left; background: transparent; border: none; color: #c084fc; display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
-                            <i class="fas fa-pen" style="width: 20px; text-align:center;"></i> Change History Name
-                        </button>
-                        
-                        <button onclick="window.actionCopy('${chat.id}', event)" style="width: 100%; padding: 12px; text-align: left; background: transparent; border: none; color: #60a5fa; display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
-                            <i class="fas fa-copy" style="width: 20px; text-align:center;"></i> Copy History
-                        </button>
-                        
-                        <button onclick="window.actionDelete('${chat.id}', event)" style="width: 100%; padding: 12px; text-align: left; background: transparent; border: none; color: #f87171; display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
-                            <i class="fas fa-trash" style="width: 20px; text-align:center;"></i> Delete History
-                        </button>
-                        
-                        <button onclick="window.actionHelp('${chat.id}', event)" style="width: 100%; padding: 12px; text-align: left; background: transparent; border: none; color: #4ade80; display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
-                            <i class="fas fa-question-circle" style="width: 20px; text-align:center;"></i> Help
-                        </button>
-
-                    </div>
                 </div>
             `;
         });
@@ -1113,18 +1089,111 @@ window.renderHistoryList = function() {
 // =========================================================
 window.pressTimer = null;
 window.isLongPress = false;
+window.historyPopupTimer = null;
+window.activeHistoryPopupId = null;
 
-window.startHistoryPress = function(id) {
+window.ensureHistoryPopup = function() {
+    let popup = document.getElementById('history-floating-popup');
+    if (popup) return popup;
+    popup = document.createElement('div');
+    popup.id = 'history-floating-popup';
+    popup.className = 'history-floating-popup hidden';
+    popup.innerHTML = `
+        <div class="history-popup-arrow" aria-hidden="true"></div>
+        <div class="history-popup-body">
+            <button id="history-popup-pin-btn" class="history-popup-btn"><i class="fas fa-thumbtack"></i> Pin History</button>
+            <button id="history-popup-rename-btn" class="history-popup-btn"><i class="fas fa-pen"></i> Change History Name</button>
+            <button id="history-popup-copy-btn" class="history-popup-btn"><i class="fas fa-copy"></i> Copy History</button>
+            <button id="history-popup-delete-btn" class="history-popup-btn history-popup-btn-danger"><i class="fas fa-trash"></i> Delete History</button>
+            <button id="history-popup-help-btn" class="history-popup-btn"><i class="fas fa-question-circle"></i> Help</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    const stop = (e) => e.stopPropagation();
+    popup.addEventListener('mousedown', stop);
+    popup.addEventListener('touchstart', stop, { passive: true });
+    return popup;
+};
+
+window.hideHistoryPopup = function() {
+    const popup = document.getElementById('history-floating-popup');
+    if (!popup) return;
+    popup.classList.add('hidden');
+    popup.style.left = '';
+    popup.style.top = '';
+    window.activeHistoryPopupId = null;
+    if (window.historyPopupTimer) {
+        clearTimeout(window.historyPopupTimer);
+        window.historyPopupTimer = null;
+    }
+};
+
+window.showHistoryPopup = function(id, triggerEl) {
+    const popup = window.ensureHistoryPopup();
+    const chat = window.chatSessions.find(c => String(c.id).trim() === String(id).trim());
+    if (!chat || !triggerEl) return;
+    window.activeHistoryPopupId = id;
+
+    const pinBtn = document.getElementById('history-popup-pin-btn');
+    const renameBtn = document.getElementById('history-popup-rename-btn');
+    const copyBtn = document.getElementById('history-popup-copy-btn');
+    const deleteBtn = document.getElementById('history-popup-delete-btn');
+    const helpBtn = document.getElementById('history-popup-help-btn');
+    if (pinBtn) {
+        pinBtn.style.color = chat.isPinned ? '#facc15' : 'var(--text-primary)';
+        pinBtn.onclick = (event) => { window.actionPin(id, event); window.hideHistoryPopup(); };
+    }
+    if (renameBtn) renameBtn.onclick = (event) => { window.actionRename(id, event); window.hideHistoryPopup(); };
+    if (copyBtn) copyBtn.onclick = (event) => { window.actionCopy(id, event); window.hideHistoryPopup(); };
+    if (deleteBtn) deleteBtn.onclick = (event) => { window.actionDelete(id, event); window.hideHistoryPopup(); };
+    if (helpBtn) helpBtn.onclick = (event) => { window.actionHelp(id, event); window.hideHistoryPopup(); };
+
+    popup.classList.remove('hidden');
+    popup.style.visibility = 'hidden';
+    popup.style.left = '0px';
+    popup.style.top = '0px';
+
+    const triggerRect = triggerEl.getBoundingClientRect();
+    const popupRect = popup.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const gap = 12;
+    const arrowSize = 10;
+
+    let left = triggerRect.right + gap;
+    let top = triggerRect.top + (triggerRect.height / 2) - (popupRect.height / 2);
+    let arrowTop = popupRect.height / 2 - 6;
+    let placeLeft = true;
+
+    if (left + popupRect.width > viewportWidth - 8) {
+        placeLeft = false;
+        left = Math.max(8, triggerRect.left - popupRect.width - gap);
+    }
+    if (top < 8) top = 8;
+    if (top + popupRect.height > viewportHeight - 8) top = Math.max(8, viewportHeight - popupRect.height - 8);
+
+    const newArrowTop = (triggerRect.top + triggerRect.height / 2) - top - 6;
+    arrowTop = Math.max(10, Math.min(popupRect.height - 16, newArrowTop));
+
+    popup.classList.toggle('arrow-left', placeLeft);
+    popup.classList.toggle('arrow-right', !placeLeft);
+    popup.style.left = `${Math.round(left)}px`;
+    popup.style.top = `${Math.round(top)}px`;
+    popup.style.setProperty('--history-popup-arrow-top', `${Math.round(arrowTop)}px`);
+    popup.style.setProperty('--history-popup-arrow-size', `${arrowSize}px`);
+    popup.style.visibility = 'visible';
+
+    if (window.historyPopupTimer) clearTimeout(window.historyPopupTimer);
+    window.historyPopupTimer = setTimeout(() => window.hideHistoryPopup(), 8000);
+};
+
+window.startHistoryPress = function(id, event) {
     window.isLongPress = false;
     window.pressTimer = setTimeout(() => {
         window.isLongPress = true; // Hold detect 
         if(typeof triggerVibration === 'function') triggerVibration("heavy");
-        
-        document.querySelectorAll('.history-context-menu').forEach(el => el.classList.add('hidden'));
-        const menu = document.getElementById(`menu-${id}`);
-        if(menu) menu.classList.remove('hidden');
-        
-        setTimeout(() => { if(menu) menu.classList.add('hidden'); }, 8000);
+        const btn = event?.currentTarget || document.querySelector(`#wrapper-${id} .history-btn-clean`);
+        window.showHistoryPopup(id, btn);
     }, 450); 
 };
 
@@ -1138,6 +1207,7 @@ window.handleHistoryClick = function(id, event) {
         event.stopPropagation();
         return; // Long press par chat mat open karo
     }
+    window.hideHistoryPopup();
     window.loadSpecificChat(id); // 1-Tap / Click par open karo
 };
 
@@ -3683,6 +3753,14 @@ document.addEventListener('click', (event) => {
     chatInput.value = chip.dataset.suggestion || chip.textContent || '';
     if (typeof window.autoResizeInput === 'function') window.autoResizeInput(chatInput);
     chatInput.focus();
+});
+
+document.addEventListener('click', (event) => {
+    const popup = document.getElementById('history-floating-popup');
+    if (!popup || popup.classList.contains('hidden')) return;
+    if (!event.target.closest('#history-floating-popup') && !event.target.closest('.history-btn-clean')) {
+        window.hideHistoryPopup();
+    }
 });
 
 
