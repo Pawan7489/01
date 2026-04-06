@@ -831,6 +831,34 @@ window.resolveTextDirectionByContent = function(text) {
     return /[\u0590-\u08FF]/.test(value) ? 'rtl' : 'ltr';
 };
 
+window.getClaudeTypingDelay = function(sourceHTML, typedIndex, baseDelay, maxDelay) {
+    const len = Math.max(1, sourceHTML.length);
+    const progress = typedIndex / len;
+    const currentChar = sourceHTML[typedIndex] || '';
+    const prevChar = sourceHTML[Math.max(0, typedIndex - 1)] || '';
+    const nextChar = sourceHTML[Math.min(len - 1, typedIndex + 1)] || '';
+
+    const variance = Math.max(1, maxDelay - baseDelay);
+    let delay = baseDelay + Math.floor(Math.random() * (variance + 1));
+
+    if (progress < 0.2) delay += Math.round((0.2 - progress) * 90);
+    if (progress > 0.82) delay += Math.round((progress - 0.82) * 36);
+
+    if (prevChar === '.' || prevChar === '!' || prevChar === '?' || prevChar === '।') delay += 170;
+    else if (prevChar === ',' || prevChar === ';' || prevChar === ':') delay += 100;
+
+    if (currentChar === ' ') delay += 12 + Math.floor(Math.random() * 20);
+    if (nextChar === '\n') delay += 55;
+    if (/[A-Z]/.test(currentChar)) delay += 10;
+    if (/[0-9]/.test(currentChar)) delay += 8;
+
+    const microBursts = (typedIndex % 11 === 0) ? 14 : 0;
+    const breathBreak = (typedIndex % 37 === 0) ? 35 : 0;
+    delay += microBursts + breathBreak;
+
+    return Math.max(8, Math.min(320, delay));
+};
+
 window.humanTypeHTML = async function(element, html, options = {}) {
     if (!element || element.dataset.humanTypingRunning === 'true') return;
     const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -878,9 +906,8 @@ window.humanTypeHTML = async function(element, html, options = {}) {
         } else {
             output += sourceHTML[i];
             i++;
-            let delay = Math.floor(Math.random() * (maxDelay - baseDelay + 1)) + baseDelay;
-            const prev = sourceHTML[i - 1];
-            if (prev === '.' || prev === ',' || prev === '!' || prev === '?') delay += 120;
+            const charIndex = Math.max(0, i - 1);
+            let delay = window.getClaudeTypingDelay(sourceHTML, charIndex, baseDelay, maxDelay);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
 
